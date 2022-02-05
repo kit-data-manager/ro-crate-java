@@ -1,0 +1,7 @@
+{
+  "@id": "mailto:tim.luckett@uts.edu.au",
+  "@type": "ContactPoint",
+  "contactType": "customer service",
+  "email": "tim.luckett@uts.edu.au",
+  "telephone": "0999444"
+}

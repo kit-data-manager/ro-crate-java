@@ -1,0 +1,27 @@
+{
+  "@context" : "https://w3id.org/ro/crate/1.1/context",
+  "@graph" : [ {
+    "@id" : "./",
+    "@type" : "Dataset",
+    "hasPart" : {
+      "@id" : "survey-responses-2019.csv"
+    },
+    "name" : "minimal",
+    "description" : "minimal RO_crate"
+  }, {
+    "@id" : "ro-crate-metadata.json",
+    "@type" : "CreativeWork",
+    "about" : {
+      "@id" : "./"
+    },
+    "conformsTo" : {
+      "@id" : "https://w3id.org/ro/crate/1.1"
+    }
+  }, {
+    "@id" : "survey-responses-2019.csv",
+    "@type" : "File",
+    "name" : "Survey responses",
+    "contentSize" : "26452",
+    "encodingFormat" : "text/csv"
+  } ]
+}
