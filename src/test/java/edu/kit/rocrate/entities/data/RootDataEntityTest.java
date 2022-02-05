@@ -37,6 +37,8 @@ public class RootDataEntityTest {
             "Palliative care planning for nursing home residents with advanced dementia ...")
         .addToHasPart(file1)
         .addToHasPart(file2)
+        .addAuthor("a1")
+        .addAuthor("a2")
         .build();
 
     InputStream inputStream =

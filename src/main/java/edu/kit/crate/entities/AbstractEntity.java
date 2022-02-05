@@ -3,13 +3,16 @@ package edu.kit.crate.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.lang.reflect.Array;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -74,6 +77,18 @@ public class AbstractEntity {
     if (name != null && id != null) {
       this.properties.set(name, MyObjectMapper.getMapper().createObjectNode().put("@id", id));
     }
+  }
+
+  public void addIdListProperties(String name, List<String> stringList) {
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    ArrayNode node = (ArrayNode) this.properties.get(name);
+    if (node == null) {
+      node = objectMapper.createArrayNode();
+    }
+    for (String s : stringList) {
+      node.add(objectMapper.createObjectNode().put("@id", s));
+    }
+    this.properties.set(name, node);
   }
 
   public void addType(String type) {

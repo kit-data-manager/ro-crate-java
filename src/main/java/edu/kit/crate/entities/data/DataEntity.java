@@ -2,8 +2,12 @@ package edu.kit.crate.entities.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.kit.crate.entities.AbstractEntity;
+import edu.kit.crate.entities.contextual.ContextualEntity;
+import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +23,7 @@ public class DataEntity extends AbstractEntity {
 
   public DataEntity(ADataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
+    this.addIdListProperties("author", entityBuilder.authors);
     this.location = entityBuilder.location;
   }
 
@@ -54,6 +59,7 @@ public class DataEntity extends AbstractEntity {
       AEntityBuilder<T> {
 
     File location;
+    List<String> authors = new ArrayList<>();
 
     public T setLocation(File file) {
       this.location = file;
@@ -61,12 +67,17 @@ public class DataEntity extends AbstractEntity {
     }
 
     public T setLicense(String id) {
-      this.addIdProperty("licence", id);
+      this.addIdProperty("license", id);
       return self();
     }
 
-    public T setAuthor(String id) {
-      this.addIdProperty("author", id);
+    public T setLicense(ContextualEntity license) {
+      this.addIdProperty("licence", license.getId());
+      return self();
+    }
+
+    public T addAuthor(String id) {
+      this.authors.add(id);
       return self();
     }
 
