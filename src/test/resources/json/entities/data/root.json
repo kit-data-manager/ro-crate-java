@@ -13,7 +13,7 @@
       "@id": "file2_id"
     }
   ],
-  "authors": [
+  "author": [
     {
       "@id": "a1"
     },

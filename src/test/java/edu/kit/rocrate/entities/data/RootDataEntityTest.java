@@ -26,6 +26,8 @@ public class RootDataEntityTest {
 
     FileEntity file2 = new FileEntity.FileEntityBuilder()
         .setId("file2_id")
+        .addIdProperty("name", "dsklfajs")
+        .addIdProperty("name", "11111111")
         .build();
 
     RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()

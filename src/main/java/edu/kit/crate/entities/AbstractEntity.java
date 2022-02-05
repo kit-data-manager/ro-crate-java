@@ -139,7 +139,21 @@ public class AbstractEntity {
 
     public T addIdProperty(String name, String id) {
       if (name != null && id != null) {
-        this.properties.set(name, MyObjectMapper.getMapper().createObjectNode().put("@id", id));
+        if (this.properties.get(name) == null) {
+          this.properties.set(name, MyObjectMapper.getMapper().createObjectNode().put("@id", id));
+        } else {
+          JsonNode nodes = this.properties.get(name);
+          if (nodes.isArray()) {
+            ArrayNode ns = (ArrayNode) nodes;
+            ns.add(MyObjectMapper.getMapper().createObjectNode().put("@id", id));
+            this.properties.set(name, ns);
+          } else {
+            ArrayNode newNodes = MyObjectMapper.getMapper().createArrayNode();
+            newNodes.add(nodes);
+            newNodes.add(MyObjectMapper.getMapper().createObjectNode().put("@id", id));
+            this.properties.set(name, newNodes);
+          }
+        }
       }
       return self();
     }
