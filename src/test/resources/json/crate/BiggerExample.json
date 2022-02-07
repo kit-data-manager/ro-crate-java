@@ -31,12 +31,6 @@
       "license": {"@id": "https://creativecommons.org/licenses/by/4.0/"}
     },
     {
-      "@id": "https://creativecommons.org/licenses/by/4.0/",
-      "@type": "CreativeWork",
-      "name": "CC BY 4.0",
-      "description": "Creative Commons Attribution 4.0 International License"
-    },
-    {
       "@id": "map.pdf",
       "@type": "File",
       "name": "Map of measurements",
@@ -53,6 +47,12 @@
       "familyName": "Tzotchev",
       "nationality": {"@id": "https://www.geonames.org/2921044"},
       "affiliation": {"@id": "https://www.geonames.org/7288147"}
+    },
+    {
+      "@id": "https://creativecommons.org/licenses/by/4.0/",
+      "@type": "CreativeWork",
+      "name": "CC BY 4.0",
+      "description": "Creative Commons Attribution 4.0 International License"
     },
     {
       "@id": "https://www.geonames.org/2921044",

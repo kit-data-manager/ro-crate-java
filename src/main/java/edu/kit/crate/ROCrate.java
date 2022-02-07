@@ -123,6 +123,7 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder setLicense(ContextualEntity license) {
       this.license = license;
+      this.rootDataEntity.addIdProperty("license", license.getId());;
       return this;
     }
 

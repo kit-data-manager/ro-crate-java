@@ -7,10 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,14 +79,22 @@ public class AbstractEntity {
 
   public void addIdListProperties(String name, List<String> stringList) {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ArrayNode node = (ArrayNode) this.properties.get(name);
-    if (node == null) {
+    ArrayNode node = objectMapper.createArrayNode();
+    if (this.properties.get(name) == null) {
       node = objectMapper.createArrayNode();
+    } else {
+      if (!this.properties.get(name).isArray()) {
+        node.add(this.properties.get(name));
+      }
     }
     for (String s : stringList) {
       node.add(objectMapper.createObjectNode().put("@id", s));
     }
-    this.properties.set(name, node);
+    if (node.size() == 1) {
+      this.properties.set(name, node.get(0));
+    } else {
+      this.properties.set(name, node);
+    }
   }
 
   public void addType(String type) {

@@ -3,7 +3,6 @@ package edu.kit.crate.entities.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
