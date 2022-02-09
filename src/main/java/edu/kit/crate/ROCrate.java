@@ -17,6 +17,7 @@ import edu.kit.crate.payload.ROCratePayload;
 import edu.kit.crate.preview.IROCratePreview;
 import edu.kit.crate.preview.ROCratePreview;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Nikola Tzotchev on 6.2.2022 г.
@@ -63,6 +64,11 @@ public class ROCrate implements IROCrate {
   @Override
   public DataEntity getDataEntityById(String id) {
     return this.roCratePayload.getDataEntityById(id);
+  }
+
+  @Override
+  public List<DataEntity> getAllDataEntities() {
+    return this.roCratePayload.getAllDataEntities();
   }
 
   @Override
