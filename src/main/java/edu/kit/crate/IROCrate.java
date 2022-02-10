@@ -1,8 +1,10 @@
 package edu.kit.crate;
 
+import edu.kit.crate.context.IROCrateMetadataContext;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
+import edu.kit.crate.entities.data.RootDataEntity;
 import java.util.List;
 
 /**
@@ -10,11 +12,28 @@ import java.util.List;
  * @version 1
  */
 public interface IROCrate {
+
+  void setMetadataContext(IROCrateMetadataContext metadataContext);
+
+  RootDataEntity getRootDataEntity();
+
+  void setRootDataEntity(RootDataEntity rootDataEntity);
+
+  DataEntity getJsonDescriptor();
+
+  void setJsonDescriptor(DataEntity jsonDescriptor);
+
   public String getJsonMetadata();
-  public DataEntity getDataEntityById(String id);
+
+  public DataEntity getDataEntityById(java.lang.String id);
+
   public List<DataEntity> getAllDataEntities();
-  public ContextualEntity getContextualEntityById(String id);
-  public AbstractEntity getEntityById(String id);
+
+  public ContextualEntity getContextualEntityById(java.lang.String id);
+
+  public AbstractEntity getEntityById(java.lang.String id);
+
   public void addDataEntity(DataEntity entity);
+
   public void addContextualEntity(ContextualEntity entity);
 }

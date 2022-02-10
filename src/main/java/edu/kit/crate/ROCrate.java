@@ -1,6 +1,5 @@
 package edu.kit.crate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,7 +8,6 @@ import edu.kit.crate.context.ROCrateMetadataContext;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
-import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
@@ -33,6 +31,31 @@ public class ROCrate implements IROCrate {
   private IROCratePreview roCratePreview;
   private RootDataEntity rootDataEntity;
   private DataEntity jsonDescriptor;
+
+
+  public void setMetadataContext(IROCrateMetadataContext metadataContext) {
+    this.metadataContext = metadataContext;
+  }
+
+  public DataEntity getJsonDescriptor() {
+    return jsonDescriptor;
+  }
+
+  public void setJsonDescriptor(DataEntity jsonDescriptor) {
+    this.jsonDescriptor = jsonDescriptor;
+  }
+
+  public RootDataEntity getRootDataEntity() {
+    return rootDataEntity;
+  }
+
+  public void setRootDataEntity(RootDataEntity rootDataEntity) {
+    this.rootDataEntity = rootDataEntity;
+  }
+
+  public ROCrate() {
+    this.roCratePayload = new ROCratePayload();
+  }
 
   public ROCrate(ROCrateBuilder roCrateBuilder) {
     this.roCratePayload = roCrateBuilder.payload;
@@ -62,7 +85,7 @@ public class ROCrate implements IROCrate {
   }
 
   @Override
-  public DataEntity getDataEntityById(String id) {
+  public DataEntity getDataEntityById(java.lang.String id) {
     return this.roCratePayload.getDataEntityById(id);
   }
 
@@ -100,7 +123,7 @@ public class ROCrate implements IROCrate {
     RootDataEntity rootDataEntity;
     DataEntity jsonDescriptor;
 
-    public ROCrateBuilder(String name, String description) {
+    public ROCrateBuilder(java.lang.String name, java.lang.String description) {
       this.payload = new ROCratePayload();
       this.preview = new ROCratePreview();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
@@ -129,7 +152,8 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder setLicense(ContextualEntity license) {
       this.license = license;
-      this.rootDataEntity.addIdProperty("license", license.getId());;
+      this.rootDataEntity.addIdProperty("license", license.getId());
+      ;
       return this;
     }
 
@@ -138,12 +162,12 @@ public class ROCrate implements IROCrate {
       return this;
     }
 
-    public ROCrateBuilder addURLToContext(String url) {
+    public ROCrateBuilder addURLToContext(java.lang.String url) {
       this.metadataContext.addToContextFromUrl(url);
       return this;
     }
 
-    public ROCrateBuilder addValuePairToContext(String key, String value) {
+    public ROCrateBuilder addValuePairToContext(java.lang.String key, java.lang.String value) {
       this.metadataContext.addToContext(key, value);
       return this;
     }

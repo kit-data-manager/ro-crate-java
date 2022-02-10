@@ -1,11 +1,9 @@
 package edu.kit.crate.context;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.util.ArrayList;
@@ -34,6 +32,26 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     this.other = new HashMap<>();
   }
 
+  public ROCrateMetadataContext(JsonNode context) {
+    this.url = new ArrayList<>();
+    this.other = new HashMap<>();
+    if (context.isArray()) {
+        for (JsonNode jsonNode : context) {
+          if (jsonNode.isTextual()) {
+            this.url.add(jsonNode.asText());
+          } else {
+            var iterate = jsonNode.fields();
+            while (iterate.hasNext()) {
+              var next = iterate.next();
+              this.other.put(next.getKey(), next.getValue().toString());
+            }
+          }
+        }
+    } else {
+      this.url.add(context.asText());
+    }
+  }
+
   @Override
   public ObjectNode getContextJsonEntity() {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
@@ -46,12 +64,10 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     for (HashMap.Entry<String, String> s : other.entrySet()) {
       jsonNode.put(s.getKey(), s.getValue());
     }
-    if (!jsonNode.isEmpty())
-    {
+    if (!jsonNode.isEmpty()) {
       array.add(jsonNode);
     }
-    if (array.size() == 1)
-    {
+    if (array.size() == 1) {
       finalNode.set("@context", array.get(0));
       return finalNode;
     }
