@@ -35,6 +35,9 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
       Map.Entry<String, JsonNode> field = fields.next();
       String fieldName = field.getKey();
       JsonNode fieldValue = field.getValue();
+      if (fieldValue.isNull()) {
+        continue;
+      }
       // if the type array contains only one type set it as String
       //  if (fieldName.equals("@type")) {
       if (fieldValue.isArray()) {
