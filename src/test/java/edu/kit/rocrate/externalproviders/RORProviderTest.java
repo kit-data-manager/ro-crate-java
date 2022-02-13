@@ -2,13 +2,11 @@ package edu.kit.rocrate.externalproviders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
 import edu.kit.crate.externalproviders.organizationprovider.RORProvider;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import edu.kit.rocrate.entities.contextual.PersonEntityTest;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Test;

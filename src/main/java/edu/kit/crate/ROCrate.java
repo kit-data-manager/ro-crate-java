@@ -13,7 +13,7 @@ import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
 import edu.kit.crate.preview.IROCratePreview;
-import edu.kit.crate.preview.ROCratePreview;
+import edu.kit.crate.preview.DefaultPreview;
 import java.util.Collections;
 import java.util.List;
 
@@ -125,7 +125,7 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder(java.lang.String name, java.lang.String description) {
       this.payload = new ROCratePayload();
-      this.preview = new ROCratePreview();
+      this.preview = new DefaultPreview();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .addProperty("name", name)
