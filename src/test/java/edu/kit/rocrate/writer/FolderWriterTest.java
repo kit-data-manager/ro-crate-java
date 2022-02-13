@@ -86,7 +86,7 @@ public class FolderWriterTest {
 
     Path result = tempDir.resolve("dest");
     folderRoCrateWriter.save(roCrate, result.toFile().toString());
-    FileUtils.copyDirectory(result.toFile(), new File("test"));
+    // FileUtils.copyDirectory(result.toFile(), new File("test"));
     assertTrue(compareTwoDir(result.toFile(), roDir.toFile()));
 
     // just so we know the metadata is still valid
