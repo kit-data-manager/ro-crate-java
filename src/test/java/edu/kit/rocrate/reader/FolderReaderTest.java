@@ -17,6 +17,8 @@ import edu.kit.crate.reader.ROCrateReader;
 import edu.kit.crate.writer.FolderWriter;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.rocrate.writer.FolderWriterTest;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -76,7 +78,7 @@ public class FolderReaderTest {
 
   @Test
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
-    Path file = temp.resolve("file.csv");
+    Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
@@ -109,6 +111,8 @@ public class FolderReaderTest {
 
     writer.save(res, destinationDir.toFile().toString());
 
+    // that copies the directory locally to see its content
+    //FileUtils.copyDirectory(locationSource.toFile(), new File("test"));
     assertTrue(FolderWriterTest.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();

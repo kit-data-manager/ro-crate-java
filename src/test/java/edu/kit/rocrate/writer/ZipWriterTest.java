@@ -10,6 +10,7 @@ import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.preview.PreviewGenerator;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.crate.writer.ZipWriter;
 import java.io.IOException;
@@ -41,6 +42,9 @@ public class ZipWriterTest {
 
     Path json = roDir.resolve("ro-crate-metadata.json");
     FileUtils.copyInputStreamToFile(fileJson, json.toFile());
+
+    PreviewGenerator.generatePreview(roDir.toString());
+
     Path file1 = roDir.resolve("input.txt");
     FileUtils.writeStringToFile(file1.toFile(), "content of Local File", Charset.defaultCharset());
     Path dirInCrate = roDir.resolve("dir");
@@ -115,6 +119,9 @@ public class ZipWriterTest {
 
     Path json = roDir.resolve("ro-crate-metadata.json");
     FileUtils.copyInputStreamToFile(fileJson, json.toFile());
+
+    PreviewGenerator.generatePreview(roDir.toString());
+
     Path file1 = roDir.resolve("input.txt");
     FileUtils.writeStringToFile(file1.toFile(), "content of Local File", Charset.defaultCharset());
     Path dirInCrate = roDir.resolve("dir");

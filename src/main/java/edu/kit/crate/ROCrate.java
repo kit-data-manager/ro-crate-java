@@ -33,6 +33,11 @@ public class ROCrate implements IROCrate {
   private DataEntity jsonDescriptor;
 
 
+  @Override
+  public IROCratePreview getPreview() {
+    return this.roCratePreview;
+  }
+
   public void setMetadataContext(IROCrateMetadataContext metadataContext) {
     this.metadataContext = metadataContext;
   }
@@ -55,6 +60,8 @@ public class ROCrate implements IROCrate {
 
   public ROCrate() {
     this.roCratePayload = new ROCratePayload();
+    this.roCratePreview = new DefaultPreview();
+    this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
   }
 
   public ROCrate(ROCrateBuilder roCrateBuilder) {
@@ -123,7 +130,7 @@ public class ROCrate implements IROCrate {
     RootDataEntity rootDataEntity;
     DataEntity jsonDescriptor;
 
-    public ROCrateBuilder(java.lang.String name, java.lang.String description) {
+    public ROCrateBuilder(String name, String description) {
       this.payload = new ROCratePayload();
       this.preview = new DefaultPreview();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
@@ -153,7 +160,6 @@ public class ROCrate implements IROCrate {
     public ROCrateBuilder setLicense(ContextualEntity license) {
       this.license = license;
       this.rootDataEntity.addIdProperty("license", license.getId());
-      ;
       return this;
     }
 

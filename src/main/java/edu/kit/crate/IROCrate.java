@@ -5,6 +5,8 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
+import edu.kit.crate.preview.IROCratePreview;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,7 @@ import java.util.List;
  * @version 1
  */
 public interface IROCrate {
+  IROCratePreview getPreview();
 
   void setMetadataContext(IROCrateMetadataContext metadataContext);
 

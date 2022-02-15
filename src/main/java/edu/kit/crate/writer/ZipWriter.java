@@ -37,6 +37,8 @@ public class ZipWriter implements IWriterStrategy {
       InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
       // write the ro-crate-metadata
       zipFile.addStream(inputStream, zipParameters);
+
+      crate.getPreview().saveALLToZip(zipFile);
     } catch (ZipException | JsonProcessingException e) {
       System.out.println("Exception writing ro-crate-metadata.json file to zip");
       e.printStackTrace();
