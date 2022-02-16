@@ -112,8 +112,11 @@ public class ROCrate implements IROCrate {
   }
 
   @Override
-  public void addDataEntity(DataEntity entity) {
+  public void addDataEntity(DataEntity entity, Boolean toHasPart) {
     this.roCratePayload.addDataEntity(entity);
+    if (toHasPart) {
+      this.rootDataEntity.addToHasPart(entity.getId());
+    }
   }
 
   @Override

@@ -10,6 +10,7 @@ import edu.kit.crate.context.ROCrateMetadataContext;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
+
 import java.io.File;
 import java.nio.file.Path;
 
@@ -29,6 +30,7 @@ public class ROCrateReader {
   /**
    * This function will read the location (using one of the specified strategies) and then
    * build the relation between the entities
+   *
    * @param location the location of the ro-crate to be read
    * @return the read RO-crate
    */
@@ -57,7 +59,7 @@ public class ROCrateReader {
           DataEntity dataEntity = new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build();
           File loc = checkFolderHasFile(dataEntity.getId(), files);
           dataEntity.setLocation(loc);
-          this.crate.addDataEntity(dataEntity);
+          this.crate.addDataEntity(dataEntity, false);
         } else {
           // contextual entity
           this.crate.addContextualEntity(
@@ -75,33 +77,35 @@ public class ROCrateReader {
     }
     return null;
   }
+
   // gets the entities that every crate should have
   // we will need the root dataset to distinguish between data entities and contextual entities
   private ArrayNode setRootEntities(ArrayNode graph) {
 
     // for now, we make an empty ArrayNode and putt all the entities that still need to be processed there
     var graphCopy = graph.deepCopy();
-    graphCopy.removeAll();
-
-    for (JsonNode node : graph) {
-      JsonNode type = node.get("@type");
-      if (!type.isArray()) {
-
-        String t = type.asText();
-
-        if (t.equals("Dataset") && node.get("@id").asText().equals("./")) {
-          // set root data entity
-          this.crate.setRootDataEntity(
-              new RootDataEntity.RootDataEntityBuilder().setAll(node.deepCopy()).build()
-          );
-        } else if (t.equals("CreativeWork") && node.get("@id").asText()
-            .equals("ro-crate-metadata.json")) {
-          // set the json descriptor
+    // use the algorithm described here: https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
+    for (int i = 0; i < graph.size() ; i++) {
+      JsonNode node = graph.get(i);
+      JsonNode type = node.get("conformsTo");
+      if (type != null) {
+        String uri = type.get("@id").asText();
+        if (uri.matches("https://w3id.org/ro/crate/.*")) {
           this.crate.setJsonDescriptor(
-              new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build()
-          );
-        } else {
-          graphCopy.add(node);
+              new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build());
+          graphCopy.remove(i);
+          String id = node.get("about").get("@id").asText();
+          for (int j = 0; j < graphCopy.size() ;j++ ) {
+            ObjectNode secondIteration = graphCopy.get(j).deepCopy();
+            if (secondIteration.get("@id").asText().equals(id)) {
+              // root data entity
+              this.crate.setRootDataEntity(
+                  new RootDataEntity.RootDataEntityBuilder().setAll(secondIteration.deepCopy()).build()
+              );
+              graphCopy.remove(j);
+              break;
+            }
+          }
         }
       }
     }

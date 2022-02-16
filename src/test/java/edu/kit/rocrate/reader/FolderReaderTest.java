@@ -159,7 +159,7 @@ public class FolderReaderTest {
         .setId("new_file")
         .setEncodingFormat("setnew")
         .setLocation(newFile.toFile())
-        .build());
+        .build(), true);
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());

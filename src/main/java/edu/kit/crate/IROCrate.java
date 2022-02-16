@@ -36,7 +36,7 @@ public interface IROCrate {
 
   public AbstractEntity getEntityById(java.lang.String id);
 
-  public void addDataEntity(DataEntity entity);
+  public void addDataEntity(DataEntity entity, Boolean toHasPart);
 
   public void addContextualEntity(ContextualEntity entity);
 }

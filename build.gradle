@@ -19,9 +19,11 @@ dependencies {
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
     implementation group: 'com.github.jsonld-java', name: 'jsonld-java', version: '0.13.3'
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.9.0'
+    implementation 'com.github.fslev:json-compare:2.39'
+
 
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.1.0'
-    implementation 'org.glassfish:jakarta.json:2.0.1'
+    testImplementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
 test {

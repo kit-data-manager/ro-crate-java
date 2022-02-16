@@ -43,7 +43,7 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
             var iterate = jsonNode.fields();
             while (iterate.hasNext()) {
               var next = iterate.next();
-              this.other.put(next.getKey(), next.getValue().toString());
+              this.other.put(next.getKey(), next.getValue().asText());
             }
           }
         }
