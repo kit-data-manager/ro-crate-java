@@ -1,11 +1,10 @@
 package edu.kit.crate.payload;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
-import java.util.Collection;
+
 import java.util.List;
 
 /**
@@ -13,14 +12,25 @@ import java.util.List;
  * @version 1
  */
 public interface IROCratePayload {
-  public DataEntity getDataEntityById(String id);
-  public ContextualEntity getContextualEntityById(String id);
-  public AbstractEntity getEntityById(String id);
-  public void addDataEntity(DataEntity dataEntity);
-  public void addContextualEntity(ContextualEntity contextualEntity);
-  public List<AbstractEntity> getAllEntities();
-  public List<DataEntity> getAllDataEntities();
-  public List<ContextualEntity> getAllContextualEntities();
+  DataEntity getDataEntityById(String id);
 
-  public ArrayNode getEntitiesMetadata();
+  ContextualEntity getContextualEntityById(String id);
+
+  AbstractEntity getEntityById(String id);
+
+  void addDataEntity(DataEntity dataEntity);
+
+  void addContextualEntity(ContextualEntity contextualEntity);
+
+  List<AbstractEntity> getAllEntities();
+
+  List<DataEntity> getAllDataEntities();
+
+  List<ContextualEntity> getAllContextualEntities();
+
+  ArrayNode getEntitiesMetadata();
+
+  void removeEntityById(String id);
+
+  void removeAllOccurrencesOf(String entityId);
 }

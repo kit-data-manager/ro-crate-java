@@ -94,4 +94,17 @@ public class ROCratePayload implements IROCratePayload {
     }
     return node;
   }
+
+  @Override
+  public void removeEntityById(String id) {
+    this.dataEntities.entrySet().removeIf(e -> e.getValue().getId().equals(id));
+    this.contextualEntities.entrySet().removeIf(e -> e.getValue().getId().equals(id));
+  }
+
+  @Override
+  public void removeAllOccurrencesOf(String entityId) {
+    for (var e : this.getAllEntities()) {
+      e.setProperties(ValueRemoverFromEntity.removeFieldsWith(entityId, e.getProperties()));
+    }
+  }
 }

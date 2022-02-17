@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.util.HashSet;
@@ -34,6 +35,10 @@ public class AbstractEntity {
   @JsonUnwrapped
   @JsonSerialize(using = ObjectNodeSerializer.class)
   private ObjectNode properties;
+
+  public void setProperties(JsonNode obj) {
+    this.properties = obj.deepCopy();
+  }
 
   public ObjectNode getProperties() {
     if (this.types != null) {

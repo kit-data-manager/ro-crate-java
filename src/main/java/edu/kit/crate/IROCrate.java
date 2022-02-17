@@ -26,17 +26,19 @@ public interface IROCrate {
 
   void setJsonDescriptor(DataEntity jsonDescriptor);
 
-  public String getJsonMetadata();
+  String getJsonMetadata();
 
-  public DataEntity getDataEntityById(java.lang.String id);
+  DataEntity getDataEntityById(java.lang.String id);
 
-  public List<DataEntity> getAllDataEntities();
+  List<DataEntity> getAllDataEntities();
 
-  public ContextualEntity getContextualEntityById(java.lang.String id);
+  ContextualEntity getContextualEntityById(java.lang.String id);
 
-  public AbstractEntity getEntityById(java.lang.String id);
+  AbstractEntity getEntityById(java.lang.String id);
 
-  public void addDataEntity(DataEntity entity, Boolean toHasPart);
+  void addDataEntity(DataEntity entity, Boolean toHasPart);
 
-  public void addContextualEntity(ContextualEntity entity);
+  void addContextualEntity(ContextualEntity entity);
+
+  void deleteEntityById(String entityId);
 }
