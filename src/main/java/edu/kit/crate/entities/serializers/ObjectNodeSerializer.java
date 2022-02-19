@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import edu.kit.crate.special.JsonHelpFunctions;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,12 +31,16 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
   public void serialize(ObjectNode value, JsonGenerator jgen, SerializerProvider provider)
       throws IOException, JsonGenerationException {
 
-    Iterator<Entry<String, JsonNode>> fields = value.fields();
+    JsonNode node = JsonHelpFunctions.unwrapSingleArray(value);
+    Iterator<Entry<String, JsonNode>> fields = node.fields();
 
     while (fields.hasNext()) {
       Map.Entry<String, JsonNode> field = fields.next();
       String fieldName = field.getKey();
       JsonNode fieldValue = field.getValue();
+      if (fieldValue.isObject() && fieldValue.size() == 0) {
+        continue;
+      }
       if (fieldValue.isNull()) {
         continue;
       }
@@ -43,9 +49,6 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
       if (fieldValue.isArray()) {
         if (fieldValue.isEmpty()) {
           continue;
-        }
-        if (fieldValue.size() == 1) {
-          fieldValue = fieldValue.get(0);
         }
       }
       jgen.writeFieldName(fieldName);

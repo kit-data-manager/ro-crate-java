@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class MyObjectMapper {
 
-  private static ObjectMapper mapper = new ObjectMapper().enable(
+  private static final ObjectMapper mapper = new ObjectMapper().enable(
           SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED).enable(
-          DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+          DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY).enable(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS);
 
   private MyObjectMapper() {
 

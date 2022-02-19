@@ -7,6 +7,8 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.special.JsonHelpFunctions;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -104,7 +106,7 @@ public class ROCratePayload implements IROCratePayload {
   @Override
   public void removeAllOccurrencesOf(String entityId) {
     for (var e : this.getAllEntities()) {
-      e.setProperties(ValueRemoverFromEntity.removeFieldsWith(entityId, e.getProperties()));
+      e.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, e.getProperties()));
     }
   }
 }

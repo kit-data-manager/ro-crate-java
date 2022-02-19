@@ -12,7 +12,7 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
-import edu.kit.crate.payload.ValueRemoverFromEntity;
+import edu.kit.crate.special.JsonHelpFunctions;
 import edu.kit.crate.preview.IROCratePreview;
 import edu.kit.crate.preview.DefaultPreview;
 
@@ -133,8 +133,8 @@ public class ROCrate implements IROCrate {
     // firstly search the root data entity and the descriptor
     this.roCratePayload.removeAllOccurrencesOf(entityId);
     // also remove in the root data entity and the descriptor
-    this.rootDataEntity.setProperties(ValueRemoverFromEntity.removeFieldsWith(entityId, this.rootDataEntity.getProperties()));
-    this.jsonDescriptor.setProperties(ValueRemoverFromEntity.removeFieldsWith(entityId, this.jsonDescriptor.getProperties()));
+    this.rootDataEntity.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties()));
+    this.jsonDescriptor.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties()));
   }
 
   static final public class ROCrateBuilder {

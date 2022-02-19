@@ -33,12 +33,12 @@ public class TestRemoveAddEntity {
     JsonNode node = objectMapper.readTree(roCrate.getJsonMetadata());
     JSONCompare.assertEquals(node, expectedJson, CompareMode.JSON_ARRAY_NON_EXTENSIBLE);
 
-
+    // remove entity and check if equals to the basic crate
     InputStream empty =
         SerializationTest.class.getResourceAsStream("/json/crate/simple.json");
     JsonNode emptyNode = objectMapper.readTree(empty);
     roCrate.deleteEntityById("survey-responses-2019.csv");
     node = objectMapper.readTree(roCrate.getJsonMetadata());
-    JSONCompare.assertNotEquals(node, emptyNode, CompareMode.JSON_ARRAY_NON_EXTENSIBLE);
+    JSONCompare.assertEquals(node, emptyNode, CompareMode.JSON_ARRAY_NON_EXTENSIBLE);
   }
 }
