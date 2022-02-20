@@ -26,6 +26,8 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
     - name: Install Dependencies
       run: npm install ro-crate-html-js
     - name: Build with Gradle
