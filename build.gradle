@@ -25,7 +25,7 @@ dependencies {
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66";
 
-    testImplementation 'org.glassfish:jakarta.json:2.0.1'
+    implementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
 test {

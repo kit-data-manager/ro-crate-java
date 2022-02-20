@@ -115,6 +115,7 @@ public class ROCrate implements IROCrate {
 
   @Override
   public void addDataEntity(DataEntity entity, Boolean toHasPart) {
+    this.metadataContext.checkEntity(entity);
     this.roCratePayload.addDataEntity(entity);
     if (toHasPart) {
       this.rootDataEntity.addToHasPart(entity.getId());
@@ -123,6 +124,7 @@ public class ROCrate implements IROCrate {
 
   @Override
   public void addContextualEntity(ContextualEntity entity) {
+    this.metadataContext.checkEntity(entity);
     this.roCratePayload.addContextualEntity(entity);
   }
 

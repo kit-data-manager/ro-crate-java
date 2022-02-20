@@ -6,6 +6,7 @@ import edu.kit.crate.IROCrate;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.data.DataEntity;
+import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.externalproviders.personprovider.ORCIDProvider;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.reader.FolderReader;
@@ -54,7 +55,7 @@ public class RealTest {
 
     FileUtils.writeStringToFile(newFile.toFile(), "blablablalblalblabla", Charset.defaultCharset());
     crate.addDataEntity(
-        new DataEntity.DataEntityBuilder()
+        new FileEntity.FileEntityBuilder()
             .setId("new_file.txt")
             .setLocation(newFile.toAbsolutePath().toFile())
             .addProperty("description", "my new file that I added")
