@@ -21,8 +21,10 @@ dependencies {
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.9.0'
     implementation 'com.github.fslev:json-compare:2.39'
 
-
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.1.0'
+
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66";
+
     testImplementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
