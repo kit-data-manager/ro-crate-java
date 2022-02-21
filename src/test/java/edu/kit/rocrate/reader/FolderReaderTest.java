@@ -1,24 +1,16 @@
 package edu.kit.rocrate.reader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.IROCrate;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.data.FileEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.reader.FolderReader;
 import edu.kit.crate.reader.ROCrateReader;
 import edu.kit.crate.writer.FolderWriter;
 import edu.kit.crate.writer.ROCrateWriter;
-import edu.kit.rocrate.writer.FolderWriterTest;
-
-import java.io.File;
+import edu.kit.rocrate.HelpFunctions;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -70,10 +62,7 @@ public class FolderReaderTest {
     ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
     IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expected = objectMapper.readTree(roCrate.getJsonMetadata());
-    JsonNode actual = objectMapper.readTree(res.getJsonMetadata());
-    assertEquals(expected, actual);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
   }
 
   @Test
@@ -113,13 +102,8 @@ public class FolderReaderTest {
 
     // that copies the directory locally to see its content
     //FileUtils.copyDirectory(locationSource.toFile(), new File("test"));
-    assertTrue(FolderWriterTest.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expected = objectMapper.readTree(roCrate.getJsonMetadata());
-    JsonNode actual = objectMapper.readTree(res.getJsonMetadata());
-
-    assertEquals(expected, actual);
+    assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
   }
 
 
@@ -166,12 +150,7 @@ public class FolderReaderTest {
 
     writer.save(res, destinationDir.toFile().toString());
 
-    assertFalse(FolderWriterTest.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expected = objectMapper.readTree(roCrate.getJsonMetadata());
-    JsonNode actual = objectMapper.readTree(res.getJsonMetadata());
-
-    assertNotEquals(expected, actual);
+    assertFalse(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
+    HelpFunctions.compareTwoMetadataJsonNotEqual(roCrate, res);
   }
 }

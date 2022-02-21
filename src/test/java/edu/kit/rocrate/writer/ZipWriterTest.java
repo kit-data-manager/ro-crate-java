@@ -1,15 +1,12 @@
 package edu.kit.rocrate.writer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.preview.AutomaticPreview;
 import edu.kit.crate.preview.PreviewGenerator;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.crate.writer.ZipWriter;
@@ -17,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+
+import edu.kit.rocrate.HelpFunctions;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -80,6 +79,7 @@ public class ZipWriterTest {
                 .setLocation(dirInCrate.toFile())
                 .build()
         )
+        .setPreview(new AutomaticPreview())
         .build();
 
     // safe the crate in the test.zip file
@@ -91,17 +91,10 @@ public class ZipWriterTest {
     Path res = tempDir.resolve("dest");
     new ZipFile(test.toFile()).extractAll(res.toString());
 
-    assertTrue(FolderWriterTest.compareTwoDir(roDir.toFile(), res.toFile()));
+    assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-
-    InputStream inputStream =
-        ZipWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
   }
 
 
@@ -170,16 +163,9 @@ public class ZipWriterTest {
     Path res = tempDir.resolve("dest");
     new ZipFile(test.toFile()).extractAll(res.toString());
 
-    assertFalse(FolderWriterTest.compareTwoDir(roDir.toFile(), res.toFile()));
+    assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-
-    InputStream inputStream =
-        ZipWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
   }
 }

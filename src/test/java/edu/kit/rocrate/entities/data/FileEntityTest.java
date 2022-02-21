@@ -1,13 +1,10 @@
 package edu.kit.rocrate.entities.data;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.entities.data.FileEntity.FileEntityBuilder;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,10 +28,6 @@ public class FileEntityTest {
         .setEncodingFormat("application/pdf")
         .addProperty("url", "https://zenodo.org/record/3541888")
         .build();
-    InputStream inputStream =
-        FileEntityTest.class.getResourceAsStream("/json/entities/data/fileEntity.json");
-    JsonNode expectedJson = MyObjectMapper.getMapper().readTree(inputStream);
-    JsonNode node = MyObjectMapper.getMapper().convertValue(file, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(file, "/json/entities/data/fileEntity.json");
   }
 }

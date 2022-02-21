@@ -1,14 +1,10 @@
 package edu.kit.rocrate.entities.data;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.DataSetEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,12 +23,7 @@ public class DataSetEntityTest {
             "This directory contains many small files, that we're not going to describe in detail.")
         .build();
 
-    InputStream inputStream =
-        DataSetEntityTest.class.getResourceAsStream("/json/entities/data/directory.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.convertValue(dir, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(dir, "/json/entities/data/directory.json");
   }
 
   /**
@@ -55,11 +46,6 @@ public class DataSetEntityTest {
         .addToHasPart(second_content)
         .build();
 
-    InputStream inputStream =
-        DataSetEntityTest.class.getResourceAsStream("/json/entities/data/directoryWeb.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.convertValue(dir, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(dir, "/json/entities/data/directoryWeb.json");
   }
 }

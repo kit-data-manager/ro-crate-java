@@ -1,13 +1,9 @@
 package edu.kit.rocrate.entities.contextual;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,12 +24,6 @@ public class OrganizationEntityTest {
         .addProperty("name", "University of Technology Sydney")
         .build();
 
-    InputStream inputStream =
-        OrganizationEntityTest.class.getResourceAsStream(
-            "/json/entities/contextual/organization.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.convertValue(organization, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(organization, "/json/entities/contextual/organization.json");
   }
 }

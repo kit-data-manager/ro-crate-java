@@ -1,21 +1,15 @@
 package edu.kit.rocrate.crate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.core.TreeCodec;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.contextual.PlaceEntity;
-import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,12 +22,7 @@ public class SerializationTest {
   void simpleROCrateSerialization() throws IOException {
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .build();
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/simple.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.readTree(roCrate.getJsonMetadata());
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/simple.json");
   }
 
   @Test
@@ -41,12 +30,7 @@ public class SerializationTest {
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .addValuePairToContext("@test", "ww.test")
         .build();
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/simple2.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.readTree(roCrate.getJsonMetadata());
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/simple2.json");
   }
 
   @Test
@@ -62,13 +46,7 @@ public class SerializationTest {
         )
         .build();
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/onlyOneFile.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
   }
 
   @Test
@@ -104,13 +82,7 @@ public class SerializationTest {
         )
         .build();
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/twoFiles.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/twoFiles.json");
   }
 
 
@@ -137,13 +109,7 @@ public class SerializationTest {
         )
         .build();
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
   }
   @Test
   void BiggerExample() throws IOException {
@@ -236,12 +202,6 @@ public class SerializationTest {
         .addContextualEntity(createAction)
         .build();
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonROCrate = objectMapper.readTree(roCrate.getJsonMetadata());
-    InputStream inputStream =
-        SerializationTest.class.getResourceAsStream("/json/crate/BiggerExample.json");
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-
-    assertEquals(jsonROCrate, expectedJson);
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/BiggerExample.json");
   }
 }

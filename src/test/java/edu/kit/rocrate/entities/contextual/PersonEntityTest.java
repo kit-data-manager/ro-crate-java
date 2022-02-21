@@ -8,6 +8,8 @@ import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,11 +29,6 @@ public class PersonEntityTest {
         .addProperty("name", "Tim Luckett")
         .build();
 
-    InputStream inputStream =
-        PersonEntityTest.class.getResourceAsStream("/json/entities/contextual/person.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.convertValue(person, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(person, "/json/entities/contextual/person.json");
   }
 }

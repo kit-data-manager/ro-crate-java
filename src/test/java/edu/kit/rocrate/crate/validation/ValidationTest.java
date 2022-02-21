@@ -8,7 +8,6 @@ import edu.kit.crate.entities.data.WorkflowEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
-import edu.kit.rocrate.entities.data.WorkflowEntityTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

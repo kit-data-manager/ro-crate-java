@@ -1,12 +1,9 @@
 package edu.kit.crate.preview;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -16,11 +13,11 @@ import org.apache.commons.io.FileUtils;
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public class DefaultPreview implements IROCratePreview {
+public class AutomaticPreview implements IROCratePreview {
 
   private static final String command = "rochtml";
 
-  public DefaultPreview() {
+  public AutomaticPreview() {
   }
 
   @Override

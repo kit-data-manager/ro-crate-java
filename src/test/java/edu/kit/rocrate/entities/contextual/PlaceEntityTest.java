@@ -1,14 +1,10 @@
 package edu.kit.rocrate.entities.contextual;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.PlaceEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
+
+import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,12 +34,6 @@ public class PlaceEntityTest {
         .setGeo("#b4168a98-8534-4c6d-a568-64a55157b656")
         .build();
 
-    InputStream inputStream =
-        PlaceEntityTest.class.getResourceAsStream(
-            "/json/entities/contextual/place.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode expectedJson = objectMapper.readTree(inputStream);
-    JsonNode node = objectMapper.convertValue(place, JsonNode.class);
-    assertEquals(node, expectedJson);
+    HelpFunctions.compareEntityWithFile(place, "/json/entities/contextual/place.json");
   }
 }

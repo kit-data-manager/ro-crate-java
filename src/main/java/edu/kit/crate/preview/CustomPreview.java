@@ -15,6 +15,9 @@ public class CustomPreview implements IROCratePreview {
   private File metadataHtml;
   private File otherFiles;
 
+  public CustomPreview() {
+  }
+
   public CustomPreview(File metadataHtml, File otherFiles) {
     if (!this.metadataHtml.getName().equals("ro-crate-preview.html")) {
       System.err.println("rename file");

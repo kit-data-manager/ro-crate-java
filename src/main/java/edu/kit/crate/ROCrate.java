@@ -12,9 +12,10 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
+import edu.kit.crate.preview.CustomPreview;
 import edu.kit.crate.special.JsonHelpFunctions;
 import edu.kit.crate.preview.IROCratePreview;
-import edu.kit.crate.preview.DefaultPreview;
+import edu.kit.crate.preview.AutomaticPreview;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +63,7 @@ public class ROCrate implements IROCrate {
 
   public ROCrate() {
     this.roCratePayload = new ROCratePayload();
-    this.roCratePreview = new DefaultPreview();
+    this.roCratePreview = new CustomPreview();
     this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
   }
 
@@ -150,7 +151,7 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder(String name, String description) {
       this.payload = new ROCratePayload();
-      this.preview = new DefaultPreview();
+      this.preview = new CustomPreview();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .addProperty("name", name)
