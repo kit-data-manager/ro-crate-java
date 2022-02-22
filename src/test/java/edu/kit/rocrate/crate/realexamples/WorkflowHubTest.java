@@ -9,7 +9,6 @@ import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
