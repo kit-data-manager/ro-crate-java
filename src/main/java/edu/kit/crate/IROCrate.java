@@ -7,6 +7,7 @@ import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.preview.IROCratePreview;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -41,4 +42,8 @@ public interface IROCrate {
   void addContextualEntity(ContextualEntity entity);
 
   void deleteEntityById(String entityId);
+
+  void setUntrackedFiles(List<File> files);
+
+  List<File> getUntrackedFiles();
 }

@@ -10,9 +10,15 @@ import edu.kit.crate.context.ROCrateMetadataContext;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author Nikola Tzotchev on 9.2.2022 г.
@@ -41,6 +47,8 @@ public class ROCrateReader {
     // get the content of the crate
     File files = reader.readContent(location);
     // entities merge
+    HashSet<String> usedFiles = new HashSet<>();
+
 
     JsonNode context = metadataJson.get("@context");
 
@@ -58,6 +66,9 @@ public class ROCrateReader {
           // data entity
           DataEntity dataEntity = new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build();
           File loc = checkFolderHasFile(dataEntity.getId(), files);
+          if (loc != null) {
+            usedFiles.add(loc.getPath());
+          }
           dataEntity.setLocation(loc);
           this.crate.addDataEntity(dataEntity, false);
         } else {
@@ -67,6 +78,14 @@ public class ROCrateReader {
         }
       }
     }
+    var itr = files.listFiles();//FileUtils.iterateFilesAndDirs(files, TrueFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
+    List<File> list = new ArrayList<>() ;
+    for (var f : itr) {
+      if (!usedFiles.contains(f.getPath())) {
+        list.add(f);
+      }
+    }
+    this.crate.setUntrackedFiles(list);
     return this.crate;
   }
 

@@ -35,7 +35,7 @@ public class ZipReader implements IReaderStrategy {
   @Override
   public File readContent(String location) {
     try {
-      FileUtils.forceDeleteOnExit(new File("temp"));
+      FileUtils.cleanDirectory(new File("temp"));
       new ZipFile(location).extractAll("temp");
       File file = new File("temp");
       return file;

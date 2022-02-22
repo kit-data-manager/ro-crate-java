@@ -87,7 +87,7 @@ public class ZipReaderTest {
     roCrateZipWriter.save(roCrate, zipPath.toString());
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-    IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+    IROCrate res = roCrateFolderReader.readCrate(zipPath.toString());
 
 
     Path locationSource = temp.resolve("expected");
@@ -96,10 +96,9 @@ public class ZipReaderTest {
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());
-    writer.save(res, destinationDir.toFile().toString());
+    writer.save(res, destinationDir.toString());
 
     // that copies the directory locally to see its content
-    // FileUtils.copyDirectory(locationSource.toFile(), new File("test"));
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
   }

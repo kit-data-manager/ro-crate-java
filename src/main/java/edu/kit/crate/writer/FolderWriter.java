@@ -30,8 +30,16 @@ public class FolderWriter implements IWriterStrategy {
 
       File json = new File(destination, "ro-crate-metadata.json");
       FileUtils.copyInputStreamToFile(inputStream, json);
+
       // save also the preview files to the crate destination
       crate.getPreview().saveALLToFolder(file);
+      for (var e : crate.getUntrackedFiles()) {
+        if (e.isDirectory()) {
+          FileUtils.copyDirectoryToDirectory(e, file);
+        } else {
+          FileUtils.copyFileToDirectory(e, file);
+        }
+      }
     } catch (IOException e) {
       System.out.println("Error creating destination directory!");
       e.printStackTrace();

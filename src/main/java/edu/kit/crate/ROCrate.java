@@ -17,6 +17,8 @@ import edu.kit.crate.special.JsonHelpFunctions;
 import edu.kit.crate.preview.IROCratePreview;
 import edu.kit.crate.preview.AutomaticPreview;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,12 +31,14 @@ public class ROCrate implements IROCrate {
   private final static String ID = "ro-crate-metadata.json";
   private final static String RO_SPEC = "https://w3id.org/ro/crate/1.1";
   private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+
   private IROCratePayload roCratePayload;
   private IROCrateMetadataContext metadataContext;
   private IROCratePreview roCratePreview;
   private RootDataEntity rootDataEntity;
   private DataEntity jsonDescriptor;
 
+  private List<File> untrackedFiles;
 
   @Override
   public IROCratePreview getPreview() {
@@ -65,6 +69,7 @@ public class ROCrate implements IROCrate {
     this.roCratePayload = new ROCratePayload();
     this.roCratePreview = new CustomPreview();
     this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
+    this.untrackedFiles = new ArrayList<>();
   }
 
   public ROCrate(ROCrateBuilder roCrateBuilder) {
@@ -73,6 +78,7 @@ public class ROCrate implements IROCrate {
     this.roCratePreview = roCrateBuilder.preview;
     this.rootDataEntity = roCrateBuilder.rootDataEntity;
     this.jsonDescriptor = roCrateBuilder.jsonDescriptor;
+    this.untrackedFiles = roCrateBuilder.untrackedFiles;
   }
 
   @Override
@@ -140,6 +146,16 @@ public class ROCrate implements IROCrate {
     this.jsonDescriptor.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties()));
   }
 
+  @Override
+  public void setUntrackedFiles(List<File> files) {
+    this.untrackedFiles = files;
+  }
+
+  @Override
+  public List<File> getUntrackedFiles() {
+    return this.untrackedFiles;
+  }
+
   static final public class ROCrateBuilder {
 
     IROCratePayload payload;
@@ -148,10 +164,12 @@ public class ROCrate implements IROCrate {
     ContextualEntity license;
     RootDataEntity rootDataEntity;
     DataEntity jsonDescriptor;
+    List<File> untrackedFiles;
 
     public ROCrateBuilder(String name, String description) {
       this.payload = new ROCratePayload();
       this.preview = new CustomPreview();
+      this.untrackedFiles = new ArrayList<>();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .addProperty("name", name)
@@ -204,6 +222,11 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder setJSONDescriptor(DataEntity descriptor) {
       this.jsonDescriptor = descriptor;
+      return this;
+    }
+
+    public ROCrateBuilder addUntrackedFile(File file) {
+      this.untrackedFiles.add(file);
       return this;
     }
 
