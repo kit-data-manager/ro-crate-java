@@ -48,11 +48,9 @@ public class TestRemoveAddEntity {
     FileEntity file = new FileEntity.FileEntityBuilder()
         .setId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
-        .addIdProperty("author", person.getId())
         .setContentLocation(place.getId())
+        .addAuthor(person.getId())
         .build();
-
-    file.setAuthor(person.getId());
 
     ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")

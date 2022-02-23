@@ -7,14 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jsonldjava.utils.Obj;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
+ * Abstract Entity parent class of every singe item in the json metadata file
+ *
  * @author Nikola Tzotchev on 3.2.2022 г.
  * @version 1
  */
@@ -75,13 +77,47 @@ public class AbstractEntity {
     }
   }
 
+  /**
+   * Add a property that looks like this:
+   * "name" : {"@id" : "id"}
+   * If the name property already exists add a second @id to it
+   *
+   * @param name the "key" of the property
+   * @param id   the "id" of the property
+   */
   public void addIdProperty(String name, String id) {
-
-    if (name != null && id != null) {
-      this.properties.set(name, MyObjectMapper.getMapper().createObjectNode().put("@id", id));
-    }
+    JsonNode jsonNode = addToIdProperty(name, id, this.properties.get(name));
+    if (jsonNode != null)
+      this.properties.set(name, jsonNode);
   }
 
+  private static JsonNode addToIdProperty(String name, String id, JsonNode property) {
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    if (name != null && id != null) {
+      if (property == null) {
+        return objectMapper.createObjectNode().put("@id", id);
+      } else {
+        if (property.isArray()) {
+          ArrayNode ns = (ArrayNode) property;
+          ns.add(objectMapper.createObjectNode().put("@id", id));
+          return ns;
+        } else {
+          ArrayNode newNodes = objectMapper.createArrayNode();
+          newNodes.add(property);
+          newNodes.add(objectMapper.createObjectNode().put("@id", id));
+          return newNodes;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Adds everything from the stringList to the property "name" as id
+   *
+   * @param name the key of the property
+   * @param stringList List containing all the id as String
+   */
   public void addIdListProperties(String name, List<String> stringList) {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ArrayNode node = objectMapper.createArrayNode();
@@ -112,7 +148,6 @@ public class AbstractEntity {
   }
 
   public JsonNode getProperty(String propertyKey) {
-
     return this.properties.get(propertyKey);
   }
 
@@ -149,22 +184,9 @@ public class AbstractEntity {
     }
 
     public T addIdProperty(String name, String id) {
-      if (name != null && id != null) {
-        if (this.properties.get(name) == null) {
-          this.properties.set(name, MyObjectMapper.getMapper().createObjectNode().put("@id", id));
-        } else {
-          JsonNode nodes = this.properties.get(name);
-          if (nodes.isArray()) {
-            ArrayNode ns = (ArrayNode) nodes;
-            ns.add(MyObjectMapper.getMapper().createObjectNode().put("@id", id));
-            this.properties.set(name, ns);
-          } else {
-            ArrayNode newNodes = MyObjectMapper.getMapper().createArrayNode();
-            newNodes.add(nodes);
-            newNodes.add(MyObjectMapper.getMapper().createObjectNode().put("@id", id));
-            this.properties.set(name, newNodes);
-          }
-        }
+      JsonNode jsonNode = AbstractEntity.addToIdProperty(name, id, this.properties.get(name));
+      if (jsonNode != null) {
+        this.properties.set(name, jsonNode);
       }
       return self();
     }
