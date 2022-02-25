@@ -67,7 +67,6 @@ public class ROCrate implements IROCrate {
 
   public ROCrate() {
     this.roCratePayload = new ROCratePayload();
-    this.roCratePreview = new CustomPreview();
     this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
     this.untrackedFiles = new ArrayList<>();
   }
@@ -168,7 +167,6 @@ public class ROCrate implements IROCrate {
 
     public ROCrateBuilder(String name, String description) {
       this.payload = new ROCratePayload();
-      this.preview = new CustomPreview();
       this.untrackedFiles = new ArrayList<>();
       this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()

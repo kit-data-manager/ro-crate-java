@@ -41,7 +41,7 @@ public class JsonSchemaValidation implements IValidatorStrategy {
         return true;
       } else {
         for (var e : errors) {
-          System.out.println(e.getMessage());
+          System.err.println(e.getMessage());
         }
       }
     } catch (IOException e) {

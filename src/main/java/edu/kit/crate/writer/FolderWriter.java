@@ -32,7 +32,9 @@ public class FolderWriter implements IWriterStrategy {
       FileUtils.copyInputStreamToFile(inputStream, json);
 
       // save also the preview files to the crate destination
-      crate.getPreview().saveALLToFolder(file);
+      if (crate.getPreview() != null) {
+        crate.getPreview().saveALLToFolder(file);
+      }
       for (var e : crate.getUntrackedFiles()) {
         if (e.isDirectory()) {
           FileUtils.copyDirectoryToDirectory(e, file);

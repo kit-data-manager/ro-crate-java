@@ -38,8 +38,7 @@ public class RealTest {
             .build()
         , true);
 
-    ORCIDProvider orcidProvider = new ORCIDProvider();
-    PersonEntity person = orcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
+    PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
     crate.addContextualEntity(person);
 
     ContextualEntity en = crate.getContextualEntityById("http://nla.gov.au/nla.party-593909");

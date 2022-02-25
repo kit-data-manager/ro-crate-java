@@ -15,19 +15,15 @@ public class CustomPreview implements IROCratePreview {
   private File metadataHtml;
   private File otherFiles;
 
-  public CustomPreview() {
-  }
 
   public CustomPreview(File metadataHtml, File otherFiles) {
-    if (!this.metadataHtml.getName().equals("ro-crate-preview.html")) {
+    if (!metadataHtml.getName().equals("ro-crate-preview.html")) {
       System.err.println("rename file");
-      // TODO: throw an exception
     } else {
       this.metadataHtml = metadataHtml;
     }
-    if (!this.otherFiles.getName().equals("ro-crate-preview")) {
+    if (!otherFiles.getName().equals("ro-crate-preview")) {
       System.err.println("rename file");
-      // TODO: throw an exception
     } else {
       this.otherFiles = otherFiles;
     }

@@ -15,10 +15,9 @@ import org.apache.http.impl.client.HttpClients;
  * @author Nikola Tzotchev on 10.2.2022 г.
  * @version 1
  */
-public class ORCIDProvider implements ExternalPersonProvider {
+public class ORCIDProvider {
 
-  @Override
-  public PersonEntity getPerson(String url) {
+  public static PersonEntity getPerson(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.matches("https://orcid.org.*")) {
       throw new IllegalArgumentException("Should provide orcid link");
@@ -35,7 +34,7 @@ public class ORCIDProvider implements ExternalPersonProvider {
       return new PersonEntity.PersonEntityBuilder().setAll(jsonNode).build();
     } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
-    return null;
   }
 }

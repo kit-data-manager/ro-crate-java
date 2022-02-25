@@ -15,8 +15,7 @@ public class RORProviderTest {
 
   @Test
   void testExternalRORProvider() throws IOException {
-    RORProvider rorProvider = new RORProvider();
-    OrganizationEntity organizationEntity = rorProvider.getOrganization("https://ror.org/04t3en479");
+    OrganizationEntity organizationEntity = RORProvider.getOrganization("https://ror.org/04t3en479");
     HelpFunctions.compareEntityWithFile(organizationEntity, "/json/entities/contextual/rorkit.json");
   }
 }

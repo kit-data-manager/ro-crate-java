@@ -13,11 +13,9 @@ import org.apache.http.impl.client.HttpClients;
  * @author Nikola Tzotchev on 11.2.2022 г.
  * @version 1
  */
-public class RORProvider implements
-    IExternalOrganizationProvider {
+public class RORProvider {
 
-  @Override
-  public OrganizationEntity getOrganization(String url) {
+  public static OrganizationEntity getOrganization(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.matches("https://ror.org/.*")) {
       throw new IllegalArgumentException("Should provide orcid link");

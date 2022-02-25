@@ -32,6 +32,7 @@ public class ValidationTest {
         ValidationTest.class.getResourceAsStream("/crates/validation/workflowschema.json");
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode expectedJson = objectMapper.readTree(inputStream);
+
     Validator validator = new Validator(new JsonSchemaValidation(expectedJson));
     assertTrue(validator.validate(crate));
 

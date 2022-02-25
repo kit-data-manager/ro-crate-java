@@ -14,8 +14,7 @@ public class ORCIDTest {
 
   @Test
   void testAddingPersonEntity() throws IOException {
-    ORCIDProvider orcidProvider = new ORCIDProvider();
-    PersonEntity person = orcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
+    PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
     HelpFunctions.compareEntityWithFile(person, "/json/entities/contextual/orcidperson.json");
   }
 }

@@ -3,6 +3,7 @@ package edu.kit.crate.entities.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,20 +39,20 @@ public class DataSetEntity extends DataEntity {
 
 
   public void addToHasPart(String id) {
-    JsonNode node = this.getProperty("hasPart");
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ArrayNode nodeArr = objectMapper.createArrayNode();
-    if (node == null) {
-      nodeArr.add(objectMapper.createObjectNode().put("@id", id));
-    } else if (node.isArray()){
-      nodeArr = node.deepCopy();
-      nodeArr.add(objectMapper.createObjectNode().put("@id", id));
-    } else {
-      // node consists of one element
-      nodeArr.add(node);
-      nodeArr.add(objectMapper.createObjectNode().put("@id", id));
+    JsonNode jsonNode = this.getProperty("hasPart");
+    ArrayNode node = objectMapper.createArrayNode();
+    if (jsonNode == null) {
+      node.add(objectMapper.createObjectNode().put("@id", id));
     }
-    this.addProperty("hasPart", nodeArr);
+    else if (jsonNode.isArray()) {
+      node = (ArrayNode) jsonNode;
+      node.add(objectMapper.createObjectNode().put("@id", id));
+    } else {
+      node.add(jsonNode);
+      node.add(objectMapper.createObjectNode().put("@id", id));
+    }
+    this.addProperty("hasPart", node);
   }
 
   public boolean hasInHasPart(String id) {
