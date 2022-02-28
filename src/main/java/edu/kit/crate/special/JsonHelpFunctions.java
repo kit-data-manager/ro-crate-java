@@ -18,9 +18,7 @@ public class JsonHelpFunctions {
     } else if (node.isArray()) {
       if (node.size() == 1) {
         return unwrapSingleArray(node.get(0));
-      }
-      else
-      {
+      } else {
         ArrayNode arrayNode = MyObjectMapper.getMapper().createArrayNode();
         for (var n : node) {
           arrayNode.add(unwrapSingleArray(n));
@@ -29,17 +27,19 @@ public class JsonHelpFunctions {
       }
     }
     return node;
-}
+  }
 
   public static JsonNode removeFieldsWith(String id, JsonNode node) {
-    ObjectNode newNode = MyObjectMapper.getMapper().createObjectNode();
+    //MyObjectMapper.getMapper().createObjectNode();
     if (node.isObject()) {
-      var itr = node.fields();
+      ObjectNode newNode = (ObjectNode) node;
+      var itr = newNode.fields();
       while (itr.hasNext()) {
         var nxt = itr.next();
-        if (nxt.getValue().isValueNode()) {
-          if (!nxt.getValue().asText().equals(id)) {
-            newNode.set(nxt.getKey(), nxt.getValue());
+        if (nxt.getKey().equals("@id") && nxt.getValue().isValueNode()) {
+          if (nxt.getValue().asText().equals(id)) {
+            newNode.remove(nxt.getKey());
+            //newNode.set(nxt.getKey(), nxt.getValue());
           }
         } else {
           newNode.set(nxt.getKey(), removeFieldsWith(id, nxt.getValue()));
@@ -48,16 +48,15 @@ public class JsonHelpFunctions {
       if (!newNode.isEmpty())
         return newNode;
     } else if (node.isArray()) {
-      ArrayNode arrayNode = MyObjectMapper.getMapper().createArrayNode();
-      for (JsonNode p : node) {
+      ArrayNode arrayNode = (ArrayNode) node;
+      for (int i = 0; i < arrayNode.size(); i++) {
+        var p = arrayNode.get(i);
         if (p.isValueNode()) {
-          if (!p.asText().equals(id)) {
-            arrayNode.add(p);
+          if (p.asText().equals(id)) {
+            arrayNode.remove(i);
           }
         } else {
-          var result = removeFieldsWith(id, p);
-          if (result != null)
-            arrayNode.add(removeFieldsWith(id, p));
+          arrayNode.set(i, removeFieldsWith(id, p));
         }
       }
       return arrayNode;

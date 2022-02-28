@@ -8,6 +8,6 @@ import java.io.File;
  * @version 1
  */
 public interface IReaderStrategy {
-  public ObjectNode readMetadataJson(String location);
-  public File readContent(String location);
+  ObjectNode readMetadataJson(String location);
+  File readContent(String location);
 }

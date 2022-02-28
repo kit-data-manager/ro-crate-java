@@ -1,5 +1,6 @@
 package edu.kit.rocrate.crate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
@@ -7,8 +8,10 @@ import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.contextual.PlaceEntity;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
+
 import java.io.IOException;
 
+import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +49,30 @@ public class SerializationTest {
         )
         .build();
 
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
+  }
+
+  @Test
+  void twoSameId() throws IOException {
+    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+        .addDataEntity(
+            new FileEntity.FileEntityBuilder()
+                .setId("survey-responses-2019.csv")
+                .addProperty("name", "dadadada")
+                .addProperty("contentSize", "26452")
+                .addProperty("encodingFormat", "text/csv")
+                .build()
+        )
+        .addDataEntity(
+            new FileEntity.FileEntityBuilder()
+                .setId("survey-responses-2019.csv")
+                .addProperty("name", "Survey responses")
+                .addProperty("contentSize", "26452")
+                .addProperty("encodingFormat", "text/csv")
+                .build()
+        )
+        .build();
+    JsonNode node = MyObjectMapper.getMapper().readTree(roCrate.getJsonMetadata());
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
   }
 
@@ -110,6 +137,7 @@ public class SerializationTest {
 
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
   }
+
   @Test
   void BiggerExample() throws IOException {
 

@@ -15,33 +15,45 @@ import java.io.IOException;
  * @version 1
  */
 public class ZipReader implements IReaderStrategy {
+  private boolean read = false;
+
+  public void readCrate(String location) {
+    try {
+      File temp = new File("temp");
+      if (temp.exists()) {
+        FileUtils.cleanDirectory(new File("temp"));
+      } else {
+        FileUtils.forceDeleteOnExit(new File("temp"));
+      }
+      new ZipFile(location).extractAll("temp");
+      this.read = true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public ObjectNode readMetadataJson(String location) {
+    if (!read) {
+      this.readCrate(location);
+    }
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ObjectNode objectNode;
+    File jsonMetadata = new File("temp/ro-crate-metadata.json");
     try {
-      FileUtils.forceDeleteOnExit(new File("temp"));
-      new ZipFile(location).extractAll("temp");
-      File jsonMetadata = new File("temp/ro-crate-metadata.json");
       objectNode = objectMapper.readTree(jsonMetadata).deepCopy();
       return objectNode;
     } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
-    return null;
   }
 
   @Override
   public File readContent(String location) {
-    try {
-      FileUtils.cleanDirectory(new File("temp"));
-      new ZipFile(location).extractAll("temp");
-      File file = new File("temp");
-      return file;
-    } catch (IOException e) {
-      e.printStackTrace();
+    if (!read) {
+      this.readCrate(location);
     }
-    return null;
+    return new File("temp");
   }
 }

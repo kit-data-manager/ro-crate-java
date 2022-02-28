@@ -141,6 +141,7 @@ public class ROCrate implements IROCrate {
     // firstly search the root data entity and the descriptor
     this.roCratePayload.removeAllOccurrencesOf(entityId);
     // also remove in the root data entity and the descriptor
+    this.rootDataEntity.removeFromHasPart(entityId);
     this.rootDataEntity.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties()));
     this.jsonDescriptor.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties()));
   }

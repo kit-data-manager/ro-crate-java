@@ -38,6 +38,8 @@ In the above example instead of a FileEntity, other supported DataEntities are:
 2. FileEntity (used in the example above)
 3. WorkflowEntity
 
+Note: if you add an entity with @id that is already in the crate, the old one will be overwritten.
+
 if you want to add something that is missing you can use **DataEntity** and add all the thinks you want example:
 ```java
 new DataEntity.DataEntityBuilder()
