@@ -36,7 +36,7 @@ public class JsonHelpFunctions {
       var itr = newNode.fields();
       while (itr.hasNext()) {
         var nxt = itr.next();
-        if (nxt.getKey().equals("@id") && nxt.getValue().isValueNode()) {
+        if (nxt.getValue().isValueNode()) {
           if (nxt.getValue().asText().equals(id)) {
             newNode.remove(nxt.getKey());
             //newNode.set(nxt.getKey(), nxt.getValue());
