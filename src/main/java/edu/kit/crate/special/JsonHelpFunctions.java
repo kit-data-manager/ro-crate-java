@@ -29,7 +29,7 @@ public class JsonHelpFunctions {
     return node;
   }
 
-  public static JsonNode removeFieldsWith(String id, JsonNode node) {
+  public static void removeFieldsWith(String id, JsonNode node) {
     //MyObjectMapper.getMapper().createObjectNode();
     if (node.isObject()) {
       ObjectNode newNode = (ObjectNode) node;
@@ -39,14 +39,11 @@ public class JsonHelpFunctions {
         if (nxt.getValue().isValueNode()) {
           if (nxt.getValue().asText().equals(id)) {
             newNode.remove(nxt.getKey());
-            //newNode.set(nxt.getKey(), nxt.getValue());
           }
         } else {
-          newNode.set(nxt.getKey(), removeFieldsWith(id, nxt.getValue()));
+          removeFieldsWith(id,nxt.getValue());
         }
       }
-      if (!newNode.isEmpty())
-        return newNode;
     } else if (node.isArray()) {
       ArrayNode arrayNode = (ArrayNode) node;
       for (int i = 0; i < arrayNode.size(); i++) {
@@ -56,11 +53,9 @@ public class JsonHelpFunctions {
             arrayNode.remove(i);
           }
         } else {
-          arrayNode.set(i, removeFieldsWith(id, p));
+          removeFieldsWith(id, p);
         }
       }
-      return arrayNode;
     }
-    return null;
   }
 }

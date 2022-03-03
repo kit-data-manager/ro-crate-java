@@ -12,10 +12,8 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
-import edu.kit.crate.preview.CustomPreview;
 import edu.kit.crate.special.JsonHelpFunctions;
 import edu.kit.crate.preview.IROCratePreview;
-import edu.kit.crate.preview.AutomaticPreview;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -142,8 +140,8 @@ public class ROCrate implements IROCrate {
     this.roCratePayload.removeAllOccurrencesOf(entityId);
     // also remove in the root data entity and the descriptor
     this.rootDataEntity.removeFromHasPart(entityId);
-    this.rootDataEntity.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties()));
-    this.jsonDescriptor.setProperties(JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties()));
+    JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties());
+    JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties());
   }
 
   @Override

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import edu.kit.crate.special.JsonHelpFunctions;
@@ -48,6 +49,17 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
       //  if (fieldName.equals("@type")) {
       if (fieldValue.isArray()) {
         if (fieldValue.isEmpty()) {
+          continue;
+        }
+        ArrayNode arrayNode = (ArrayNode) fieldValue;
+        int size = arrayNode.size();
+        for (int i = size-1 ; i >= 0; i--) {
+          var element = arrayNode.get(i);
+          if (element.isObject() && element.isEmpty()) {
+            arrayNode.remove(i);
+          }
+        }
+        if (arrayNode.isEmpty()) {
           continue;
         }
       }

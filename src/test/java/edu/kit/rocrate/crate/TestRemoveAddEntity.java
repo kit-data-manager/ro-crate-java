@@ -1,5 +1,7 @@
 package edu.kit.rocrate.crate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.contextual.PersonEntity;
@@ -72,5 +74,52 @@ public class TestRemoveAddEntity {
     ROCrate roCrate2 = new ROCrate.ROCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity").build();
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, roCrate2);
+  }
+
+  @Test
+  void removeOtherOccur() throws JsonProcessingException {
+    PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
+        .setId("http://sws.geonames.org/8152662/")
+        .addProperty("name", "Catalina Park")
+        .build();
+
+    PersonEntity person = new PersonEntity.PersonEntityBuilder()
+        .setId("#alice")
+        .addProperty("name", "Alice")
+        .addProperty("description", "One of hopefully many Contextual Entities")
+        .build();
+
+    FileEntity file = new FileEntity.FileEntityBuilder()
+        .setId("data1.txt")
+        .addProperty("description", "One of hopefully many Data Entities")
+        .setContentLocation(place.getId())
+        .addAuthor(person.getId())
+        .addAuthor(person.getId())
+        .build();
+
+    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+        "The RO-Crate Root Data Entity")
+        .addContextualEntity(place)
+        .addContextualEntity(person)
+        .addDataEntity(file)
+        .build();
+
+    ObjectMapper mapper = MyObjectMapper.getMapper();
+    JsonNode node = mapper.readTree(roCrate.getJsonMetadata());
+    System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
+    roCrate.deleteEntityById(person.getId());
+    roCrate.deleteEntityById(place.getId());
+    node = mapper.readTree(roCrate.getJsonMetadata());
+    System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
+
+    FileEntity file2 = new FileEntity.FileEntityBuilder()
+        .setId("data1.txt")
+        .addProperty("description", "One of hopefully many Data Entities")
+        .build();
+    ROCrate second2 = new ROCrate.ROCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
+        .addDataEntity(file2)
+        .build();
+
+    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, second2);
   }
 }

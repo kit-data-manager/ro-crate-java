@@ -1,6 +1,5 @@
 package edu.kit.rocrate.crate;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
@@ -11,7 +10,6 @@ import edu.kit.crate.entities.data.FileEntity;
 
 import java.io.IOException;
 
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +70,6 @@ public class SerializationTest {
                 .build()
         )
         .build();
-    JsonNode node = MyObjectMapper.getMapper().readTree(roCrate.getJsonMetadata());
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
   }
 
