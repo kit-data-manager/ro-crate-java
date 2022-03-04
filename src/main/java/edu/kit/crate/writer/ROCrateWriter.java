@@ -1,6 +1,8 @@
 package edu.kit.crate.writer;
 
 import edu.kit.crate.IROCrate;
+import edu.kit.crate.validation.JsonSchemaValidation;
+import edu.kit.crate.validation.Validator;
 
 /**
  * @author Nikola Tzotchev on 9.2.2022 г.
@@ -15,6 +17,8 @@ public class ROCrateWriter {
   }
 
   public void save(IROCrate crate, String destination) {
+    Validator defaultValidation = new Validator(new JsonSchemaValidation());
+    defaultValidation.validate(crate);
     this.writer.save(crate, destination);
   }
 }

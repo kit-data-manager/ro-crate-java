@@ -1,0 +1,48 @@
+{
+  "required": [
+    "@context",
+    "@graph"
+  ],
+  "properties" : {
+    "@graph" : {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "patternProperties" : {
+          ".*": {
+            "anyOf" : [
+              { "type":"string"},
+              {
+                "type":"object",
+                "properties": {
+                  "@id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "@id" : {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              {
+                "type": "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

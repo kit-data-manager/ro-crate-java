@@ -12,6 +12,8 @@ import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.validation.JsonSchemaValidation;
+import edu.kit.crate.validation.Validator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -89,6 +91,8 @@ public class ROCrateReader {
       }
     }
     this.crate.setUntrackedFiles(list);
+    Validator defaultValidation = new Validator(new JsonSchemaValidation());
+    defaultValidation.validate(this.crate);
     return this.crate;
   }
 

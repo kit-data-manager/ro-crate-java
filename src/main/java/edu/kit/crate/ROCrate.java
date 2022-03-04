@@ -14,6 +14,8 @@ import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
 import edu.kit.crate.special.JsonHelpFunctions;
 import edu.kit.crate.preview.IROCratePreview;
+import edu.kit.crate.validation.JsonSchemaValidation;
+import edu.kit.crate.validation.Validator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,6 +78,8 @@ public class ROCrate implements IROCrate {
     this.rootDataEntity = roCrateBuilder.rootDataEntity;
     this.jsonDescriptor = roCrateBuilder.jsonDescriptor;
     this.untrackedFiles = roCrateBuilder.untrackedFiles;
+    Validator defaultValidation = new Validator(new JsonSchemaValidation());
+    defaultValidation.validate(this);
   }
 
   @Override

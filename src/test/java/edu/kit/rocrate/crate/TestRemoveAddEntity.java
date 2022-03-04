@@ -104,13 +104,8 @@ public class TestRemoveAddEntity {
         .addDataEntity(file)
         .build();
 
-    ObjectMapper mapper = MyObjectMapper.getMapper();
-    JsonNode node = mapper.readTree(roCrate.getJsonMetadata());
-    System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
     roCrate.deleteEntityById(person.getId());
     roCrate.deleteEntityById(place.getId());
-    node = mapper.readTree(roCrate.getJsonMetadata());
-    System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
 
     FileEntity file2 = new FileEntity.FileEntityBuilder()
         .setId("data1.txt")

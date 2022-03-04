@@ -41,7 +41,7 @@ public class JsonHelpFunctions {
             newNode.remove(nxt.getKey());
           }
         } else {
-          removeFieldsWith(id,nxt.getValue());
+          removeFieldsWith(id, nxt.getValue());
         }
       }
     } else if (node.isArray()) {
