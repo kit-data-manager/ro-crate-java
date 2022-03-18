@@ -10,6 +10,8 @@ import edu.kit.crate.preview.AutomaticPreview;
 import edu.kit.crate.preview.PreviewGenerator;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.crate.writer.ZipWriter;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -44,7 +46,7 @@ public class ZipWriterTest {
 
     PreviewGenerator.generatePreview(roDir.toString());
 
-    Path file1 = roDir.resolve("input.txt");
+    Path file1 = roDir.resolve("cp7glop.ai");
     FileUtils.writeStringToFile(file1.toFile(), "content of Local File", Charset.defaultCharset());
     Path dirInCrate = roDir.resolve("dir");
     FileUtils.forceMkdir(dirInCrate.toFile());
@@ -90,7 +92,6 @@ public class ZipWriterTest {
     roCrateZipWriter.save(roCrate, test.toString());
     Path res = tempDir.resolve("dest");
     new ZipFile(test.toFile()).extractAll(res.toString());
-
     assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid

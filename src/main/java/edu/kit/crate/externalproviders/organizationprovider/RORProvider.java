@@ -18,7 +18,7 @@ public class RORProvider {
   public static OrganizationEntity getOrganization(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.matches("https://ror.org/.*")) {
-      throw new IllegalArgumentException("Should provide orcid link");
+      throw new IllegalArgumentException("Should provide ror url");
     }
     String newUrl = "https://api.ror.org/organizations/" + url.replaceAll("https://ror.org/","");
     HttpGet request = new HttpGet(newUrl);

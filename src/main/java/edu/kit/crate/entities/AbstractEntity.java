@@ -58,7 +58,7 @@ public class AbstractEntity {
   @JsonIgnore
   public String getId() {
     JsonNode id = this.properties.get("@id");
-    return id.asText();
+    return id == null ? null : id.asText();
   }
 
   public void setId(String id) {
@@ -170,6 +170,14 @@ public class AbstractEntity {
         this.types = new HashSet<>();
       }
       this.types.add(type);
+      return self();
+    }
+
+    public T addTypes(List<String> types) {
+      if (this.types == null) {
+        this.types = new HashSet<>();
+      }
+      this.types.addAll(types);
       return self();
     }
 

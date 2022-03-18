@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -23,6 +24,9 @@ public class DataEntity extends AbstractEntity {
   public DataEntity(ADataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addIdListProperties("author", entityBuilder.authors);
+    if (entityBuilder.location != null && this.getId() == null) {
+      this.setId(entityBuilder.location.getName());
+    }
     this.location = entityBuilder.location;
   }
 
@@ -32,7 +36,9 @@ public class DataEntity extends AbstractEntity {
 
   public void saveToZip(ZipFile zipFile) throws ZipException {
     if (this.location != null) {
-      zipFile.addFile(this.location);
+      ZipParameters zipParameters = new ZipParameters();
+      zipParameters.setFileNameInZip(this.getId());
+      zipFile.addFile(this.location,zipParameters);
     }
   }
 
