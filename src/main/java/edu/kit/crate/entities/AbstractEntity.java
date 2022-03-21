@@ -2,16 +2,29 @@ package edu.kit.crate.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+import com.networknt.schema.ValidationMessage;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
+import edu.kit.crate.entities.validation.EntityValidation;
+import edu.kit.crate.entities.validation.JsonSchemaValidation;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -38,9 +51,15 @@ public class AbstractEntity {
   @JsonSerialize(using = ObjectNodeSerializer.class)
   private ObjectNode properties;
 
+  private static EntityValidation entityValidation = new EntityValidation(new JsonSchemaValidation());
+
   public void setProperties(JsonNode obj) {
-    this.properties = obj.deepCopy();
+    // validate whole entity
+    if (entityValidation.entityValidation(obj)) {
+      this.properties = obj.deepCopy();
+    }
   }
+
 
   public ObjectNode getProperties() {
     if (this.types != null) {
@@ -71,9 +90,27 @@ public class AbstractEntity {
     }
   }
 
+  public void addProperty(String key, long value) {
+    if (key != null) {
+      this.properties.put(key, value);
+    }
+  }
+
+  public void addProperty(String key, double value) {
+    if (key != null) {
+      this.properties.put(key, value);
+    }
+  }
+
   public void addProperty(String key, JsonNode value) {
+    addProperty(this.properties, key, value);
+  }
+
+  private static void addProperty(ObjectNode whereToAdd, String key, JsonNode value) {
     if (key != null && value != null) {
-      this.properties.set(key, value);
+      if (entityValidation.fieldValidation(value)) {
+        whereToAdd.set(key, value);
+      }
     }
   }
 
@@ -115,7 +152,7 @@ public class AbstractEntity {
   /**
    * Adds everything from the stringList to the property "name" as id
    *
-   * @param name the key of the property
+   * @param name       the key of the property
    * @param stringList List containing all the id as String
    */
   public void addIdListProperties(String name, List<String> stringList) {
@@ -182,11 +219,21 @@ public class AbstractEntity {
     }
 
     public T addProperty(String key, JsonNode value) {
-      this.properties.set(key, value);
+      AbstractEntity.addProperty(this.properties, key, value);
       return self();
     }
 
     public T addProperty(String key, String value) {
+      this.properties.put(key, value);
+      return self();
+    }
+
+    public T addProperty(String key, int value) {
+      this.properties.put(key, value);
+      return self();
+    }
+
+    public T addProperty(String key, double value) {
       this.properties.put(key, value);
       return self();
     }

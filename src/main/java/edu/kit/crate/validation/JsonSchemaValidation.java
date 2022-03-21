@@ -46,7 +46,7 @@ public class JsonSchemaValidation implements IValidatorStrategy {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     try {
       final JsonNode good = objectMapper.readTree(crate.getJsonMetadata());
-      JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
+      JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
       JsonSchema jsonSchema = factory.getSchema(this.schema);
       Set<ValidationMessage> errors = jsonSchema.validate(good);
       if (errors.size() == 0) {
