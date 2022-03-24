@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -15,34 +16,31 @@ public class CustomPreview implements IROCratePreview {
   private File metadataHtml;
   private File otherFiles;
 
-
   public CustomPreview(File metadataHtml, File otherFiles) {
-    if (!metadataHtml.getName().equals("ro-crate-preview.html")) {
-      System.err.println("rename file");
-    } else {
-      this.metadataHtml = metadataHtml;
-    }
-    if (!otherFiles.getName().equals("ro-crate-preview")) {
-      System.err.println("rename file");
-    } else {
-      this.otherFiles = otherFiles;
-    }
+    this.metadataHtml = metadataHtml;
+    this.otherFiles = otherFiles;
+  }
+
+  public CustomPreview(File metadataHtml) {
+    this.metadataHtml = metadataHtml;
   }
 
   @Override
   public void saveALLToZip(ZipFile zipFile) {
     if (this.metadataHtml != null) {
       try {
-        zipFile.addFile(this.metadataHtml);
+        ZipParameters zipParameters = new ZipParameters();
+        zipParameters.setFileNameInZip("ro-crate-preview.html");
+        zipFile.addFile(this.metadataHtml, zipParameters);
       } catch (ZipException e) {
-        System.out.println("Exception writing preview html to zip");
+        System.err.println("Exception writing preview html to zip");
       }
     }
     if (this.otherFiles != null) {
       try {
         zipFile.addFolder(this.otherFiles);
       } catch (ZipException e) {
-        System.out.println("Exception writing preview files to zip");
+        System.err.println("Exception writing preview files to zip");
       }
     }
   }
@@ -51,10 +49,12 @@ public class CustomPreview implements IROCratePreview {
   public void saveALLToFolder(File folder) {
     try {
       if (this.metadataHtml != null) {
-        FileUtils.copyFileToDirectory(this.metadataHtml, folder);
+        File fileInCrate = folder.toPath().resolve("ro-crate-preview.html").toFile();
+        FileUtils.copyFile(this.metadataHtml, fileInCrate);
       }
       if (this.otherFiles != null) {
-        FileUtils.copyDirectoryToDirectory(this.otherFiles, folder);
+        File folderName = folder.toPath().resolve("ro-crate-preview_files").toFile();
+        FileUtils.copyDirectory(this.otherFiles, folderName);
       }
     } catch (IOException e) {
       e.printStackTrace();

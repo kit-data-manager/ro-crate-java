@@ -15,8 +15,6 @@ import org.apache.commons.io.FileUtils;
  */
 public class AutomaticPreview implements IROCratePreview {
 
-  private static final String command = "rochtml";
-
   public AutomaticPreview() {
   }
 
