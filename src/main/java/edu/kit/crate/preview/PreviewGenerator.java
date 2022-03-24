@@ -23,7 +23,7 @@ public class PreviewGenerator {
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
             }
-
+            reader.close();
             int exitVal = process.waitFor();
             if (exitVal == 0) {
                 // success

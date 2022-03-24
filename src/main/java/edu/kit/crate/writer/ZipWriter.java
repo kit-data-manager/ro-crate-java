@@ -9,6 +9,7 @@ import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import net.lingala.zip4j.ZipFile;
@@ -37,12 +38,14 @@ public class ZipWriter implements IWriterStrategy {
       InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
       // write the ro-crate-metadata
       zipFile.addStream(inputStream, zipParameters);
-
+      inputStream.close();
       if (crate.getPreview() != null) {
         crate.getPreview().saveALLToZip(zipFile);
       }
     } catch (ZipException | JsonProcessingException e) {
       System.out.println("Exception writing ro-crate-metadata.json file to zip");
+      e.printStackTrace();
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
