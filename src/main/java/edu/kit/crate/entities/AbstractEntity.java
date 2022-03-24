@@ -2,29 +2,18 @@ package edu.kit.crate.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
 import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.entities.validation.EntityValidation;
 import edu.kit.crate.entities.validation.JsonSchemaValidation;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -247,7 +236,9 @@ public class AbstractEntity {
     }
 
     public T setAll(ObjectNode properties) {
-      this.properties = properties;
+      if (AbstractEntity.entityValidation.entityValidation(properties)) {
+        this.properties = properties;
+      }
       return self();
     }
 
