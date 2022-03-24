@@ -45,5 +45,7 @@ public interface IROCrate {
 
   void setUntrackedFiles(List<File> files);
 
+  void addFromDataCiteSchema(String locationURL);
+
   List<File> getUntrackedFiles();
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.context.IROCrateMetadataContext;
 import edu.kit.crate.context.ROCrateMetadataContext;
+import edu.kit.crate.customimport.ImportFromCustomDataCite;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
@@ -43,6 +44,10 @@ public class ROCrate implements IROCrate {
   @Override
   public IROCratePreview getPreview() {
     return this.roCratePreview;
+  }
+
+  public void setRoCratePreview(IROCratePreview preview) {
+    this.roCratePreview = preview;
   }
 
   public void setMetadataContext(IROCrateMetadataContext metadataContext) {
@@ -151,6 +156,11 @@ public class ROCrate implements IROCrate {
   @Override
   public void setUntrackedFiles(List<File> files) {
     this.untrackedFiles = files;
+  }
+
+  @Override
+  public void addFromDataCiteSchema(String locationURL) {
+    ImportFromCustomDataCite.addDataCiteResource(locationURL, this);
   }
 
   @Override
