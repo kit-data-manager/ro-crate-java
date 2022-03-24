@@ -26,7 +26,7 @@ public class PreviewTest {
         .setPreview(new AutomaticPreview())
         .build();
     ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
-    writer.save(crate, location.toFile().toString());
+    writer.save(crate, location.toFile().getAbsolutePath());
     assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
 
