@@ -31,6 +31,7 @@ public class FolderWriter implements IWriterStrategy {
       File json = new File(destination, "ro-crate-metadata.json");
       FileUtils.copyInputStreamToFile(inputStream, json);
 
+      inputStream.close();
       // save also the preview files to the crate destination
       if (crate.getPreview() != null) {
         crate.getPreview().saveALLToFolder(file);
