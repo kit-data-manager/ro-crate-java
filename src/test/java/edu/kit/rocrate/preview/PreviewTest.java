@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PreviewTest {
 
   @Test
-  void testAutomaticPreview(@TempDir Path temp) {
+  void testAutomaticPreview(@TempDir Path temp) throws IOException {
     Path location = temp.resolve("ro_crate1");
     ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
         .setPreview(new AutomaticPreview())
         .build();
     ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
-    assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
+    assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
 
   @Test
