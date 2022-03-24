@@ -20,12 +20,13 @@ import java.nio.file.Path;
 public class RealTest {
 
   @Test
-  void testWithParadisecExample(@TempDir Path temp) throws IOException {
+  void testWithIDRCProject(@TempDir Path temp) throws IOException {
 
     ROCrateReader reader = new ROCrateReader(new FolderReader());
-    IROCrate crate = reader.readCrate(RealTest.class.getResource("/crates/paradisec/test123").getPath());
+    final String locationMetadataFile = "/crates/other/idrc_project/ro-crate-metadata.json";
+    IROCrate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
 
-    HelpFunctions.compareTwoMetadataJsonEqual(crate, "/crates/paradisec/test123/ro-crate-metadata.json");
+    HelpFunctions.compareTwoMetadataJsonEqual(crate, locationMetadataFile);
 
     Path newFile = temp.resolve("new_file.txt");
 
@@ -41,13 +42,13 @@ public class RealTest {
     PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
     crate.addContextualEntity(person);
 
-    ContextualEntity en = crate.getContextualEntityById("http://nla.gov.au/nla.party-593909");
+    ContextualEntity en = crate.getContextualEntityById("9a4e89e1-13bf-4d44-b5f7-ced40eb33cb2");
     en.addIdProperty("custom", "new_file.txt");
 
-    HelpFunctions.compareTwoMetadataJsonNotEqual(crate,"/crates/paradisec/test123/ro-crate-metadata.json");
+    HelpFunctions.compareTwoMetadataJsonNotEqual(crate,locationMetadataFile);
     crate.deleteEntityById("new_file.txt");
     crate.deleteEntityById("https://orcid.org/0000-0001-9842-9718");
-    HelpFunctions.compareTwoMetadataJsonEqual(crate, "/crates/paradisec/test123/ro-crate-metadata.json");
+    HelpFunctions.compareTwoMetadataJsonEqual(crate, locationMetadataFile);
     //  uncomment if want to see crate in local folder structure
     /*  FolderWriter folderWriter = new FolderWriter();
       ROCrateWriter roCrateWriter = new ROCrateWriter(folderWriter);
