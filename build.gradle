@@ -30,4 +30,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    maxParallelForks(4)
 }

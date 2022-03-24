@@ -20,7 +20,7 @@ public class PreviewTest {
 
   @Test
   void testAutomaticPreview(@TempDir Path temp) {
-    Path location = temp.resolve("ro_crate");
+    Path location = temp.resolve("ro_crate1");
     ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
         .setPreview(new AutomaticPreview())
         .build();
@@ -31,7 +31,7 @@ public class PreviewTest {
 
   @Test
   void testAutomaticPreviewAddingLater(@TempDir Path temp) {
-    Path location = temp.resolve("ro_crate");
+    Path location = temp.resolve("ro_crate2");
     ROCrate crate = new ROCrate.ROCrateBuilder("name", "description").build();
     ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
@@ -43,7 +43,7 @@ public class PreviewTest {
 
   @Test
   void testCustomPreviewOnlyHtmlFile(@TempDir Path temp) throws IOException {
-    Path location = temp.resolve("ro_crate");
+    Path location = temp.resolve("ro_crate3");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
     ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
@@ -56,7 +56,7 @@ public class PreviewTest {
 
   @Test
   void testCustomPreviewOnlyHtmlFileWithOtherFiles(@TempDir Path temp) throws IOException {
-    Path location = temp.resolve("ro_crate");
+    Path location = temp.resolve("ro_crate4");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
     Path dirHtml = temp.resolve("html_dir");
