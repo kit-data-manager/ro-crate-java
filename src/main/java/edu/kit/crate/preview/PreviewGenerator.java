@@ -12,7 +12,7 @@ public class PreviewGenerator {
         // check if we are running on windows or unix
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win")) {
-            builder.command("cmd.exe", "-c", command + " " + location + "/ro-crate-metadata.json");
+            builder.command("cmd.exe", "/c", command + " " + location + "/ro-crate-metadata.json");
 
         } else {
             builder.command("sh", "-c", command + " " + location + "/ro-crate-metadata.json");
