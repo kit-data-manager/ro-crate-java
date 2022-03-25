@@ -1,45 +1,17 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "required": [
     "@context",
     "@graph"
   ],
-  "properties" : {
-    "@graph" : {
+  "properties": {
+    "@graph": {
       "type": "array",
       "items": {
         "type": "object",
-        "patternProperties" : {
+        "patternProperties": {
           ".*": {
-            "anyOf" : [
-              { "type":"string"},
-              {
-                "type":"object",
-                "properties": {
-                  "@id": {
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
-              {
-                "type": "array",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "@id" : {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              },
-              {
-                "type": "array",
-                "items" : {
-                  "type" : "string"
-                }
-              }
-            ]
+            "$ref": "entity_field_structure_schema.json"
           }
         }
       }

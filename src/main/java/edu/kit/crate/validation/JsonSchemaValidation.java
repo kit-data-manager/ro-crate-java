@@ -11,34 +11,42 @@ import edu.kit.crate.objectmapper.MyObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Set;
 
 public class JsonSchemaValidation implements IValidatorStrategy {
+
   private static final String defaultSchema = "json_schemas/default.json";
-  private JsonNode schema;
+  private JsonSchema schema;
+
+  private void getSchema(URI schemaURI) {
+    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    this.schema = factory.getSchema(schemaURI);
+  }
 
   public JsonSchemaValidation() {
-    String str = Objects.requireNonNull(getClass().getClassLoader().getResource(defaultSchema)).getFile();
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
     try {
-      this.schema = objectMapper.readTree(new File(str));
-    } catch (IOException e) {
+      URI schemaURI = Objects.requireNonNull(getClass().getClassLoader().getResource(defaultSchema)).toURI();
+      getSchema(schemaURI);
+    } catch (URISyntaxException e) {
       e.printStackTrace();
     }
+  }
+
+  public JsonSchemaValidation(URI schemaURI) {
+    getSchema(schemaURI);
   }
 
   public JsonSchemaValidation(String schema) {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    try {
-      this.schema = objectMapper.readTree(new File(schema));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    URI schemaURI = new File(schema).toURI();
+    getSchema(schemaURI);
   }
 
   public JsonSchemaValidation(JsonNode schema) {
-    this.schema = schema;
+    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    this.schema = factory.getSchema(schema);
   }
 
   @Override
@@ -46,9 +54,7 @@ public class JsonSchemaValidation implements IValidatorStrategy {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     try {
       final JsonNode good = objectMapper.readTree(crate.getJsonMetadata());
-      JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-      JsonSchema jsonSchema = factory.getSchema(this.schema);
-      Set<ValidationMessage> errors = jsonSchema.validate(good);
+      Set<ValidationMessage> errors = this.schema.validate(good);
       if (errors.size() == 0) {
         return true;
       } else {
