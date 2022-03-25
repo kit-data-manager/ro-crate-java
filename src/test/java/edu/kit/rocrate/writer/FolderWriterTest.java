@@ -152,7 +152,7 @@ public class FolderWriterTest {
     Path result = tempDir.resolve("dest");
     folderRoCrateWriter.save(roCrate, result.toFile().toString());
     //FileUtils.copyDirectory(result.toFile(), new File("test"));
- //   assertFalse(HelpFunctions.compareTwoDir(result.toFile(), roDir.toFile()));
+    assertFalse(HelpFunctions.compareTwoDir(result.toFile(), roDir.toFile()));
 
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
   }

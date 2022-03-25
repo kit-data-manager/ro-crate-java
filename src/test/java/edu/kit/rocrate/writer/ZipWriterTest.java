@@ -164,7 +164,7 @@ public class ZipWriterTest {
     Path res = tempDir.resolve("dest");
     new ZipFile(test.toFile()).extractAll(res.toFile().getAbsolutePath());
 
-    //assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
+    assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
     HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");

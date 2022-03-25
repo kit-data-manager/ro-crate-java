@@ -22,10 +22,9 @@ public class ZipReader implements IReaderStrategy {
       File temp = new File("temp");
       if (temp.exists()) {
         FileUtils.cleanDirectory(new File("temp"));
-      } else {
-        FileUtils.forceDeleteOnExit(new File("temp"));
       }
       new ZipFile(location).extractAll("temp");
+      FileUtils.forceDeleteOnExit(new File("temp"));
       this.read = true;
     } catch (IOException e) {
       e.printStackTrace();

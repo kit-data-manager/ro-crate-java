@@ -56,7 +56,7 @@ public class ZipReaderTest {
 
     ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
-    roCrateZipWriter.save(roCrate, zipPath.toString());
+    roCrateZipWriter.save(roCrate, zipPath.toFile().getAbsolutePath());
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
     IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());

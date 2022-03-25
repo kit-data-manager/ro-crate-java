@@ -9,9 +9,16 @@ public class PreviewGenerator {
     public static void generatePreview(String location) {
         ProcessBuilder builder = new ProcessBuilder();
         // this is the equivalent of "rochtml dir/ro-crate-metadata.json"
-        // TODO: add solution for windows, this works only with linux machines
-        builder.command("sh", "-c", command + " " + location + "/ro-crate-metadata.json");
-        Process process = null;
+        // check if we are running on windows or unix
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            builder.command("cmd", "-c", command + " " + command + "/ro-crate-metadata.json");
+
+        } else {
+            builder.command("sh", "-c", command + " " + location + "/ro-crate-metadata.json");
+        }
+
+        Process process;
         try {
             process = builder.start();
             StringBuilder output = new StringBuilder();
