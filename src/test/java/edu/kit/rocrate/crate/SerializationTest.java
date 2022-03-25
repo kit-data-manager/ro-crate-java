@@ -23,7 +23,7 @@ public class SerializationTest {
   void simpleROCrateSerialization() throws IOException {
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .build();
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/simple.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
   }
 
   @Test
@@ -31,7 +31,7 @@ public class SerializationTest {
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .addValuePairToContext("@test", "ww.test")
         .build();
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/simple2.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple2.json");
   }
 
   @Test
@@ -47,7 +47,7 @@ public class SerializationTest {
         )
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/onlyOneFile.json");
   }
 
   @Test
@@ -70,7 +70,7 @@ public class SerializationTest {
                 .build()
         )
         .build();
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/onlyOneFile.json");
   }
 
   @Test
@@ -105,7 +105,7 @@ public class SerializationTest {
         )
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/twoFiles.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/twoFiles.json");
   }
 
 
@@ -132,7 +132,7 @@ public class SerializationTest {
         )
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
 
   @Test
@@ -226,6 +226,6 @@ public class SerializationTest {
         .addContextualEntity(createAction)
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/BiggerExample.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/BiggerExample.json");
   }
 }

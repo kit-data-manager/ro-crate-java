@@ -231,11 +231,6 @@ public class ROCrate implements IROCrate {
       return this;
     }
 
-    public ROCrateBuilder setJSONDescriptor(DataEntity descriptor) {
-      this.jsonDescriptor = descriptor;
-      return this;
-    }
-
     public ROCrateBuilder addUntrackedFile(File file) {
       this.untrackedFiles.add(file);
       return this;

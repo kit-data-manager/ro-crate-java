@@ -1,7 +1,6 @@
 package edu.kit.rocrate.crate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.contextual.PersonEntity;
@@ -27,11 +26,11 @@ public class TestRemoveAddEntity {
                 .build()
         )
         .build();
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/onlyOneFile.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/onlyOneFile.json");
 
     // remove entity and check if equals to the basic crate
     roCrate.deleteEntityById("survey-responses-2019.csv");
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/simple.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
   }
 
   @Test
@@ -64,7 +63,7 @@ public class TestRemoveAddEntity {
         )
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/twoFiles.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/twoFiles.json");
 
     roCrate.deleteEntityById("data1.txt");
     roCrate.deleteEntityById("data2.txt");
@@ -73,7 +72,7 @@ public class TestRemoveAddEntity {
 
     ROCrate roCrate2 = new ROCrate.ROCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity").build();
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, roCrate2);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, roCrate2);
   }
 
   @Test
@@ -115,6 +114,6 @@ public class TestRemoveAddEntity {
         .addDataEntity(file2)
         .build();
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, second2);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, second2);
   }
 }

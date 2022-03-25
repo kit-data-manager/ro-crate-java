@@ -13,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ public class ZipReaderTest {
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
     IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 
 
@@ -61,7 +60,7 @@ public class ZipReaderTest {
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
     IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 
   @Test
@@ -100,7 +99,7 @@ public class ZipReaderTest {
 
     // that copies the directory locally to see its content
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 
   @Test

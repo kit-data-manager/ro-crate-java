@@ -20,7 +20,7 @@ public class WorkflowHubTest {
     ROCrateReader reader = new ROCrateReader(new ZipReader());
     IROCrate crate = reader.readCrate(WorkflowHubTest.class.getResource("/crates/workflowhub/workflow-109-5.crate.zip").getPath());
 
-    HelpFunctions.compareTwoMetadataJsonEqual(crate, "/crates/workflowhub/workflow1/ro-crate-metadata.json");
+    HelpFunctions.compareCrateJsonToFileInResources(crate, "/crates/workflowhub/workflow1/ro-crate-metadata.json");
     ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
     writer.save(crate, temp.toString());
     HelpFunctions.compareTwoDir(temp.toFile(), new File(WorkflowHubTest.class.getResource("/crates/workflowhub/workflow1/").getPath()));

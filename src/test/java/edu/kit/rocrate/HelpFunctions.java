@@ -7,8 +7,6 @@ import edu.kit.crate.IROCrate;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.special.JsonHelpFunctions;
-import edu.kit.rocrate.entities.data.FileEntityTest;
-import edu.kit.rocrate.writer.FolderWriterTest;
 import org.apache.commons.io.FileUtils;
 import ro.skyah.comparator.JSONCompare;
 import ro.skyah.comparator.JsonComparator;
@@ -64,14 +62,21 @@ public class HelpFunctions {
     compare(node1, node2, false);
   }
 
-  public static void compareTwoMetadataJsonEqual(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
+  public static void compareCrateJsonToFileInResources(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode node1 = objectMapper.readTree(crate1.getJsonMetadata());
     JsonNode node2 = objectMapper.readTree(crate2.getJsonMetadata());
     compare(node1, node2, true);
   }
 
-  public static void compareTwoMetadataJsonEqual(IROCrate crate1, String jsonFileString) throws IOException {
+  public static void compareCrateJsonToFileInResources(File file1, File file2) throws IOException {
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    JsonNode node1 = JsonHelpFunctions.unwrapSingleArray(objectMapper.readTree(file1));
+    JsonNode node2 = JsonHelpFunctions.unwrapSingleArray(objectMapper.readTree(file2));
+    compare(node1, node2, true);
+  }
+
+  public static void compareCrateJsonToFileInResources(IROCrate crate1, String jsonFileString) throws IOException {
     InputStream inputStream = HelpFunctions.class.getResourceAsStream(
         jsonFileString);
     ObjectMapper objectMapper = MyObjectMapper.getMapper();

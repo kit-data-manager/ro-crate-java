@@ -62,7 +62,7 @@ public class FolderReaderTest {
     ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
     IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 
   @Test
@@ -103,7 +103,7 @@ public class FolderReaderTest {
     // that copies the directory locally to see its content
     //FileUtils.copyDirectory(locationSource.toFile(), new File("test"));
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, res);
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 
 

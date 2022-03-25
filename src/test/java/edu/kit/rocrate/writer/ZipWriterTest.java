@@ -11,7 +11,6 @@ import edu.kit.crate.preview.PreviewGenerator;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.crate.writer.ZipWriter;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -95,7 +94,7 @@ public class ZipWriterTest {
     assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
 
 
@@ -167,6 +166,6 @@ public class ZipWriterTest {
     assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
 }

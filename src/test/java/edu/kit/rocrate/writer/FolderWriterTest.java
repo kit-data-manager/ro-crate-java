@@ -89,7 +89,7 @@ public class FolderWriterTest {
     assertTrue(HelpFunctions.compareTwoDir(result.toFile(), roDir.toFile()));
 
     // just so we know the metadata is still valid
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
 
   @Test
@@ -154,6 +154,6 @@ public class FolderWriterTest {
     //FileUtils.copyDirectory(result.toFile(), new File("test"));
     assertFalse(HelpFunctions.compareTwoDir(result.toFile(), roDir.toFile()));
 
-    HelpFunctions.compareTwoMetadataJsonEqual(roCrate, "/json/crate/fileAndDir.json");
+    HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
 }

@@ -26,7 +26,7 @@ public class RealTest {
     final String locationMetadataFile = "/crates/other/idrc_project/ro-crate-metadata.json";
     IROCrate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
 
-    HelpFunctions.compareTwoMetadataJsonEqual(crate, locationMetadataFile);
+    HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
 
     Path newFile = temp.resolve("new_file.txt");
 
@@ -48,7 +48,7 @@ public class RealTest {
     HelpFunctions.compareTwoMetadataJsonNotEqual(crate,locationMetadataFile);
     crate.deleteEntityById("new_file.txt");
     crate.deleteEntityById("https://orcid.org/0000-0001-9842-9718");
-    HelpFunctions.compareTwoMetadataJsonEqual(crate, locationMetadataFile);
+    HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
     //  uncomment if want to see crate in local folder structure
     /*  FolderWriter folderWriter = new FolderWriter();
       ROCrateWriter roCrateWriter = new ROCrateWriter(folderWriter);
