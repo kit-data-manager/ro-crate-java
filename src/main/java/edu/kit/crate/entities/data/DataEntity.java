@@ -24,9 +24,9 @@ public class DataEntity extends AbstractEntity {
   public DataEntity(ADataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addIdListProperties("author", entityBuilder.authors);
-    if (entityBuilder.location != null && this.getId() == null) {
-      this.setId(entityBuilder.location.getName());
-    }
+//    if (entityBuilder.location != null) {
+//      this.setId(entityBuilder.location.getName());
+//    }
     this.location = entityBuilder.location;
   }
 
@@ -45,9 +45,9 @@ public class DataEntity extends AbstractEntity {
   public void savetoFile(File file) throws IOException {
     if (this.getLocation() != null) {
       if (this.getLocation().isDirectory()) {
-        FileUtils.copyDirectoryToDirectory(this.getLocation(), file);
+        FileUtils.copyDirectory(this.getLocation(), file.toPath().resolve(this.getId()).toFile());
       } else {
-        FileUtils.copyFileToDirectory(this.getLocation(), file);
+        FileUtils.copyFile(this.getLocation(), file.toPath().resolve(this.getId()).toFile());
       }
     }
   }
@@ -67,6 +67,9 @@ public class DataEntity extends AbstractEntity {
     List<String> authors = new ArrayList<>();
 
     public T setLocation(File file) {
+      if (this.getId() == null) {
+        this.setId(file.getName());
+      }
       this.location = file;
       return self();
     }

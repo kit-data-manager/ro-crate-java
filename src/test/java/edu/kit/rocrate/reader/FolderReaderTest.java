@@ -11,6 +11,7 @@ import edu.kit.crate.reader.ROCrateReader;
 import edu.kit.crate.writer.FolderWriter;
 import edu.kit.crate.writer.ROCrateWriter;
 import edu.kit.rocrate.HelpFunctions;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -61,7 +62,6 @@ public class FolderReaderTest {
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
     IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
-
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
   }
 

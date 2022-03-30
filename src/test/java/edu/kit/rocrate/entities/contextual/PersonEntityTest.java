@@ -1,16 +1,13 @@
 package edu.kit.rocrate.entities.contextual;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.crate.entities.contextual.PersonEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
+
 import java.io.IOException;
-import java.io.InputStream;
 
 import edu.kit.rocrate.HelpFunctions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Nikola Tzotchev on 5.2.2022 г.
@@ -30,5 +27,19 @@ public class PersonEntityTest {
         .build();
 
     HelpFunctions.compareEntityWithFile(person, "/json/entities/contextual/person.json");
+  }
+
+  // test if creating an entity without Id will get a default UUI
+  @Test
+  void personWithoutId() {
+    PersonEntity person = new PersonEntity.PersonEntityBuilder()
+        .setContactPoint("mailto:tim.luckett@uts.edu.au")
+        .setAffiliation("https://ror.org/03f0f6041")
+        .setFamilyName("Luckett")
+        .setGivenName("Tim")
+        .addProperty("name", "Tim Luckett")
+        .build();
+
+    assertFalse(person.getId().isEmpty());
   }
 }

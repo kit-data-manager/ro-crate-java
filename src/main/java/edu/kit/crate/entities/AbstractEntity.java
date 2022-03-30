@@ -15,6 +15,7 @@ import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Abstract Entity parent class of every singe item in the json metadata file
@@ -61,6 +62,13 @@ public class AbstractEntity {
   public AbstractEntity(AEntityBuilder<?> entityBuilder) {
     this.types = entityBuilder.types;
     this.properties = entityBuilder.properties;
+    if (this.properties.get("@id") == null) {
+      if (entityBuilder.id == null) {
+        this.properties.put("@id", UUID.randomUUID().toString());
+      } else {
+        this.properties.put("@id", entityBuilder.id);
+      }
+    }
   }
 
   @JsonIgnore
@@ -181,13 +189,17 @@ public class AbstractEntity {
 
     private Set<String> types;
     private ObjectNode properties;
+    private String id;
 
     public AEntityBuilder() {
       this.properties = MyObjectMapper.getMapper().createObjectNode();
     }
-
+    protected String getId() {
+      return this.id;
+    }
     public T setId(String id) {
-      this.properties.put("@id", id);
+      this.id = id;
+      //this.properties.put("@id", id);
       return self();
     }
 
