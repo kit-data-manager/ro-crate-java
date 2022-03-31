@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.context.IROCrateMetadataContext;
 import edu.kit.crate.context.ROCrateMetadataContext;
-import edu.kit.crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
@@ -157,10 +156,10 @@ public class ROCrate implements IROCrate {
     this.untrackedFiles = files;
   }
 
-  @Override
-  public void addFromDataCiteSchema(String locationURL) {
-    ImportFromDataCite.addDataCiteResource(locationURL, this);
-  }
+//  @Override
+//  public void addFromDataCiteSchema(String locationURL) {
+//    ImportFromDataCite.addDataCiteResource(locationURL, this);
+//  }
 
   @Override
   public List<File> getUntrackedFiles() {
