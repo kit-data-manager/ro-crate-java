@@ -39,20 +39,20 @@ public class RealTest {
             .build()
         , true);
 
+
     PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
     crate.addContextualEntity(person);
 
+    // problem
     ContextualEntity en = crate.getContextualEntityById("9a4e89e1-13bf-4d44-b5f7-ced40eb33cb2");
     en.addIdProperty("custom", "new_file.txt");
 
     HelpFunctions.compareTwoMetadataJsonNotEqual(crate,locationMetadataFile);
-    crate.deleteEntityById("new_file.txt");
     crate.deleteEntityById("https://orcid.org/0000-0001-9842-9718");
+    crate.deleteEntityById("new_file.txt");
+
+
     HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
     //  uncomment if want to see crate in local folder structure
-    /*  FolderWriter folderWriter = new FolderWriter();
-      ROCrateWriter roCrateWriter = new ROCrateWriter(folderWriter);
-      roCrateWriter.save(crate, "test");
-     */
   }
 }

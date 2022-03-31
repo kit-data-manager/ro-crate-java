@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import edu.kit.crate.special.JsonHelpFunctions;
+import edu.kit.crate.special.JsonUtilFunctions;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,9 +30,9 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
 
   @Override
   public void serialize(ObjectNode value, JsonGenerator jgen, SerializerProvider provider)
-      throws IOException, JsonGenerationException {
+      throws IOException {
 
-    JsonNode node = JsonHelpFunctions.unwrapSingleArray(value);
+    JsonNode node = JsonUtilFunctions.unwrapSingleArray(value);
     Iterator<Entry<String, JsonNode>> fields = node.fields();
 
     while (fields.hasNext()) {

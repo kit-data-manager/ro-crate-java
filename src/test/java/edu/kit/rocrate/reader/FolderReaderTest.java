@@ -1,8 +1,5 @@
 package edu.kit.rocrate.reader;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import edu.kit.crate.IROCrate;
 import edu.kit.crate.ROCrate;
 import edu.kit.crate.entities.data.FileEntity;
@@ -18,6 +15,8 @@ import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Nikola Tzotchev on 9.2.2022 г.

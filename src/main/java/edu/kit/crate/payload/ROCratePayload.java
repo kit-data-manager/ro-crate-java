@@ -7,11 +7,9 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import edu.kit.crate.special.JsonHelpFunctions;
+import edu.kit.crate.special.JsonUtilFunctions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Nikola Tzotchev on 6.2.2022 г.
@@ -22,9 +20,12 @@ public class ROCratePayload implements IROCratePayload {
   private HashMap<String, DataEntity> dataEntities;
   private HashMap<String, ContextualEntity> contextualEntities;
 
+  private HashMap<String, Set<String>> associatedItems;
+
   public ROCratePayload() {
     this.dataEntities = new HashMap<>();
     this.contextualEntities = new HashMap<>();
+    this.associatedItems = new HashMap<>();
   }
 
   @Override
@@ -49,12 +50,24 @@ public class ROCratePayload implements IROCratePayload {
 
   @Override
   public void addDataEntity(DataEntity dataEntity) {
+    this.addToAssociatedItems(dataEntity);
     this.dataEntities.put(dataEntity.getId(), dataEntity);
+    dataEntity.setObserver(new EntityObserver(this));
   }
 
   @Override
   public void addContextualEntity(ContextualEntity contextualEntity) {
+    this.addToAssociatedItems(contextualEntity);
     this.contextualEntities.put(contextualEntity.getId(), contextualEntity);
+    contextualEntity.setObserver(new EntityObserver(this));
+  }
+
+  public void addToAssociatedItems(AbstractEntity abstractEntity) {
+    var set = abstractEntity.getLinkedTo();
+    for (var e : set) {
+      this.associatedItems.computeIfAbsent(e, k -> new HashSet<>());
+      this.associatedItems.get(e).add(abstractEntity.getId());
+    }
   }
 
   @Override
@@ -91,7 +104,7 @@ public class ROCratePayload implements IROCratePayload {
     for (DataEntity ent : this.getAllDataEntities()) {
       node.add(objectMapper.convertValue(ent, ObjectNode.class));
     }
-    for (ContextualEntity ent : this.getAllContextualEntities()){
+    for (ContextualEntity ent : this.getAllContextualEntities()) {
       node.add(objectMapper.convertValue(ent, ObjectNode.class));
     }
     return node;
@@ -106,8 +119,21 @@ public class ROCratePayload implements IROCratePayload {
 
   @Override
   public void removeAllOccurrencesOf(String entityId) {
-    for (var e : this.getAllEntities()) {
-      JsonHelpFunctions.removeFieldsWith(entityId, e.getProperties());
+    for (var e : this.getAllEntitiesFromIds(this.associatedItems.get(entityId))) {
+      JsonUtilFunctions.removeFieldsWith(entityId, e.getProperties());
     }
   }
+
+  private List<AbstractEntity> getAllEntitiesFromIds(Set<String> set) {
+    List<AbstractEntity> list = new ArrayList<>();
+    if (set != null) {
+      for (var element : set) {
+        var entity = this.getEntityById(element);
+        if (entity != null)
+          list.add(entity);
+      }
+    }
+    return list;
+  }
+
 }

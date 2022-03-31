@@ -1,6 +1,5 @@
 package edu.kit.crate.reader;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,12 +10,8 @@ import edu.kit.crate.context.ROCrateMetadataContext;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
-import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -31,7 +26,7 @@ import java.util.Set;
  */
 public class ROCrateReader {
 
-  private IReaderStrategy reader;
+  private final IReaderStrategy reader;
   private IROCrate crate;
 
   public ROCrateReader(IReaderStrategy reader) {
@@ -51,9 +46,12 @@ public class ROCrateReader {
     ObjectNode metadataJson = reader.readMetadataJson(location);
     // get the content of the crate
     File files = reader.readContent(location);
-    // entities merge
-    HashSet<String> usedFiles = new HashSet<>();
 
+    // this set will contain the files that are associated with entities
+    HashSet<String> usedFiles = new HashSet<>();
+    usedFiles.add(new File(location).toPath().resolve("ro-crate-metadata.json").toFile().getPath());
+    usedFiles.add(new File(location).toPath().resolve("ro-crate-preview.html").toFile().getPath());
+    usedFiles.add(new File(location).toPath().resolve("ro-crate-preview_files").toFile().getPath());
 
     JsonNode context = metadataJson.get("@context");
 
@@ -64,7 +62,6 @@ public class ROCrateReader {
     if (graph.isArray()) {
 
       graph = setRootEntities((ArrayNode) graph);
-
       for (JsonNode node : graph) {
         // if the id is in the root has part we should add this entity as data entity
         if (this.crate.getRootDataEntity().hasInHasPart(node.get("@id").asText())) {

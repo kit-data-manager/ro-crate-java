@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 
-public class JsonHelpFunctions {
+import java.util.HashSet;
+import java.util.Set;
+
+public class JsonUtilFunctions {
+
   public static JsonNode unwrapSingleArray(JsonNode node) {
     ObjectNode newNode = MyObjectMapper.getMapper().createObjectNode();
     if (node.isObject()) {
@@ -57,5 +61,49 @@ public class JsonHelpFunctions {
         }
       }
     }
+  }
+
+  /**
+   * This method extracts from every property of a json objects its id's
+   * The method is intended for flattened json objects
+   *
+   * @param node The JsonNode json object
+   * @return the set containing all the strings
+   */
+  public static Set<String> getIdPropertiesFromJsonNode(JsonNode node) {
+    Set<String> set = new HashSet<>();
+    var itr = node.fields();
+    while(itr.hasNext()) {
+      set.addAll(getIdPropertiesFromProperty(itr.next().getValue()));
+    }
+    return set;
+  }
+
+  /**
+   * Extracts the id from a JsonNode property.
+   * This method is intended for flattened json-ld
+   * that is why it is not recursive
+   *
+   * @param node the JsonNode property
+   * @return Set containing all the id as string
+   */
+  public static Set<String> getIdPropertiesFromProperty(JsonNode node) {
+    Set<String> set = new HashSet<>();
+    if (node.isArray()) {
+      for (var element : node) {
+        if (element.isObject()) {
+          var id = element.get("@id");
+          if (id != null) {
+            set.add(id.asText());
+          }
+        }
+      }
+    } else if (node.isObject()) {
+      var id = node.get("@id");
+      if (id != null) {
+        set.add(id.asText());
+      }
+    }
+    return set;
   }
 }

@@ -13,7 +13,7 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
-import edu.kit.crate.special.JsonHelpFunctions;
+import edu.kit.crate.special.JsonUtilFunctions;
 import edu.kit.crate.preview.IROCratePreview;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
@@ -148,8 +148,8 @@ public class ROCrate implements IROCrate {
     // remove from the root data entity hasPart
     this.rootDataEntity.removeFromHasPart(entityId);
     // remove from the root entity and the file descriptor
-    JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties());
-    JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties());
+    JsonUtilFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties());
+    JsonUtilFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties());
   }
 
   @Override

@@ -11,11 +11,10 @@ import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.entities.validation.EntityValidation;
 import edu.kit.crate.entities.validation.JsonSchemaValidation;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.payload.IObserver;
+import edu.kit.crate.special.JsonUtilFunctions;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Abstract Entity parent class of every singe item in the json metadata file
@@ -43,11 +42,39 @@ public class AbstractEntity {
 
   private static EntityValidation entityValidation = new EntityValidation(new JsonSchemaValidation());
 
-  public void setProperties(JsonNode obj) {
-    // validate whole entity
-    if (entityValidation.entityValidation(obj)) {
-      this.properties = obj.deepCopy();
+
+  @JsonIgnore
+  private Set<String> linkedTo;
+
+
+  @JsonIgnore
+  private IObserver observer;
+
+  public void setObserver(IObserver observer) {
+    this.observer = observer;
+  }
+
+  private void notifyObservers() {
+    if (this.observer != null)
+      this.observer.update(this.getId());
+  }
+
+
+  public AbstractEntity(AEntityBuilder<?> entityBuilder) {
+    this.types = entityBuilder.types;
+    this.properties = entityBuilder.properties;
+    this.linkedTo = entityBuilder.relatedItems;
+    if (this.properties.get("@id") == null) {
+      if (entityBuilder.id == null) {
+        this.properties.put("@id", UUID.randomUUID().toString());
+      } else {
+        this.properties.put("@id", entityBuilder.id);
+      }
     }
+  }
+
+  public Set<String> getLinkedTo() {
+    return linkedTo;
   }
 
 
@@ -59,16 +86,8 @@ public class AbstractEntity {
     return properties;
   }
 
-  public AbstractEntity(AEntityBuilder<?> entityBuilder) {
-    this.types = entityBuilder.types;
-    this.properties = entityBuilder.properties;
-    if (this.properties.get("@id") == null) {
-      if (entityBuilder.id == null) {
-        this.properties.put("@id", UUID.randomUUID().toString());
-      } else {
-        this.properties.put("@id", entityBuilder.id);
-      }
-    }
+  public JsonNode getProperty(String propertyKey) {
+    return this.properties.get(propertyKey);
   }
 
   @JsonIgnore
@@ -77,38 +96,52 @@ public class AbstractEntity {
     return id == null ? null : id.asText();
   }
 
-  public void setId(String id) {
+  public void setProperties(JsonNode obj) {
+    // validate whole entity
+    if (entityValidation.entityValidation(obj)) {
+      this.properties = obj.deepCopy();
+      this.notifyObservers();
+    }
+  }
+
+  protected void setId(String id) {
     this.properties.put("@id", id);
   }
 
   public void addProperty(String key, String value) {
     if (key != null && value != null) {
       this.properties.put(key, value);
+      this.notifyObservers();
     }
   }
 
   public void addProperty(String key, long value) {
     if (key != null) {
       this.properties.put(key, value);
+      this.notifyObservers();
     }
   }
 
   public void addProperty(String key, double value) {
     if (key != null) {
       this.properties.put(key, value);
+      this.notifyObservers();
     }
   }
 
   public void addProperty(String key, JsonNode value) {
-    addProperty(this.properties, key, value);
+    if (addProperty(this.properties, key, value))
+      notifyObservers();
   }
 
-  private static void addProperty(ObjectNode whereToAdd, String key, JsonNode value) {
+  private static boolean addProperty(ObjectNode whereToAdd, String key, JsonNode value) {
     if (key != null && value != null) {
       if (entityValidation.fieldValidation(value)) {
         whereToAdd.set(key, value);
+        return true;
       }
     }
+    return false;
   }
 
   /**
@@ -121,8 +154,11 @@ public class AbstractEntity {
    */
   public void addIdProperty(String name, String id) {
     JsonNode jsonNode = addToIdProperty(name, id, this.properties.get(name));
-    if (jsonNode != null)
+    if (jsonNode != null) {
+      this.linkedTo.add(id);
       this.properties.set(name, jsonNode);
+      this.notifyObservers();
+    }
   }
 
   private static JsonNode addToIdProperty(String name, String id, JsonNode property) {
@@ -163,6 +199,7 @@ public class AbstractEntity {
       }
     }
     for (String s : stringList) {
+      this.linkedTo.add(s);
       node.add(objectMapper.createObjectNode().put("@id", s));
     }
     if (node.size() == 1) {
@@ -170,6 +207,7 @@ public class AbstractEntity {
     } else {
       this.properties.set(name, node);
     }
+    notifyObservers();
   }
 
   public void addType(String type) {
@@ -181,22 +219,23 @@ public class AbstractEntity {
     this.properties.set("@type", node);
   }
 
-  public JsonNode getProperty(String propertyKey) {
-    return this.properties.get(propertyKey);
-  }
 
   public static abstract class AEntityBuilder<T extends AEntityBuilder<T>> {
 
     private Set<String> types;
+    private Set<String> relatedItems;
     private ObjectNode properties;
     private String id;
 
     public AEntityBuilder() {
       this.properties = MyObjectMapper.getMapper().createObjectNode();
+      this.relatedItems = new HashSet<>();
     }
+
     protected String getId() {
       return this.id;
     }
+
     public T setId(String id) {
       this.id = id;
       //this.properties.put("@id", id);
@@ -220,7 +259,9 @@ public class AbstractEntity {
     }
 
     public T addProperty(String key, JsonNode value) {
-      AbstractEntity.addProperty(this.properties, key, value);
+      if (AbstractEntity.addProperty(this.properties, key, value)) {
+        this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromProperty(value));
+      }
       return self();
     }
 
@@ -243,6 +284,7 @@ public class AbstractEntity {
       JsonNode jsonNode = AbstractEntity.addToIdProperty(name, id, this.properties.get(name));
       if (jsonNode != null) {
         this.properties.set(name, jsonNode);
+        this.relatedItems.add(id);
       }
       return self();
     }
@@ -250,6 +292,7 @@ public class AbstractEntity {
     public T setAll(ObjectNode properties) {
       if (AbstractEntity.entityValidation.entityValidation(properties)) {
         this.properties = properties;
+        this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
       }
       return self();
     }
