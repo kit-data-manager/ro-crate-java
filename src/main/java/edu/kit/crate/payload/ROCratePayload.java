@@ -101,6 +101,7 @@ public class ROCratePayload implements IROCratePayload {
   public void removeEntityById(String id) {
     this.dataEntities.remove(id);
     this.contextualEntities.remove(id);
+    this.removeAllOccurrencesOf(id);
   }
 
   @Override

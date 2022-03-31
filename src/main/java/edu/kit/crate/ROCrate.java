@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.context.IROCrateMetadataContext;
 import edu.kit.crate.context.ROCrateMetadataContext;
-import edu.kit.crate.customimport.ImportFromCustomDataCite;
+import edu.kit.crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
@@ -145,10 +145,9 @@ public class ROCrate implements IROCrate {
   public void deleteEntityById(String entityId) {
     // delete the entity firstly
     this.roCratePayload.removeEntityById(entityId);
-    // firstly search the root data entity and the descriptor
-    this.roCratePayload.removeAllOccurrencesOf(entityId);
-    // also remove in the root data entity and the descriptor
+    // remove from the root data entity hasPart
     this.rootDataEntity.removeFromHasPart(entityId);
+    // remove from the root entity and the file descriptor
     JsonHelpFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties());
     JsonHelpFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties());
   }
@@ -160,7 +159,7 @@ public class ROCrate implements IROCrate {
 
   @Override
   public void addFromDataCiteSchema(String locationURL) {
-    ImportFromCustomDataCite.addDataCiteResource(locationURL, this);
+    ImportFromDataCite.addDataCiteResource(locationURL, this);
   }
 
   @Override
