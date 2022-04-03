@@ -5,6 +5,7 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,6 +22,10 @@ public interface IROCratePayload {
   void addDataEntity(DataEntity dataEntity);
 
   void addContextualEntity(ContextualEntity contextualEntity);
+
+  void addEntity(AbstractEntity entity);
+
+  void addEntities(Collection<AbstractEntity> entity);
 
   List<AbstractEntity> getAllEntities();
 

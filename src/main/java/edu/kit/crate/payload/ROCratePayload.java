@@ -62,6 +62,26 @@ public class ROCratePayload implements IROCratePayload {
     contextualEntity.setObserver(new EntityObserver(this));
   }
 
+  @Override
+  public void addEntity(AbstractEntity entity) {
+    if (entity != null) {
+      if (entity instanceof DataEntity) {
+        this.addDataEntity((DataEntity) entity);
+      } else {
+        this.addContextualEntity((ContextualEntity) entity);
+      }
+    }
+  }
+
+  @Override
+  public void addEntities(Collection<AbstractEntity> entities) {
+    if (entities != null) {
+      for (var element : entities) {
+        this.addEntity(element);
+      }
+    }
+  }
+
   public void addToAssociatedItems(AbstractEntity abstractEntity) {
     var set = abstractEntity.getLinkedTo();
     for (var e : set) {
