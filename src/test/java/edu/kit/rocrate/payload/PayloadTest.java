@@ -101,6 +101,25 @@ public class PayloadTest {
   }
 
   @Test
+  void addSameIdTest() {
+    var dataEntity1 = new DataEntity.DataEntityBuilder()
+        .setId("en1")
+        .addProperty("description", "yes")
+        .build();
+
+    var dataEntity2 = new DataEntity.DataEntityBuilder()
+        .setId("en1")
+        .addProperty("description", "different")
+        .build();
+
+    this.payload.addDataEntity(dataEntity1);
+    this.payload.addDataEntity(dataEntity2);
+
+    assertEquals(this.payload.getAllEntities().size(), 1);
+    var retrieve = this.payload.getEntityById("en1");
+    assertEquals(retrieve, dataEntity2);
+  }
+  @Test
   void removeEntity() {
     var dataEntity1 = new DataEntity.DataEntityBuilder()
         .setId("en1")
