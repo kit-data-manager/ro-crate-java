@@ -23,7 +23,9 @@ public class DataEntity extends AbstractEntity {
 
   public DataEntity(ADataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
-    this.addIdListProperties("author", entityBuilder.authors);
+    if (!entityBuilder.authors.isEmpty()) {
+      this.addIdListProperties("author", entityBuilder.authors);
+    }
 //    if (entityBuilder.location != null) {
 //      this.setId(entityBuilder.location.getName());
 //    }

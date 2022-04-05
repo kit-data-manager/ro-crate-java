@@ -32,7 +32,6 @@ public class ROCrate implements IROCrate {
 
   private final static String ID = "ro-crate-metadata.json";
   private final static String RO_SPEC = "https://w3id.org/ro/crate/1.1";
-  private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
 
   private final IROCratePayload roCratePayload;
   private IROCrateMetadataContext metadataContext;
@@ -73,7 +72,7 @@ public class ROCrate implements IROCrate {
 
   public ROCrate() {
     this.roCratePayload = new ROCratePayload();
-    this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
+    this.metadataContext = new ROCrateMetadataContext();
     this.untrackedFiles = new ArrayList<>();
   }
 
@@ -187,7 +186,7 @@ public class ROCrate implements IROCrate {
     public ROCrateBuilder(String name, String description) {
       this.payload = new ROCratePayload();
       this.untrackedFiles = new ArrayList<>();
-      this.metadataContext = new ROCrateMetadataContext(Collections.singletonList(DEFAULT_CONTEXT));
+      this.metadataContext = new ROCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .addProperty("name", name)
           .addProperty("description", description)

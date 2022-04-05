@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author Nikola Tzotchev on 6.2.2022 г.
@@ -25,11 +26,20 @@ import java.util.*;
  */
 public class ROCrateMetadataContext implements IROCrateMetadataContext {
 
-  private List<String> url;
-  private HashMap<String, String> contextMap;
+  private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+
+  private final List<String> url;
+  private final HashMap<String, String> contextMap;
   // we need to keep the ones that are no coming from url
   // for the final representation
-  private HashMap<String, String> other;
+  private final HashMap<String, String> other;
+
+  public ROCrateMetadataContext() {
+    this.url = new ArrayList<>();
+    this.contextMap = new HashMap<>();
+    this.other = new HashMap<>();
+    this.addToContextFromUrl(DEFAULT_CONTEXT);
+  }
 
   public ROCrateMetadataContext(List<String> url) {
     this.url = new ArrayList<>();
@@ -44,19 +54,25 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     this.url = new ArrayList<>();
     this.other = new HashMap<>();
     this.contextMap = new HashMap<>();
+
+    Consumer<JsonNode> addPairs = x -> {
+      var iterate = x.fields();
+      while (iterate.hasNext()) {
+        var next = iterate.next();
+        this.other.put(next.getKey(), next.getValue().asText());
+        this.contextMap.put(next.getKey(), next.getValue().asText());
+      }
+    };
     if (context.isArray()) {
       for (JsonNode jsonNode : context) {
         if (jsonNode.isTextual()) {
           this.addToContextFromUrl(jsonNode.asText());
-        } else {
-          var iterate = jsonNode.fields();
-          while (iterate.hasNext()) {
-            var next = iterate.next();
-            this.other.put(next.getKey(), next.getValue().asText());
-            this.contextMap.put(next.getKey(), next.getValue().asText());
-          }
+        } else if (jsonNode.isObject()) {
+          addPairs.accept(jsonNode);
         }
       }
+    } else if (context.isObject()) {
+      addPairs.accept(context);
     } else {
       this.addToContextFromUrl(context.asText());
     }
@@ -86,7 +102,6 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
   }
 
   public ObjectNode getFromSchema(String type) {
-
     CloseableHttpClient httpclient = HttpClients.createDefault();
     String url = this.contextMap.get(type);
     HttpGet httpGet = new HttpGet(url);
@@ -118,6 +133,7 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     for (var s : types) {
       if (this.contextMap.get(s) == null) {
         System.err.println("type " + s + " is missing from the context!");
+        return false;
       }
     }
 
@@ -126,6 +142,7 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
       String s = names.next();
       if (this.contextMap.get(s) == null) {
         System.err.println("entity " + s + " is missing from context;");
+        return false;
       }
     }
     return true;
@@ -228,10 +245,8 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
       this.contextMap.putAll(objectMapper.convertValue(jsonNode.get("@context"),
           new TypeReference<>() {
           }));
-
-      // System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode));
     } catch (IOException e) {
-      e.printStackTrace();
+      System.err.println("Cannot get context from this url.");
     }
   }
 
