@@ -8,6 +8,7 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.preview.IROCratePreview;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,7 +46,9 @@ public interface IROCrate {
 
   void setUntrackedFiles(List<File> files);
 
- // void addFromDataCiteSchema(String locationURL);
+  void addFromCollection(Collection<AbstractEntity> entities);
+
+  void addItemFromDataCite(String locationURL);
 
   List<File> getUntrackedFiles();
 }

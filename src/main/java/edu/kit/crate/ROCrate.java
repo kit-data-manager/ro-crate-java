@@ -9,6 +9,7 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
+import edu.kit.crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.payload.IROCratePayload;
 import edu.kit.crate.payload.ROCratePayload;
@@ -19,6 +20,7 @@ import edu.kit.crate.validation.Validator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class ROCrate implements IROCrate {
   private final static String RO_SPEC = "https://w3id.org/ro/crate/1.1";
   private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
 
-  private IROCratePayload roCratePayload;
+  private final IROCratePayload roCratePayload;
   private IROCrateMetadataContext metadataContext;
   private IROCratePreview roCratePreview;
   private RootDataEntity rootDataEntity;
@@ -156,10 +158,16 @@ public class ROCrate implements IROCrate {
     this.untrackedFiles = files;
   }
 
-//  @Override
-//  public void addFromDataCiteSchema(String locationURL) {
-//    ImportFromDataCite.addDataCiteResource(locationURL, this);
-//  }
+  // fix this
+  @Override
+  public void addFromCollection(Collection<AbstractEntity> entities) {
+    this.roCratePayload.addEntities(entities);
+  }
+
+  @Override
+  public void addItemFromDataCite(String locationURL) {
+    ImportFromDataCite.addDataCiteToCrate(locationURL, this);
+  }
 
   @Override
   public List<File> getUntrackedFiles() {
