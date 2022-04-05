@@ -40,11 +40,11 @@ public class AbstractEntity {
   @JsonSerialize(using = ObjectNodeSerializer.class)
   private ObjectNode properties;
 
-  private static EntityValidation entityValidation = new EntityValidation(new JsonSchemaValidation());
+  private final static EntityValidation entityValidation = new EntityValidation(new JsonSchemaValidation());
 
 
   @JsonIgnore
-  private Set<String> linkedTo;
+  private final Set<String> linkedTo;
 
 
   @JsonIgnore
@@ -223,7 +223,7 @@ public class AbstractEntity {
   public static abstract class AEntityBuilder<T extends AEntityBuilder<T>> {
 
     private Set<String> types;
-    private Set<String> relatedItems;
+    protected Set<String> relatedItems;
     private ObjectNode properties;
     private String id;
 

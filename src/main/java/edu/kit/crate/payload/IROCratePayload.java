@@ -36,6 +36,4 @@ public interface IROCratePayload {
   ArrayNode getEntitiesMetadata();
 
   void removeEntityById(String id);
-
-  void removeAllOccurrencesOf(String entityId);
 }

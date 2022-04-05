@@ -65,12 +65,18 @@ public class DataSetEntity extends DataEntity {
     }
 
     public T addToHasPart(DataEntity dataEntity) {
-      this.hasPart.add(dataEntity.getId());
+      if (dataEntity != null) {
+        this.hasPart.add(dataEntity.getId());
+        this.relatedItems.add(dataEntity.getId());
+      }
       return self();
     }
 
     public T addToHasPart(String dataEntity) {
-      this.hasPart.add(dataEntity);
+      if (dataEntity != null) {
+        this.hasPart.add(dataEntity);
+        this.relatedItems.add(dataEntity);
+      }
       return self();
     }
 

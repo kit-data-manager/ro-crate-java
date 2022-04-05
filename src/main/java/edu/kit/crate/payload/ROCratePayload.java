@@ -17,10 +17,9 @@ import java.util.*;
  */
 public class ROCratePayload implements IROCratePayload {
 
-  private HashMap<String, DataEntity> dataEntities;
-  private HashMap<String, ContextualEntity> contextualEntities;
-
-  private HashMap<String, Set<String>> associatedItems;
+  private final HashMap<String, DataEntity> dataEntities;
+  private final HashMap<String, ContextualEntity> contextualEntities;
+  private final HashMap<String, Set<String>> associatedItems;
 
   public ROCratePayload() {
     this.dataEntities = new HashMap<>();
@@ -137,8 +136,7 @@ public class ROCratePayload implements IROCratePayload {
     this.removeAllOccurrencesOf(id);
   }
 
-  @Override
-  public void removeAllOccurrencesOf(String entityId) {
+  private void removeAllOccurrencesOf(String entityId) {
     for (var e : this.getAllEntitiesFromIds(this.associatedItems.get(entityId))) {
       JsonUtilFunctions.removeFieldsWith(entityId, e.getProperties());
     }
