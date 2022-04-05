@@ -237,7 +237,8 @@ public class AbstractEntity {
     }
 
     public T setId(String id) {
-      this.id = id;
+      if (id != null)
+        this.id = id;
       //this.properties.put("@id", id);
       return self();
     }
@@ -285,6 +286,22 @@ public class AbstractEntity {
       if (jsonNode != null) {
         this.properties.set(name, jsonNode);
         this.relatedItems.add(id);
+      }
+      return self();
+    }
+
+    public T addIdProperty(String name, AbstractEntity entity) {
+      if (entity != null) {
+        return addIdProperty(name, entity.getId());
+      }
+      return self();
+    }
+
+    public T addIdFromCollectionOFEntities(String name, Collection<AbstractEntity> entities) {
+      if (entities != null) {
+        for (var e : entities) {
+          addIdProperty(name, e);
+        }
       }
       return self();
     }
