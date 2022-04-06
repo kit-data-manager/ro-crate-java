@@ -13,8 +13,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class CustomPreview implements IROCratePreview {
 
-  private File metadataHtml;
-  private File otherFiles;
+  private final File metadataHtml;
+  private final File otherFiles;
 
   public CustomPreview(File metadataHtml, File otherFiles) {
     this.metadataHtml = metadataHtml;
@@ -23,6 +23,7 @@ public class CustomPreview implements IROCratePreview {
 
   public CustomPreview(File metadataHtml) {
     this.metadataHtml = metadataHtml;
+    this.otherFiles = null;
   }
 
   @Override
@@ -39,6 +40,7 @@ public class CustomPreview implements IROCratePreview {
     if (this.otherFiles != null) {
       try {
         zipFile.addFolder(this.otherFiles);
+        zipFile.renameFile(this.otherFiles.getName()+"/", "ro-crate-preview_files/");
       } catch (ZipException e) {
         System.err.println("Exception writing preview files to zip");
       }
