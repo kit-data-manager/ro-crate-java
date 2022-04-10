@@ -37,7 +37,7 @@ public class ROCrate implements IROCrate {
   private IROCrateMetadataContext metadataContext;
   private IROCratePreview roCratePreview;
   private RootDataEntity rootDataEntity;
-  private DataEntity jsonDescriptor;
+  private ContextualEntity jsonDescriptor;
 
   private List<File> untrackedFiles;
 
@@ -54,11 +54,11 @@ public class ROCrate implements IROCrate {
     this.metadataContext = metadataContext;
   }
 
-  public DataEntity getJsonDescriptor() {
+  public ContextualEntity getJsonDescriptor() {
     return jsonDescriptor;
   }
 
-  public void setJsonDescriptor(DataEntity jsonDescriptor) {
+  public void setJsonDescriptor(ContextualEntity jsonDescriptor) {
     this.jsonDescriptor = jsonDescriptor;
   }
 
@@ -180,7 +180,7 @@ public class ROCrate implements IROCrate {
     IROCrateMetadataContext metadataContext;
     ContextualEntity license;
     RootDataEntity rootDataEntity;
-    DataEntity jsonDescriptor;
+    ContextualEntity jsonDescriptor;
     List<File> untrackedFiles;
 
     public ROCrateBuilder(String name, String description) {
@@ -191,7 +191,7 @@ public class ROCrate implements IROCrate {
           .addProperty("name", name)
           .addProperty("description", description)
           .build();
-      jsonDescriptor = new DataEntity.DataEntityBuilder()
+      jsonDescriptor = new ContextualEntity.ContextualEntityBuilder()
           .setId(ID)
           .addType("CreativeWork")
           .addIdProperty("about", "./")

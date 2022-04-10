@@ -115,7 +115,7 @@ public class ROCrateReader {
         String uri = type.get("@id").asText();
         if (uri.matches("https://w3id.org/ro/crate/.*")) {
           this.crate.setJsonDescriptor(
-              new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build());
+              new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
           graphCopy.remove(i);
           String id = node.get("about").get("@id").asText();
           for (int j = 0; j < graphCopy.size(); j++) {

@@ -1,5 +1,7 @@
 package edu.kit.crate.entities.data;
 
+import java.io.File;
+
 /**
  * The root DataEntity is basically a DataSet with a default id.
  * This class may be usefully for other functionalities later.
@@ -24,6 +26,8 @@ public class RootDataEntity extends DataSetEntity {
 
     @Override
     public RootDataEntity build() {
+      // small hack not to get the command line message
+      this.setSource(new File("./"));
       return new RootDataEntity(this);
     }
   }

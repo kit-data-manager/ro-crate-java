@@ -24,9 +24,9 @@ public interface IROCrate {
 
   void setRootDataEntity(RootDataEntity rootDataEntity);
 
-  DataEntity getJsonDescriptor();
+  ContextualEntity getJsonDescriptor();
 
-  void setJsonDescriptor(DataEntity jsonDescriptor);
+  void setJsonDescriptor(ContextualEntity jsonDescriptor);
 
   String getJsonMetadata();
 
