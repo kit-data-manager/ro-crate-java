@@ -34,7 +34,7 @@ public class RealTest {
     crate.addDataEntity(
         new FileEntity.FileEntityBuilder()
             .setId("new_file.txt")
-            .setLocation(newFile.toAbsolutePath().toFile())
+            .setSource(newFile.toAbsolutePath().toFile())
             .addProperty("description", "my new file that I added")
             .build()
         , true);

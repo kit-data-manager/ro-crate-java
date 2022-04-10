@@ -44,7 +44,7 @@ public class FileEntityTest {
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     FileEntity file = new FileEntityBuilder()
         .setId("example.json")
-        .setLocation(new File(url.getFile()))
+        .setSource(new File(url.getFile()))
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .build();
@@ -53,7 +53,7 @@ public class FileEntityTest {
     // if the entity does not include and id but includes a physical file
     // use the name of the file as id
     FileEntity fileWithoutId = new FileEntityBuilder()
-        .setLocation(new File(url.getFile()))
+        .setSource(new File(url.getFile()))
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .build();

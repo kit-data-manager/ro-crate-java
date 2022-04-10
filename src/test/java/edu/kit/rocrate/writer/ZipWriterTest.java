@@ -68,7 +68,7 @@ public class ZipWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setLocation(file1.toFile())
+                .setSource(file1.toFile())
                 .build()
         )
         .addDataEntity(
@@ -77,7 +77,7 @@ public class ZipWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setLocation(dirInCrate.toFile())
+                .setSource(dirInCrate.toFile())
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -140,7 +140,7 @@ public class ZipWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setLocation(falseFile.toFile())
+                .setSource(falseFile.toFile())
                 .build()
         )
         .addDataEntity(
@@ -149,7 +149,7 @@ public class ZipWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setLocation(dirInCrate.toFile())
+                .setSource(dirInCrate.toFile())
                 .build()
         )
         .build();

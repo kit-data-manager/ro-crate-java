@@ -74,7 +74,7 @@ public class ZipReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setLocation(file.toFile())
+                .setSource(file.toFile())
                 .build()
         )
         .build();
@@ -113,7 +113,7 @@ public class ZipReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setLocation(file.toFile())
+                .setSource(file.toFile())
                 .build()
         )
         .build();
@@ -139,7 +139,7 @@ public class ZipReaderTest {
     res.addDataEntity(new FileEntity.FileEntityBuilder()
         .setId("new_file")
         .setEncodingFormat("setnew")
-        .setLocation(newFile.toFile())
+        .setSource(newFile.toFile())
         .build(), true);
 
     Path destinationDir = temp.resolve("result");

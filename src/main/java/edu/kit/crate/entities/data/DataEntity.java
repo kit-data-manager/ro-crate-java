@@ -68,7 +68,7 @@ public class DataEntity extends AbstractEntity {
     File location;
     List<String> authors = new ArrayList<>();
 
-    public T setLocation(File file) {
+    public T setSource(File file) {
       if (this.getId() == null) {
         this.setId(file.getName());
       }

@@ -12,7 +12,6 @@ import edu.kit.crate.preview.PreviewGenerator;
 import edu.kit.crate.writer.FolderWriter;
 import edu.kit.crate.writer.ROCrateWriter;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -59,7 +58,7 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setLocation(file1.toFile())
+                .setSource(file1.toFile())
                 .build()
         )
         .addDataEntity(
@@ -68,14 +67,14 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setLocation(dirInCrate.toFile())
+                .setSource(dirInCrate.toFile())
                 .build()
         )
         .addDataEntity(
             new DataEntity.DataEntityBuilder()
                 .addProperty("name", "fileWihtoutID")
                 .addProperty("description", "this File should have the same name as the filed that is being copied")
-                .setLocation(fileWithoutID.toFile())
+                .setSource(fileWithoutID.toFile())
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -133,7 +132,7 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setLocation(file1.toFile())
+                .setSource(file1.toFile())
                 .build()
         )
         .addDataEntity(
@@ -142,7 +141,7 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setLocation(dirInCrate.toFile())
+                .setSource(dirInCrate.toFile())
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -199,7 +198,7 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setLocation(falseFile.toFile())
+                .setSource(falseFile.toFile())
                 .build()
         )
         .addDataEntity(
@@ -208,7 +207,7 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setLocation(dirInCrate.toFile())
+                .setSource(dirInCrate.toFile())
                 .build()
         )
         .build();
