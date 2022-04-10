@@ -62,7 +62,7 @@ public class HelpFunctions {
     compare(node1, node2, false);
   }
 
-  public static void compareCrateJsonToFileInResources(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
+  public static void compareTwoCrateJson(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode node1 = objectMapper.readTree(crate1.getJsonMetadata());
     JsonNode node2 = objectMapper.readTree(crate2.getJsonMetadata());

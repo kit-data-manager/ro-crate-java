@@ -73,10 +73,12 @@ public class DataEntity extends AbstractEntity {
     List<String> authors = new ArrayList<>();
 
     public T setSource(File file) {
-      if (this.getId() == null) {
-        this.setId(file.getName());
+      if (file != null) {
+        if (this.getId() == null) {
+          this.setId(file.getName());
+        }
+        this.location = file;
       }
-      this.location = file;
       return self();
     }
 

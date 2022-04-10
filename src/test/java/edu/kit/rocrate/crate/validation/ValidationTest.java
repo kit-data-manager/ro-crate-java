@@ -26,7 +26,7 @@ public class ValidationTest {
     IROCrate crate = new ROCrate.ROCrateBuilder("workflowCrate", "this is a test")
         .addDataEntity(
             new WorkflowEntity.WorkflowEntityBuilder()
-                .setId("test123")
+                .setId("https://www.example.com/entity")
                 .build()
         )
         .build();
@@ -47,7 +47,7 @@ public class ValidationTest {
     validator = new Validator(new JsonSchemaValidation(schemaUrl.toURI()));
     assertTrue(validator.validate(crate));
 
-    crate.deleteEntityById("test123");
+    crate.deleteEntityById("https://www.example.com/entity");
     // crate should not match this schema
     assertFalse(validator.validate(crate));
   }

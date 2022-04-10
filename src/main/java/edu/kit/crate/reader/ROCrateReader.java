@@ -65,13 +65,15 @@ public class ROCrateReader {
       for (JsonNode node : graph) {
         // if the id is in the root has part we should add this entity as data entity
         if (this.crate.getRootDataEntity().hasInHasPart(node.get("@id").asText())) {
-          // data entity
-          DataEntity dataEntity = new DataEntity.DataEntityBuilder().setAll(node.deepCopy()).build();
-          File loc = checkFolderHasFile(dataEntity.getId(), files);
+          File loc = checkFolderHasFile(node.get("@id").asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
           }
-          dataEntity.setSource(loc);
+          // data entity
+          DataEntity dataEntity = new DataEntity.DataEntityBuilder()
+              .setAll(node.deepCopy())
+              .setSource(loc)
+              .build();
           this.crate.addDataEntity(dataEntity, false);
         } else {
           // contextual entity

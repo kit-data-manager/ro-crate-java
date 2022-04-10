@@ -1,6 +1,8 @@
 package edu.kit.rocrate.entities.data;
 
 import edu.kit.crate.entities.data.WorkflowEntity;
+
+import java.io.File;
 import java.io.IOException;
 
 import edu.kit.rocrate.HelpFunctions;
@@ -18,6 +20,7 @@ public class WorkflowEntityTest {
 
     WorkflowEntity entity = new WorkflowEntity.WorkflowEntityBuilder()
         .setId("workflow/alignment.knime")
+        .setSource(new File("src"))
         .addIdProperty("conformsTo", "https://bioschemas.org/profiles/ComputationalWorkflow/0.5-DRAFT-2020_07_21/")
         .addProperty("name", "Sequence alignment workflow")
         .addIdProperty("programmingLanguage", "#knime")

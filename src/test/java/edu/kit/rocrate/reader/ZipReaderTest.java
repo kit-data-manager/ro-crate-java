@@ -34,16 +34,19 @@ public class ZipReaderTest {
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
     IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
 
   @Test
   void testWithFile(@TempDir Path temp) throws IOException {
+    Path cvs = temp.resolve("survey-responses-2019.csv");
+    FileUtils.touch(cvs.toFile());
+    FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
+                .setSource(cvs.toFile())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -60,7 +63,7 @@ public class ZipReaderTest {
     ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
     IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
 
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
   @Test
@@ -99,7 +102,7 @@ public class ZipReaderTest {
 
     // that copies the directory locally to see its content
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
   @Test

@@ -44,6 +44,6 @@ public class ReadAndWriteTest {
     // the preview files as well as the metadata file should not be included here
     assertEquals(0, newCrate.getUntrackedFiles().size());
 
-    HelpFunctions.compareCrateJsonToFileInResources(newCrate, crate);
+    HelpFunctions.compareTwoCrateJson(newCrate, crate);
   }
 }

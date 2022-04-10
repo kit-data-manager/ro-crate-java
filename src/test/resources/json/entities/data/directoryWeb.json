@@ -1,5 +1,5 @@
 {
-  "@id": "urltodir",
+  "@id": "https://www.example.com/urltodir",
   "@type": "Dataset",
   "name": "Directory that is located on the web",
   "hasPart": [

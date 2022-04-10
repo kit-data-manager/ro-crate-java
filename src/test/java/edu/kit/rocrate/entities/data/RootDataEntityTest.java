@@ -2,6 +2,8 @@ package edu.kit.rocrate.entities.data;
 
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
+
+import java.io.File;
 import java.io.IOException;
 
 import edu.kit.rocrate.HelpFunctions;
@@ -18,12 +20,14 @@ public class RootDataEntityTest {
   void testSerialization() throws IOException {
     FileEntity file1 = new FileEntity.FileEntityBuilder()
         .setId("file1_id")
+        .setSource(new File("does_not_matter"))
         .build();
 
     FileEntity file2 = new FileEntity.FileEntityBuilder()
         .setId("file2_id")
         .addIdProperty("name", "dsklfajs")
         .addIdProperty("name", "11111111")
+        .setSource(new File("does_not_matter"))
         .build();
 
     RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()

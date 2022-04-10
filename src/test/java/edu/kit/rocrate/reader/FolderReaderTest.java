@@ -44,10 +44,14 @@ public class FolderReaderTest {
 
   @Test
   void testWithFile(@TempDir Path temp) throws IOException {
+    Path cvs = temp.resolve("survey-responses-2019.csv");
+    FileUtils.touch(cvs.toFile());
+    FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
+
     ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
+                .setSource(cvs.toFile())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -61,7 +65,7 @@ public class FolderReaderTest {
 
     ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
     IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
   @Test
@@ -102,7 +106,7 @@ public class FolderReaderTest {
     // that copies the directory locally to see its content
     //FileUtils.copyDirectory(locationSource.toFile(), new File("test"));
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, res);
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
 

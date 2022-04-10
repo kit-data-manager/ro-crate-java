@@ -72,7 +72,7 @@ public class TestRemoveAddEntity {
 
     ROCrate roCrate2 = new ROCrate.ROCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity").build();
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, roCrate2);
+    HelpFunctions.compareTwoCrateJson(roCrate, roCrate2);
   }
 
   @Test
@@ -114,6 +114,6 @@ public class TestRemoveAddEntity {
         .addDataEntity(file2)
         .build();
 
-    HelpFunctions.compareCrateJsonToFileInResources(roCrate, second2);
+    HelpFunctions.compareTwoCrateJson(roCrate, second2);
   }
 }

@@ -2,6 +2,8 @@ package edu.kit.rocrate.entities.data;
 
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.DataSetEntity;
+
+import java.io.File;
 import java.io.IOException;
 
 import edu.kit.rocrate.HelpFunctions;
@@ -18,6 +20,8 @@ public class DataSetEntityTest {
 
     DataSetEntity dir = new DataSetEntity.DataSetBuilder()
         .setId("lots_of_little_files/")
+        // this does not change anything, but it shows that the entity contains a physical file
+        .setSource(new File("invalid_file"))
         .addProperty("name", "Too many files")
         .addProperty("description",
             "This directory contains many small files, that we're not going to describe in detail.")
@@ -35,12 +39,13 @@ public class DataSetEntityTest {
 
     DataEntity second_content = new DataEntity.DataEntityBuilder()
         .setId("second_content")
+        .setSource(new File("does_not_matter"))
         .addProperty("description", "This entity just describes one of the contents in the Dir")
         .build();
 
     // we can add to hasPart using directly the id, or passing the entity to it
     DataSetEntity dir = new DataSetEntity.DataSetBuilder()
-        .setId("urltodir")
+        .setId("https://www.example.com/urltodir")
         .addProperty("name", "Directory that is located on the web")
         .addToHasPart("first_content")
         .addToHasPart(second_content)

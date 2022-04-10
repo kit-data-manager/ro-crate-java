@@ -114,7 +114,7 @@ public class ContextTest {
 
     var data = new DataEntity.DataEntityBuilder()
         .addType("house")
-        .setId("df")
+        .setId("https://www.example.com/entity")
         .build();
     // house is in the context
     assertTrue(newContext.checkEntity(data));
