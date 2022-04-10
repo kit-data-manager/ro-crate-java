@@ -90,7 +90,7 @@ public class DataEntityTest {
         .setId("dfkjdfkj")
         .build();
 
-    assertEquals(outputStreamCaptor.toString(), "This Data Entity remote ID does not resolve to a valid URL.\n");
+    assertEquals(outputStreamCaptor.toString().trim(), "This Data Entity remote ID does not resolve to a valid URL.");
     // also clear the stream so that we get it ready for the next comparison
     outputStreamCaptor.reset();
 
@@ -101,6 +101,7 @@ public class DataEntityTest {
         .build();
 
 
+    assertEquals(outputStreamCaptor.toString().trim(), "");
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
@@ -112,7 +113,7 @@ public class DataEntityTest {
         .build();
 
     outputStreamCaptor.reset();
-    assertEquals(outputStreamCaptor.toString(), "");
+    assertEquals(outputStreamCaptor.toString().trim(), "");
     System.setOut(standardOut);
   }
 }
