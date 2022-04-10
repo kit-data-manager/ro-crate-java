@@ -11,6 +11,7 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 
 /**
  * @author Nikola Tzotchev on 4.2.2022 г.
@@ -19,17 +20,20 @@ import org.apache.commons.io.FileUtils;
 public class DataEntity extends AbstractEntity {
 
   @JsonIgnore
-  private File location;
+  private File source;
 
   public DataEntity(ADataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     if (!entityBuilder.authors.isEmpty()) {
       this.addIdListProperties("author", entityBuilder.authors);
     }
-//    if (entityBuilder.location != null) {
-//      this.setId(entityBuilder.location.getName());
-//    }
-    this.location = entityBuilder.location;
+    this.source = entityBuilder.location;
+    if (this.getSource() == null) {
+      UrlValidator urlValidator = new UrlValidator();
+      if (!urlValidator.isValid(this.getId())) {
+        System.out.println("This Data Entity remote ID does not resolve to a valid URL.");
+      }
+    }
   }
 
   public void setAuthor(String id) {
@@ -37,29 +41,29 @@ public class DataEntity extends AbstractEntity {
   }
 
   public void saveToZip(ZipFile zipFile) throws ZipException {
-    if (this.location != null) {
+    if (this.source != null) {
       ZipParameters zipParameters = new ZipParameters();
       zipParameters.setFileNameInZip(this.getId());
-      zipFile.addFile(this.location,zipParameters);
+      zipFile.addFile(this.source,zipParameters);
     }
   }
 
   public void savetoFile(File file) throws IOException {
-    if (this.getLocation() != null) {
-      if (this.getLocation().isDirectory()) {
-        FileUtils.copyDirectory(this.getLocation(), file.toPath().resolve(this.getId()).toFile());
+    if (this.getSource() != null) {
+      if (this.getSource().isDirectory()) {
+        FileUtils.copyDirectory(this.getSource(), file.toPath().resolve(this.getId()).toFile());
       } else {
-        FileUtils.copyFile(this.getLocation(), file.toPath().resolve(this.getId()).toFile());
+        FileUtils.copyFile(this.getSource(), file.toPath().resolve(this.getId()).toFile());
       }
     }
   }
 
-  public File getLocation() {
-    return location;
+  public File getSource() {
+    return source;
   }
 
-  public void setLocation(File location) {
-    this.location = location;
+  public void setSource(File source) {
+    this.source = source;
   }
 
   abstract static class ADataEntityBuilder<T extends ADataEntityBuilder<T>> extends

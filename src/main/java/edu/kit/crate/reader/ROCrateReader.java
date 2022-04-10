@@ -71,7 +71,7 @@ public class ROCrateReader {
           if (loc != null) {
             usedFiles.add(loc.getPath());
           }
-          dataEntity.setLocation(loc);
+          dataEntity.setSource(loc);
           this.crate.addDataEntity(dataEntity, false);
         } else {
           // contextual entity

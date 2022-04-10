@@ -1,14 +1,9 @@
 package edu.kit.crate.entities.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.entities.serializers.HasPartSerializer;
-import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
-import edu.kit.crate.objectmapper.MyObjectMapper;
+
 import java.util.HashSet;
 import java.util.Set;
 import net.lingala.zip4j.ZipFile;
@@ -36,8 +31,8 @@ public class DataSetEntity extends DataEntity {
   }
   @Override
   public void saveToZip(ZipFile zipFile) throws ZipException {
-    if (this.getLocation() != null) {
-      zipFile.addFolder(this.getLocation());
+    if (this.getSource() != null) {
+      zipFile.addFolder(this.getSource());
     }
   }
 
