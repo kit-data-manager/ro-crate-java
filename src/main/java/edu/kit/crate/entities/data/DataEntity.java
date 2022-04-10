@@ -82,7 +82,7 @@ public class DataEntity extends AbstractEntity {
     }
 
     public T setLicense(ContextualEntity license) {
-      this.addIdProperty("licence", license.getId());
+      this.addIdProperty("license", license.getId());
       return self();
     }
 

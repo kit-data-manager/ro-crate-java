@@ -1,5 +1,6 @@
 package edu.kit.rocrate.entities.data;
 
+import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.entities.data.FileEntity.FileEntityBuilder;
 
@@ -23,7 +24,7 @@ public class FileEntityTest {
    * For any Data Entity (File, Dir, Workflow) it is also possible to just use the
    * DataEntity class (check DataEntityTest for examples) the only difference is it will be more
    * "work"
-   * @throws IOException
+   * @throws IOException if reading fails
    */
   @Test
   void testSerialization() throws IOException {
@@ -42,6 +43,7 @@ public class FileEntityTest {
     // add a random json file
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
+    assert url != null;
     FileEntity file = new FileEntityBuilder()
         .setId("example.json")
         .setSource(new File(url.getFile()))
@@ -59,5 +61,25 @@ public class FileEntityTest {
         .build();
 
     assertEquals(fileWithoutId.getId(), new File(url.getFile()).getName());
+  }
+
+  @Test
+  void testSerializationWithLicense() throws IOException {
+    ContextualEntity entity = new ContextualEntity.ContextualEntityBuilder()
+        .setId("https://creativecommons.org/licenses/by/4.0/")
+        .addType("CreativeWork")
+        .build();
+
+    URL url =
+        HelpFunctions.class.getResource("/json/crate/simple2.json");
+    assert url != null;
+    FileEntity file = new FileEntityBuilder()
+        .setId("example.json")
+        .setSource(new File(url.getFile()))
+        .addProperty("name", "RO-Crate specification")
+        .setEncodingFormat("application/json")
+        .setLicense(entity)
+        .build();
+    HelpFunctions.compareEntityWithFile(file, "/json/entities/data/localFileWithLicense.json");
   }
 }
