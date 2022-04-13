@@ -1,4 +1,4 @@
-package edu.kit.rocrate.writer;
+package edu.kit.crate.writer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,15 +8,13 @@ import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.preview.AutomaticPreview;
 import edu.kit.crate.preview.PreviewGenerator;
-import edu.kit.crate.writer.ROCrateWriter;
-import edu.kit.crate.writer.ZipWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import edu.kit.rocrate.HelpFunctions;
+import edu.kit.crate.HelpFunctions;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
