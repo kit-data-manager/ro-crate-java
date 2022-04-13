@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 public class ROCrateMetadataContext implements IROCrateMetadataContext {
 
   private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+  private static JsonNode defaultContext = null;
 
   private final List<String> url;
   private final HashMap<String, String> contextMap;
@@ -234,20 +235,29 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     this.url.add(url);
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    CloseableHttpClient httpclient = HttpClients.createDefault();
-    HttpGet httpGet = new HttpGet(url);
-    CloseableHttpResponse response;
 
-    try {
-      response = httpclient.execute(httpGet);
-      JsonNode jsonNode = objectMapper.readValue(response.getEntity().getContent(),
-          JsonNode.class);
-      this.contextMap.putAll(objectMapper.convertValue(jsonNode.get("@context"),
-          new TypeReference<>() {
-          }));
-    } catch (IOException e) {
-      System.err.println("Cannot get context from this url.");
+    JsonNode jsonNode;
+    if (url.equals(DEFAULT_CONTEXT) && defaultContext != null) {
+      jsonNode = defaultContext;
+    } else {
+      CloseableHttpClient httpclient = HttpClients.createDefault();
+      HttpGet httpGet = new HttpGet(url);
+      CloseableHttpResponse response;
+      try {
+        response = httpclient.execute(httpGet);
+        jsonNode = objectMapper.readValue(response.getEntity().getContent(),
+            JsonNode.class);
+      } catch (IOException e) {
+        System.err.println("Cannot get context from this url.");
+        return;
+      }
+      if (url.equals(DEFAULT_CONTEXT)) {
+        defaultContext = jsonNode;
+      }
     }
+    this.contextMap.putAll(objectMapper.convertValue(jsonNode.get("@context"),
+        new TypeReference<>() {
+        }));
   }
 
   @Override
