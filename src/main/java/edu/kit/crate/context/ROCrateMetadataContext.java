@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 public class ROCrateMetadataContext implements IROCrateMetadataContext {
 
   private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+  private final static String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
   private static JsonNode defaultContext = null;
 
   private final List<String> url;
@@ -236,10 +237,19 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
 
-    JsonNode jsonNode;
-    if (url.equals(DEFAULT_CONTEXT) && defaultContext != null) {
-      jsonNode = defaultContext;
-    } else {
+    JsonNode jsonNode = null;
+    if (url.equals(DEFAULT_CONTEXT)) {
+      if (defaultContext != null) {
+        jsonNode = defaultContext;
+      } else {
+        try {
+          jsonNode = objectMapper.readTree(getClass().getClassLoader().getResource(DEFAULT_CONTEXT_LOCATION));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    if (jsonNode == null) {
       CloseableHttpClient httpclient = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(url);
       CloseableHttpResponse response;
