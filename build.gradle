@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jvm-test-suite'
 }
 
 group 'org.example'
@@ -28,9 +29,70 @@ dependencies {
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
 
+    test {
+        java {
+           // compileClasspath += sourceSets.main.output
+            //runtimeClasspath += sourceSets.main.output
+            srcDirs = ['src/test/java']
+        }
+    }
+
+    performanceTest {
+        java {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+            srcDirs = ['src/performanceTest/java']
+        }
+    }
+}
+configurations {
+    performanceTestImplementation.extendsFrom implementation
+}
+
+
+task performanceContextEntitiesBenchmark(type: JavaExec) {
+    description = "Run the context entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.singlecratebenchmarks.ContextualEntitiesPerformance'
+}
+
+task performanceLocalDataEntitiesBenchmark(type: JavaExec) {
+    description = "Run the local data entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.singlecratebenchmarks.LocalDataEntitiesPerformance'
+}
+
+task performanceRemoteDataEntitiesBenchmark(type: JavaExec) {
+    description = "Run the remote data entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.singlecratebenchmarks.RemoteDataEntitiesPerformance'
+}
+
+task performanceMixEntitiesBenchmark(type: JavaExec) {
+    description = "Run the remote data entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.singlecratebenchmarks.MixtureOfEntitiesPerformance'
+}
+task performanceDeletionEntitiesBenchmark(type: JavaExec) {
+    description = "Run the remote data entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.singlecratebenchmarks.DeletionEntitiesPerformance'
+}
+
+task performanceMultipleCratesBenchmark(type: JavaExec) {
+    description = "Run the remote data entities benchmarks."
+    classpath = sourceSets.performanceTest.runtimeClasspath
+    mainClass = 'edu.kit.crate.multiplecrates.MultipleCratesBenchmark'
+}
 test {
     useJUnitPlatform()
-   // maxParallelForks(2)
-   // failFast = true
 }
+// maxParallelForks(2)
+// failFast = true
