@@ -51,14 +51,14 @@ public class ROCratePayload implements IROCratePayload {
   public void addDataEntity(DataEntity dataEntity) {
     this.addToAssociatedItems(dataEntity);
     this.dataEntities.put(dataEntity.getId(), dataEntity);
-    dataEntity.setObserver(new EntityObserver(this));
+    dataEntity.addObserver(new EntityObserver(this));
   }
 
   @Override
   public void addContextualEntity(ContextualEntity contextualEntity) {
     this.addToAssociatedItems(contextualEntity);
     this.contextualEntities.put(contextualEntity.getId(), contextualEntity);
-    contextualEntity.setObserver(new EntityObserver(this));
+    contextualEntity.addObserver(new EntityObserver(this));
   }
 
   @Override

@@ -48,15 +48,16 @@ public class AbstractEntity {
 
 
   @JsonIgnore
-  private IObserver observer;
+  private final List<IObserver> observers;
 
-  public void setObserver(IObserver observer) {
-    this.observer = observer;
+  public void addObserver(IObserver observer) {
+    this.observers.add(observer);
   }
 
   private void notifyObservers() {
-    if (this.observer != null)
-      this.observer.update(this.getId());
+    for (var obs : this.observers) {
+      obs.update(this.getId());
+    }
   }
 
 
@@ -64,6 +65,7 @@ public class AbstractEntity {
     this.types = entityBuilder.types;
     this.properties = entityBuilder.properties;
     this.linkedTo = entityBuilder.relatedItems;
+    this.observers = new ArrayList<>();
     if (this.properties.get("@id") == null) {
       if (entityBuilder.id == null) {
         this.properties.put("@id", UUID.randomUUID().toString());

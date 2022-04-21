@@ -2,7 +2,7 @@ package edu.kit.crate.payload;
 
 public class EntityObserver implements IObserver {
 
-  private ROCratePayload payload;
+  private final ROCratePayload payload;
 
   public EntityObserver(ROCratePayload payload) {
     this.payload = payload;
