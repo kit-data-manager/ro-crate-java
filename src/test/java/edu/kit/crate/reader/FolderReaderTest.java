@@ -1,10 +1,10 @@
 package edu.kit.crate.reader;
 
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.writer.FolderWriter;
-import edu.kit.crate.writer.ROCrateWriter;
+import edu.kit.crate.writer.RoCrateWriter;
 import edu.kit.crate.HelpFunctions;
 
 import java.io.IOException;
@@ -24,14 +24,14 @@ public class FolderReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .build();
     Path f = temp.resolve("ro-crate-metadata.json");
     FileUtils.touch(f.toFile());
     FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
-    IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
 
     Path r = temp.resolve("output.txt");
     FileUtils.touch(r.toFile());
@@ -46,7 +46,7 @@ public class FolderReaderTest {
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
 
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setSource(cvs.toFile())
@@ -61,8 +61,8 @@ public class FolderReaderTest {
     FileUtils.touch(f.toFile());
     FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
-    IROCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
@@ -70,7 +70,7 @@ public class FolderReaderTest {
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -83,7 +83,7 @@ public class FolderReaderTest {
         .build();
     Path locationSource = temp.resolve("src");
     FileUtils.forceMkdir(locationSource.toFile());
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
 
     writer.save(roCrate, locationSource.toFile().toString());
 
@@ -92,9 +92,9 @@ public class FolderReaderTest {
     FileUtils.touch(f.toFile());
     FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
 
-    IROCrate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
+    Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());
@@ -112,7 +112,7 @@ public class FolderReaderTest {
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("file.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -125,7 +125,7 @@ public class FolderReaderTest {
         .build();
     Path locationSource = temp.resolve("src");
     FileUtils.forceMkdir(locationSource.toFile());
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
 
     writer.save(roCrate, locationSource.toFile().toString());
 
@@ -134,12 +134,12 @@ public class FolderReaderTest {
     FileUtils.touch(f.toFile());
     FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
 
     Path newFile = temp.resolve("new_file");
     FileUtils.writeStringToFile(newFile.toFile(), "fkladjsl;fjasd;lfjda;lkf", Charset.defaultCharset());
 
-    IROCrate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
+    Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
     res.addDataEntity(new FileEntity.FileEntityBuilder()
         .setId("new_file")
         .setEncodingFormat("setnew")

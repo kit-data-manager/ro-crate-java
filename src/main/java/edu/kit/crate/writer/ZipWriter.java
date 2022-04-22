@@ -1,10 +1,9 @@
 package edu.kit.crate.writer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.crate.IROCrate;
+import edu.kit.crate.Crate;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import java.io.ByteArrayInputStream;
@@ -17,13 +16,13 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 
 /**
- * @author Nikola Tzotchev on 9.2.2022 г.
- * @version 1
+ * Implementation of the writing strategy
+ * to provide a way of writing crates to a zip archive.
  */
-public class ZipWriter implements IWriterStrategy {
+public class ZipWriter implements WriterStrategy {
 
   @Override
-  public void save(IROCrate crate, String destination) {
+  public void save(Crate crate, String destination) {
     File file = new File(destination);
     ZipFile zipFile = new ZipFile(destination);
 
@@ -40,7 +39,7 @@ public class ZipWriter implements IWriterStrategy {
       zipFile.addStream(inputStream, zipParameters);
       inputStream.close();
       if (crate.getPreview() != null) {
-        crate.getPreview().saveALLToZip(zipFile);
+        crate.getPreview().saveAllToZip(zipFile);
       }
     } catch (ZipException | JsonProcessingException e) {
       System.out.println("Exception writing ro-crate-metadata.json file to zip");

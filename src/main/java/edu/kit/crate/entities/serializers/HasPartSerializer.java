@@ -1,16 +1,17 @@
 package edu.kit.crate.entities.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * Class for serializing the hasPart property of a entity.
+ */
 public class HasPartSerializer extends StdSerializer<Set<String>> {
 
   public HasPartSerializer() {
@@ -27,7 +28,8 @@ public class HasPartSerializer extends StdSerializer<Set<String>> {
   }
 
   @Override
-  public void serialize(Set<String> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(Set<String> value, JsonGenerator gen, SerializerProvider provider)
+      throws IOException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     if (value.size() > 1) {
       gen.writeStartArray();
@@ -38,7 +40,7 @@ public class HasPartSerializer extends StdSerializer<Set<String>> {
       }
       gen.writeEndArray();
     } else if (value.size() == 1) {
-      gen.writeObject(objectMapper.createObjectNode().put("@id",value.iterator().next()));
+      gen.writeObject(objectMapper.createObjectNode().put("@id", value.iterator().next()));
     }
   }
 }

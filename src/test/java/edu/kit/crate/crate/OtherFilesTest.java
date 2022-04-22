@@ -1,8 +1,8 @@
 package edu.kit.crate.crate;
 
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.writer.FolderWriter;
-import edu.kit.crate.writer.ROCrateWriter;
+import edu.kit.crate.writer.RoCrateWriter;
 import edu.kit.crate.HelpFunctions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class OtherFilesTest {
     FileUtils.touch(file2.toFile());
     FileUtils.writeStringToFile(file1.toFile(), "content of file 1", Charset.defaultCharset());
     FileUtils.writeStringToFile(file2.toFile(), "content of file 2", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addUntrackedFile(file1.toFile())
         .addUntrackedFile(file2.toFile())
         .build();
@@ -40,7 +40,7 @@ public class OtherFilesTest {
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
 
     // write the crate in the temp dir
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(roCrate, crate.toFile().getAbsolutePath());
 
     HelpFunctions.compareCrateJsonToFileInResources(new File(Objects.requireNonNull(OtherFilesTest.class.getResource("/json/crate/simple.json")).toURI()), crate.resolve("ro-crate-metadata.json").toFile());

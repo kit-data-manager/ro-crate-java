@@ -4,15 +4,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
-
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Interface for the ROCrate payload.
+ * In the payload of the metadata is stored.
+ * It provides useful methods for its management.
+ *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public interface IROCratePayload {
+public interface CratePayload {
   DataEntity getDataEntityById(String id);
 
   ContextualEntity getContextualEntityById(String id);

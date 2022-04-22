@@ -8,20 +8,29 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Set;
 
-public class JsonSchemaValidation implements IEntityValidationStrategy {
+/**
+ * Implementation of the entity validation strategy that uses json schema.
+ */
+public class JsonSchemaValidation implements EntityValidationStrategy {
 
-  private static final URL entitySchemaDefault = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader().getResource("json_schemas/entity_schema.json"));
-  private static final URL fieldSchemaDefault = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader().getResource("json_schemas/entity_field_structure_schema.json"));
+  private static final URL entitySchemaDefault
+      = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader()
+      .getResource("json_schemas/entity_schema.json"));
+  private static final URL fieldSchemaDefault
+      = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader()
+      .getResource("json_schemas/entity_field_structure_schema.json"));
 
   private JsonSchema entitySchema;
   private JsonSchema entityFieldSchema;
 
+  /**
+   *  Default constructor that uses the default schemas.
+   */
   public JsonSchemaValidation() {
     JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
     try {
@@ -32,6 +41,12 @@ public class JsonSchemaValidation implements IEntityValidationStrategy {
     }
   }
 
+  /**
+   * Constructor that uses custom schemas present as Json files.
+   *
+   * @param entitySchema schema for the entities validation.
+   * @param fieldSchema schema for the field validation.
+   */
   public JsonSchemaValidation(JsonNode entitySchema, JsonNode fieldSchema) {
     JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
     this.entitySchema = factory.getSchema(entitySchema);
@@ -59,7 +74,8 @@ public class JsonSchemaValidation implements IEntityValidationStrategy {
       } catch (JsonProcessingException e) {
         e.printStackTrace();
       }
-      System.err.println("does not comply with the flattened structure of the RO-Crate json document.");
+      System.err.println("does not comply with the flattened structure"
+          + " of the RO-Crate json document.");
       return false;
     }
     return true;

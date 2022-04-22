@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ContextTest {
 
-  ROCrateMetadataContext context;
+  RoCrateMetadataContext context;
 
   @BeforeEach
   void initContext() {
     // this will load the default context
-    this.context = new ROCrateMetadataContext();
+    this.context = new RoCrateMetadataContext();
   }
 
   @Test
@@ -66,7 +66,7 @@ public class ContextTest {
 
   @Test
   void creationUrlTest() {
-    ROCrateMetadataContext newContext = new ROCrateMetadataContext(List.of("www.example.com", "www.example.com/context"));
+    RoCrateMetadataContext newContext = new RoCrateMetadataContext(List.of("www.example.com", "www.example.com/context"));
 
     var contextualEntityWrongField = new ContextualEntity.ContextualEntityBuilder()
         .setId("dkfaj")
@@ -89,7 +89,7 @@ public class ContextTest {
     node.put("road", "www.example.con/road");
 
     res.set("@context", node);
-    ROCrateMetadataContext newContext = new ROCrateMetadataContext(node);
+    RoCrateMetadataContext newContext = new RoCrateMetadataContext(node);
     HelpFunctions.compare(newContext.getContextJsonEntity(), res, true);
   }
 
@@ -108,7 +108,7 @@ public class ContextTest {
     arr.add("www.example.com/context");
 
     res.set("@context", arr);
-    ROCrateMetadataContext newContext = new ROCrateMetadataContext(arr);
+    RoCrateMetadataContext newContext = new RoCrateMetadataContext(arr);
     HelpFunctions.compare(newContext.getContextJsonEntity(), res, true);
 
     var data = new DataEntity.DataEntityBuilder()

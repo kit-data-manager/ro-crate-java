@@ -11,13 +11,18 @@ import edu.kit.crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.crate.entities.validation.EntityValidation;
 import edu.kit.crate.entities.validation.JsonSchemaValidation;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import edu.kit.crate.payload.IObserver;
+import edu.kit.crate.payload.Observer;
 import edu.kit.crate.special.JsonUtilFunctions;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import java.util.*;
 
 /**
- * Abstract Entity parent class of every singe item in the json metadata file
+ * Abstract Entity parent class of every singe item in the json metadata file.
  *
  * @author Nikola Tzotchev on 3.2.2022 г.
  * @version 1
@@ -40,7 +45,8 @@ public class AbstractEntity {
   @JsonSerialize(using = ObjectNodeSerializer.class)
   private ObjectNode properties;
 
-  private final static EntityValidation entityValidation = new EntityValidation(new JsonSchemaValidation());
+  private static final EntityValidation entityValidation
+      = new EntityValidation(new JsonSchemaValidation());
 
 
   @JsonIgnore
@@ -48,9 +54,9 @@ public class AbstractEntity {
 
 
   @JsonIgnore
-  private final List<IObserver> observers;
+  private final List<Observer> observers;
 
-  public void addObserver(IObserver observer) {
+  public void addObserver(Observer observer) {
     this.observers.add(observer);
   }
 
@@ -60,8 +66,12 @@ public class AbstractEntity {
     }
   }
 
-
-  public AbstractEntity(AEntityBuilder<?> entityBuilder) {
+  /**
+   * Constructor that takes a builder and instantiates all the fields from it.
+   *
+   * @param entityBuilder the entity builder passed to the constructor.
+   */
+  public AbstractEntity(AbstractEntityBuilder<?> entityBuilder) {
     this.types = entityBuilder.types;
     this.properties = entityBuilder.properties;
     this.linkedTo = entityBuilder.relatedItems;
@@ -79,7 +89,11 @@ public class AbstractEntity {
     return linkedTo;
   }
 
-
+  /**
+   * Returns a Json object containing the properties of the entity.
+   *
+   * @return ObjectNode representing the properties.
+   */
   public ObjectNode getProperties() {
     if (this.types != null) {
       JsonNode node = MyObjectMapper.getMapper().valueToTree(this.types);
@@ -98,6 +112,12 @@ public class AbstractEntity {
     return id == null ? null : id.asText();
   }
 
+  /**
+   * Set all the properties from a Json object to the Entity.
+   * The entities are first validated to filter any invalid entity properties.
+   *
+   * @param obj the object that contains all the json properties that should be added.
+   */
   public void setProperties(JsonNode obj) {
     // validate whole entity
     if (entityValidation.entityValidation(obj)) {
@@ -110,6 +130,13 @@ public class AbstractEntity {
     this.properties.put("@id", id);
   }
 
+  /**
+   * Add a JSON property to the entity.
+   * Here the value of the property is a String.
+   *
+   * @param key   the name of the property (term).
+   * @param value the value that the property has.
+   */
   public void addProperty(String key, String value) {
     if (key != null && value != null) {
       this.properties.put(key, value);
@@ -117,6 +144,13 @@ public class AbstractEntity {
     }
   }
 
+  /**
+   * This is another way of adding a property,
+   * this time the value is a long integer.
+   *
+   * @param key   the String key of the property.
+   * @param value the long value.
+   */
   public void addProperty(String key, long value) {
     if (key != null) {
       this.properties.put(key, value);
@@ -124,6 +158,12 @@ public class AbstractEntity {
     }
   }
 
+  /**
+   * Another way of adding a property this time the value is a double.
+   *
+   * @param key   the string key of the property.
+   * @param value double value of the property.
+   */
   public void addProperty(String key, double value) {
     if (key != null) {
       this.properties.put(key, value);
@@ -131,9 +171,18 @@ public class AbstractEntity {
     }
   }
 
+  /**
+   * This is the most generic way of adding a property.
+   * The value is a JsonNode that could contain anything possible.
+   * This is way firstly it is validated that it follows the correct guidelines.
+   *
+   * @param key   String key of the property.
+   * @param value The JsonNode representing the value.
+   */
   public void addProperty(String key, JsonNode value) {
-    if (addProperty(this.properties, key, value))
+    if (addProperty(this.properties, key, value)) {
       notifyObservers();
+    }
   }
 
   private static boolean addProperty(ObjectNode whereToAdd, String key, JsonNode value) {
@@ -149,10 +198,10 @@ public class AbstractEntity {
   /**
    * Add a property that looks like this:
    * "name" : {"@id" : "id"}
-   * If the name property already exists add a second @id to it
+   * If the name property already exists add a second @id to it.
    *
-   * @param name the "key" of the property
-   * @param id   the "id" of the property
+   * @param name the "key" of the property.
+   * @param id   the "id" of the property.
    */
   public void addIdProperty(String name, String id) {
     JsonNode jsonNode = addToIdProperty(name, id, this.properties.get(name));
@@ -185,10 +234,10 @@ public class AbstractEntity {
   }
 
   /**
-   * Adds everything from the stringList to the property "name" as id
+   * Adds everything from the stringList to the property "name" as id.
    *
-   * @param name       the key of the property
-   * @param stringList List containing all the id as String
+   * @param name       the key of the property.
+   * @param stringList List containing all the id as String.
    */
   public void addIdListProperties(String name, List<String> stringList) {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
@@ -212,6 +261,11 @@ public class AbstractEntity {
     notifyObservers();
   }
 
+  /**
+   * Adding new type to the property (which may have multiple such ones).
+   *
+   * @param type the String representing the type.
+   */
   public void addType(String type) {
     if (this.types == null) {
       this.types = new HashSet<>();
@@ -221,15 +275,19 @@ public class AbstractEntity {
     this.properties.set("@type", node);
   }
 
-
-  public static abstract class AEntityBuilder<T extends AEntityBuilder<T>> {
+  /**
+   * This a builder inner class that should allow for an easier creating of entities.
+   *
+   * @param <T> The type of the child builders so that they to can use the methods provided here.
+   */
+  public abstract static class AbstractEntityBuilder<T extends AbstractEntityBuilder<T>> {
 
     private Set<String> types;
     protected Set<String> relatedItems;
     private ObjectNode properties;
     private String id;
 
-    public AEntityBuilder() {
+    public AbstractEntityBuilder() {
       this.properties = MyObjectMapper.getMapper().createObjectNode();
       this.relatedItems = new HashSet<>();
     }
@@ -238,13 +296,26 @@ public class AbstractEntity {
       return this.id;
     }
 
+    /**
+     * Setting the id property of the entity.
+     *
+     * @param id the String representing the id.
+     * @return the generic builder.
+     */
     public T setId(String id) {
-      if (id != null)
+      if (id != null) {
         this.id = id;
+      }
       //this.properties.put("@id", id);
       return self();
     }
 
+    /**
+     * Adding a type to the builder types.
+     *
+     * @param type the type to add.
+     * @return the generic builder.
+     */
     public T addType(String type) {
       if (this.types == null) {
         this.types = new HashSet<>();
@@ -253,6 +324,12 @@ public class AbstractEntity {
       return self();
     }
 
+    /**
+     * Adding multiple types as list.
+     *
+     * @param types the types in a String List.
+     * @return the generic builder.
+     */
     public T addTypes(List<String> types) {
       if (this.types == null) {
         this.types = new HashSet<>();
@@ -261,6 +338,13 @@ public class AbstractEntity {
       return self();
     }
 
+    /**
+     * Adding a property to the builder.
+     *
+     * @param key the key of the property in a string.
+     * @param value the JsonNode value of te property.
+     * @return the generic builder.
+     */
     public T addProperty(String key, JsonNode value) {
       if (AbstractEntity.addProperty(this.properties, key, value)) {
         this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromProperty(value));
@@ -283,6 +367,18 @@ public class AbstractEntity {
       return self();
     }
 
+    /**
+     * ID properties are often used when referencing other entities within the ROCrate.
+     * This method adds automatically such one.
+     * Instead of:
+     *  "name": "id"
+     * added is :
+     *  "name" : {"@id": "id"}
+     *
+     * @param name the name of the ID property.
+     * @param id the ID.
+     * @return the generic builder
+     */
     public T addIdProperty(String name, String id) {
       JsonNode jsonNode = AbstractEntity.addToIdProperty(name, id, this.properties.get(name));
       if (jsonNode != null) {
@@ -292,6 +388,13 @@ public class AbstractEntity {
       return self();
     }
 
+    /**
+     * This is another way of adding the ID property, this time the whole other Entity is provided.
+     *
+     * @param name the name of the property.
+     * @param entity the other entity that is referenced.
+     * @return the generic builder.
+     */
     public T addIdProperty(String name, AbstractEntity entity) {
       if (entity != null) {
         return addIdProperty(name, entity.getId());
@@ -299,7 +402,14 @@ public class AbstractEntity {
       return self();
     }
 
-    public T addIdFromCollectionOFEntities(String name, Collection<AbstractEntity> entities) {
+    /**
+     * This adds multiple id entities to a single key.
+     *
+     * @param name the name of the property.
+     * @param entities the Collection containing the multiple entities.
+     * @return the generic builder.
+     */
+    public T addIdFromCollectionOfEntities(String name, Collection<AbstractEntity> entities) {
       if (entities != null) {
         for (var e : entities) {
           addIdProperty(name, e);
@@ -308,6 +418,13 @@ public class AbstractEntity {
       return self();
     }
 
+    /**
+     * This sets everything from a json object to the property.
+     * Can be useful when the entity is already available somewhere.
+     *
+     * @param properties the Json representing all the properties.
+     * @return the generic builder.
+     */
     public T setAll(ObjectNode properties) {
       if (AbstractEntity.entityValidation.entityValidation(properties)) {
         this.properties = properties;
@@ -318,7 +435,7 @@ public class AbstractEntity {
 
     public abstract T self();
 
-    abstract public AbstractEntity build();
+    public abstract AbstractEntity build();
   }
 
 }

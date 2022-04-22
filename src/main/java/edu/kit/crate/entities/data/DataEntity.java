@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 
 /**
+ * The base class of every data entity.
+ *
  * @author Nikola Tzotchev on 4.2.2022 г.
  * @version 1
  */
@@ -22,7 +24,12 @@ public class DataEntity extends AbstractEntity {
   @JsonIgnore
   private File source;
 
-  public DataEntity(ADataEntityBuilder<?> entityBuilder) {
+  /**
+   * The constructor that takes an DataEntity builder and instantiates the entity.
+   *
+   * @param entityBuilder the builder passed as argument.
+   */
+  public DataEntity(AbstractDataEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     if (!entityBuilder.authors.isEmpty()) {
       this.addIdListProperties("author", entityBuilder.authors);
@@ -40,14 +47,28 @@ public class DataEntity extends AbstractEntity {
     this.addIdProperty("author", id);
   }
 
+  /**
+   * If the data entity contains a physical file.
+   * This method will write it when the crate is being written to a zip archive.
+   *
+   * @param zipFile the zipFile where it should be written.
+   * @throws ZipException when something goes wrong with the writing to the zip file.
+   */
   public void saveToZip(ZipFile zipFile) throws ZipException {
     if (this.source != null) {
       ZipParameters zipParameters = new ZipParameters();
       zipParameters.setFileNameInZip(this.getId());
-      zipFile.addFile(this.source,zipParameters);
+      zipFile.addFile(this.source, zipParameters);
     }
   }
 
+  /**
+   * If the data entity contains a physical file.
+   * This method will write it when the crate is being written to a folder.
+   *
+   * @param file the folder location where the entity should be written.
+   * @throws IOException if something goes wrong with the writing.
+   */
   public void savetoFile(File file) throws IOException {
     if (this.getSource() != null) {
       if (this.getSource().isDirectory()) {
@@ -66,8 +87,8 @@ public class DataEntity extends AbstractEntity {
     this.source = source;
   }
 
-  abstract static class ADataEntityBuilder<T extends ADataEntityBuilder<T>> extends
-      AEntityBuilder<T> {
+  abstract static class AbstractDataEntityBuilder<T extends AbstractDataEntityBuilder<T>> extends
+      AbstractEntityBuilder<T> {
 
     File location;
     List<String> authors = new ArrayList<>();
@@ -103,10 +124,13 @@ public class DataEntity extends AbstractEntity {
     }
 
     @Override
-    abstract public DataEntity build();
+    public abstract DataEntity build();
   }
 
-  final static public class DataEntityBuilder extends ADataEntityBuilder<DataEntityBuilder> {
+  /**
+   * Data Entity builder class that allows for easier data entity creation.
+   */
+  public static final class DataEntityBuilder extends AbstractDataEntityBuilder<DataEntityBuilder> {
 
     @Override
     public DataEntityBuilder self() {

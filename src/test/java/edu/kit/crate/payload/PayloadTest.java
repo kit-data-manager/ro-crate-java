@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PayloadTest {
 
-  private ROCratePayload payload;
+  private RoCratePayload payload;
 
   @BeforeEach
   void setPayload() {
-    this.payload = new ROCratePayload();
+    this.payload = new RoCratePayload();
   }
 
   @Test

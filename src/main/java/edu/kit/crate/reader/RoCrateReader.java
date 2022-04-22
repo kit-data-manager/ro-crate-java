@@ -3,16 +3,15 @@ package edu.kit.crate.reader;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.crate.ROCrate;
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.context.IROCrateMetadataContext;
-import edu.kit.crate.context.ROCrateMetadataContext;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
+import edu.kit.crate.context.CrateMetadataContext;
+import edu.kit.crate.context.RoCrateMetadataContext;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,27 +20,28 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Nikola Tzotchev on 9.2.2022 г.
- * @version 1
+ * The reader used for reading crates from the outside into the library.
+ * The class has a field using a strategy to support different ways of importing the crates.
+ * (from zip, folder, etc.)
  */
-public class ROCrateReader {
+public class RoCrateReader {
 
-  private final IReaderStrategy reader;
-  private IROCrate crate;
+  private final ReaderStrategy reader;
+  private Crate crate;
 
-  public ROCrateReader(IReaderStrategy reader) {
+  public RoCrateReader(ReaderStrategy reader) {
     this.reader = reader;
   }
 
   /**
    * This function will read the location (using one of the specified strategies) and then
-   * build the relation between the entities
+   * build the relation between the entities.
    *
    * @param location the location of the ro-crate to be read
    * @return the read RO-crate
    */
-  public IROCrate readCrate(String location) {
-    crate = new ROCrate();
+  public Crate readCrate(String location) {
+    crate = new RoCrate();
     // get the ro-crate-medata.json
     ObjectNode metadataJson = reader.readMetadataJson(location);
     // get the content of the crate
@@ -55,7 +55,7 @@ public class ROCrateReader {
 
     JsonNode context = metadataJson.get("@context");
 
-    IROCrateMetadataContext crateContext = new ROCrateMetadataContext(context);
+    CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
     this.crate.setMetadataContext(crateContext);
     JsonNode graph = metadataJson.get("@graph");
 
@@ -82,7 +82,7 @@ public class ROCrateReader {
         }
       }
     }
-    var itr = files.listFiles();//FileUtils.iterateFilesAndDirs(files, TrueFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
+    var itr = files.listFiles();
     List<File> list = new ArrayList<>();
     for (var f : itr) {
       if (!usedFiles.contains(f.getPath())) {
@@ -107,7 +107,8 @@ public class ROCrateReader {
   // we will need the root dataset to distinguish between data entities and contextual entities
   private ArrayNode setRootEntities(ArrayNode graph) {
 
-    // for now, we make an empty ArrayNode and putt all the entities that still need to be processed there
+    // for now, we make an empty ArrayNode and putt all the entities
+    // that still need to be processed there
     var graphCopy = graph.deepCopy();
     // use the algorithm described here: https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
     for (int i = 0; i < graph.size(); i++) {
@@ -135,7 +136,6 @@ public class ROCrateReader {
                   hasPartSet.add(hasPartNode.get("@id").asText());
                 }
               }
-              // Set<String> has = MyObjectMapper.getMapper().convertValue(secondIteration.get("hasPart"), new TypeReference<>(){});
               secondIteration.remove("hasPart");
               this.crate.setRootDataEntity(
                   new RootDataEntity.RootDataEntityBuilder()

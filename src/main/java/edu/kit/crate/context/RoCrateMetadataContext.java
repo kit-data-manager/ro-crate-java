@@ -7,27 +7,27 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Consumer;
 
 /**
+ * The class representing the crate json-ld context.
+ *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public class ROCrateMetadataContext implements IROCrateMetadataContext {
+public class RoCrateMetadataContext implements CrateMetadataContext {
 
-  private final static String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
-  private final static String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
+  private static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+  private static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
   private static JsonNode defaultContext = null;
 
   private final List<String> url;
@@ -36,14 +36,22 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
   // for the final representation
   private final HashMap<String, String> other;
 
-  public ROCrateMetadataContext() {
+  /**
+   * Default constructor for the creation of the default context.
+   */
+  public RoCrateMetadataContext() {
     this.url = new ArrayList<>();
     this.contextMap = new HashMap<>();
     this.other = new HashMap<>();
     this.addToContextFromUrl(DEFAULT_CONTEXT);
   }
 
-  public ROCrateMetadataContext(List<String> url) {
+  /**
+   * Constructor for creating the context from a list of url.
+   *
+   * @param url the url list with different context.
+   */
+  public RoCrateMetadataContext(List<String> url) {
     this.url = new ArrayList<>();
     this.contextMap = new HashMap<>();
     this.other = new HashMap<>();
@@ -52,7 +60,12 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     }
   }
 
-  public ROCrateMetadataContext(JsonNode context) {
+  /**
+   * Constructor for creating the context from a json object.
+   *
+   * @param context the Json object of the context.
+   */
+  public RoCrateMetadataContext(JsonNode context) {
     this.url = new ArrayList<>();
     this.other = new HashMap<>();
     this.contextMap = new HashMap<>();
@@ -103,6 +116,7 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     return finalNode;
   }
 
+  /*
   public ObjectNode getFromSchema(String type) {
     CloseableHttpClient httpclient = HttpClients.createDefault();
     String url = this.contextMap.get(type);
@@ -120,6 +134,7 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
     }
     return null;
   }
+  */
 
   @Override
   public boolean checkEntity(AbstractEntity entity) {
@@ -243,7 +258,8 @@ public class ROCrateMetadataContext implements IROCrateMetadataContext {
         jsonNode = defaultContext;
       } else {
         try {
-          jsonNode = objectMapper.readTree(getClass().getClassLoader().getResource(DEFAULT_CONTEXT_LOCATION));
+          jsonNode = objectMapper.readTree(
+              getClass().getClassLoader().getResource(DEFAULT_CONTEXT_LOCATION));
         } catch (IOException e) {
           e.printStackTrace();
         }

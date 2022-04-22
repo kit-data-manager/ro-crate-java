@@ -3,54 +3,54 @@ package edu.kit.crate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.crate.context.IROCrateMetadataContext;
-import edu.kit.crate.context.ROCrateMetadataContext;
+import edu.kit.crate.context.CrateMetadataContext;
+import edu.kit.crate.context.RoCrateMetadataContext;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import edu.kit.crate.payload.IROCratePayload;
-import edu.kit.crate.payload.ROCratePayload;
+import edu.kit.crate.payload.CratePayload;
+import edu.kit.crate.payload.RoCratePayload;
+import edu.kit.crate.preview.CratePreview;
 import edu.kit.crate.special.JsonUtilFunctions;
-import edu.kit.crate.preview.IROCratePreview;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
+ * The class that represents a single ROCrate.
+ *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public class ROCrate implements IROCrate {
+public class RoCrate implements Crate {
 
-  private final static String ID = "ro-crate-metadata.json";
-  private final static String RO_SPEC = "https://w3id.org/ro/crate/1.1";
+  private static final String ID = "ro-crate-metadata.json";
+  private static final String RO_SPEC = "https://w3id.org/ro/crate/1.1";
 
-  private final IROCratePayload roCratePayload;
-  private IROCrateMetadataContext metadataContext;
-  private IROCratePreview roCratePreview;
+  private final CratePayload roCratePayload;
+  private CrateMetadataContext metadataContext;
+  private CratePreview roCratePreview;
   private RootDataEntity rootDataEntity;
   private ContextualEntity jsonDescriptor;
 
   private List<File> untrackedFiles;
 
   @Override
-  public IROCratePreview getPreview() {
+  public CratePreview getPreview() {
     return this.roCratePreview;
   }
 
-  public void setRoCratePreview(IROCratePreview preview) {
+  public void setRoCratePreview(CratePreview preview) {
     this.roCratePreview = preview;
   }
 
-  public void setMetadataContext(IROCrateMetadataContext metadataContext) {
+  public void setMetadataContext(CrateMetadataContext metadataContext) {
     this.metadataContext = metadataContext;
   }
 
@@ -70,13 +70,21 @@ public class ROCrate implements IROCrate {
     this.rootDataEntity = rootDataEntity;
   }
 
-  public ROCrate() {
-    this.roCratePayload = new ROCratePayload();
-    this.metadataContext = new ROCrateMetadataContext();
+  /**
+   * Default constructor for creation of an empty crate.
+   */
+  public RoCrate() {
+    this.roCratePayload = new RoCratePayload();
+    this.metadataContext = new RoCrateMetadataContext();
     this.untrackedFiles = new ArrayList<>();
   }
 
-  public ROCrate(ROCrateBuilder roCrateBuilder) {
+  /**
+   * A constructor for creating the crate using a Crate builder for easier creation.
+   *
+   * @param roCrateBuilder the builder to use.
+   */
+  public RoCrate(RoCrateBuilder roCrateBuilder) {
     this.roCratePayload = roCrateBuilder.payload;
     this.metadataContext = roCrateBuilder.metadataContext;
     this.roCratePreview = roCrateBuilder.preview;
@@ -157,15 +165,14 @@ public class ROCrate implements IROCrate {
     this.untrackedFiles = files;
   }
 
-  // fix this
   @Override
   public void addFromCollection(Collection<AbstractEntity> entities) {
     this.roCratePayload.addEntities(entities);
   }
 
   @Override
-  public void addItemFromDataCite(String locationURL) {
-    ImportFromDataCite.addDataCiteToCrate(locationURL, this);
+  public void addItemFromDataCite(String locationUrl) {
+    ImportFromDataCite.addDataCiteToCrate(locationUrl, this);
   }
 
   @Override
@@ -173,20 +180,29 @@ public class ROCrate implements IROCrate {
     return this.untrackedFiles;
   }
 
-  static final public class ROCrateBuilder {
+  /**
+   * The inner class builder for the easier creation of a ROCrate.
+   */
+  public static final class RoCrateBuilder {
 
-    IROCratePayload payload;
-    IROCratePreview preview;
-    IROCrateMetadataContext metadataContext;
+    CratePayload payload;
+    CratePreview preview;
+    CrateMetadataContext metadataContext;
     ContextualEntity license;
     RootDataEntity rootDataEntity;
     ContextualEntity jsonDescriptor;
     List<File> untrackedFiles;
 
-    public ROCrateBuilder(String name, String description) {
-      this.payload = new ROCratePayload();
+    /**
+     * The default constructor of a builder.
+     *
+     * @param name the name of the crate.
+     * @param description the description of the crate.
+     */
+    public RoCrateBuilder(String name, String description) {
+      this.payload = new RoCratePayload();
       this.untrackedFiles = new ArrayList<>();
-      this.metadataContext = new ROCrateMetadataContext();
+      this.metadataContext = new RoCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .addProperty("name", name)
           .addProperty("description", description)
@@ -199,50 +215,63 @@ public class ROCrate implements IROCrate {
           .build();
     }
 
-    public ROCrateBuilder addDataEntity(DataEntity dataEntity) {
+    /**
+     * Adding a data entity to the crate.
+     * The important part here is to also add its id to the RootData Entity hasPart.
+     *
+     * @param dataEntity the DataEntity object.
+     * @return returns the builder for further usage.
+     */
+    public RoCrateBuilder addDataEntity(DataEntity dataEntity) {
       this.payload.addDataEntity(dataEntity);
       this.rootDataEntity.addToHasPart(dataEntity.getId());
       return this;
     }
 
-    public ROCrateBuilder addContextualEntity(ContextualEntity contextualEntity) {
+    public RoCrateBuilder addContextualEntity(ContextualEntity contextualEntity) {
       this.payload.addContextualEntity(contextualEntity);
       return this;
     }
 
-    public ROCrateBuilder setLicense(ContextualEntity license) {
+    /**
+     * Setting the license of the crate.
+     *
+     * @param license the license is a contextual entity.
+     * @return the builder for further usage.
+     */
+    public RoCrateBuilder setLicense(ContextualEntity license) {
       this.license = license;
       this.rootDataEntity.addIdProperty("license", license.getId());
       return this;
     }
 
-    public ROCrateBuilder setContext(IROCrateMetadataContext context) {
+    public RoCrateBuilder setContext(CrateMetadataContext context) {
       this.metadataContext = context;
       return this;
     }
 
-    public ROCrateBuilder addURLToContext(java.lang.String url) {
+    public RoCrateBuilder addUrlToContext(java.lang.String url) {
       this.metadataContext.addToContextFromUrl(url);
       return this;
     }
 
-    public ROCrateBuilder addValuePairToContext(java.lang.String key, java.lang.String value) {
+    public RoCrateBuilder addValuePairToContext(java.lang.String key, java.lang.String value) {
       this.metadataContext.addToContext(key, value);
       return this;
     }
 
-    public ROCrateBuilder setPreview(IROCratePreview preview) {
+    public RoCrateBuilder setPreview(CratePreview preview) {
       this.preview = preview;
       return this;
     }
 
-    public ROCrateBuilder addUntrackedFile(File file) {
+    public RoCrateBuilder addUntrackedFile(File file) {
       this.untrackedFiles.add(file);
       return this;
     }
 
-    public ROCrate build() {
-      return new ROCrate(this);
+    public RoCrate build() {
+      return new RoCrate(this);
     }
   }
 

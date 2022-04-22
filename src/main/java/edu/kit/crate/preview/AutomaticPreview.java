@@ -2,7 +2,6 @@ package edu.kit.crate.preview;
 
 import java.io.File;
 import java.io.IOException;
-
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 
@@ -13,13 +12,13 @@ import org.apache.commons.io.FileUtils;
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public class AutomaticPreview implements IROCratePreview {
+public class AutomaticPreview implements CratePreview {
 
   public AutomaticPreview() {
   }
 
   @Override
-  public void saveALLToZip(ZipFile zipFile) {
+  public void saveAllToZip(ZipFile zipFile) {
     try {
       // extract the .json file so we can run the "rochtml" tool on it"
       zipFile.extractFile("ro-crate-metadata.json", "temp");
@@ -32,7 +31,7 @@ public class AutomaticPreview implements IROCratePreview {
   }
 
   @Override
-  public void saveALLToFolder(File folder) {
+  public void saveAllToFolder(File folder) {
     PreviewGenerator.generatePreview(folder.getAbsolutePath());
   }
 }

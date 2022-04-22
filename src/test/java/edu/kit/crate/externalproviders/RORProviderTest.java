@@ -1,7 +1,7 @@
 package edu.kit.crate.externalproviders;
 
 import edu.kit.crate.entities.contextual.OrganizationEntity;
-import edu.kit.crate.externalproviders.organizationprovider.RORProvider;
+import edu.kit.crate.externalproviders.organizationprovider.RorProvider;
 import java.io.IOException;
 
 import edu.kit.crate.HelpFunctions;
@@ -15,7 +15,7 @@ public class RORProviderTest {
 
   @Test
   void testExternalRORProvider() throws IOException {
-    OrganizationEntity organizationEntity = RORProvider.getOrganization("https://ror.org/04t3en479");
+    OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/04t3en479");
     HelpFunctions.compareEntityWithFile(organizationEntity, "/json/entities/contextual/rorkit.json");
   }
 }

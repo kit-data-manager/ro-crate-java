@@ -4,12 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Class with util functions used with json objects.
+ */
 public class JsonUtilFunctions {
 
+  /**
+   * A function for unwrapping single array elements in a Json object.
+   *
+   * @param node the json node that should be unwrapped.
+   * @return the unwrapped Json.
+   */
   public static JsonNode unwrapSingleArray(JsonNode node) {
     ObjectNode newNode = MyObjectMapper.getMapper().createObjectNode();
     if (node.isObject()) {
@@ -33,6 +41,12 @@ public class JsonUtilFunctions {
     return node;
   }
 
+  /**
+   * A function for removing id fields from a JSON object.
+   *
+   * @param id every property with this as id will be removed.
+   * @param node the json from which to remove the properties.
+   */
   public static void removeFieldsWith(String id, JsonNode node) {
     //MyObjectMapper.getMapper().createObjectNode();
     if (node.isObject()) {
@@ -64,16 +78,16 @@ public class JsonUtilFunctions {
   }
 
   /**
-   * This method extracts from every property of a json objects its id's
-   * The method is intended for flattened json objects
+   * This method extracts from every property of a json objects its id's.
+   * The method is intended for flattened json objects.
    *
-   * @param node The JsonNode json object
-   * @return the set containing all the strings
+   * @param node The JsonNode json object.
+   * @return the set containing all the strings.
    */
   public static Set<String> getIdPropertiesFromJsonNode(JsonNode node) {
     Set<String> set = new HashSet<>();
     var itr = node.fields();
-    while(itr.hasNext()) {
+    while (itr.hasNext()) {
       set.addAll(getIdPropertiesFromProperty(itr.next().getValue()));
     }
     return set;

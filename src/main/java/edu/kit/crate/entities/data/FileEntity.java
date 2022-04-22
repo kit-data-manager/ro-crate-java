@@ -1,6 +1,8 @@
 package edu.kit.crate.entities.data;
 
 /**
+ * A helping class representing a File entity.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
@@ -8,13 +10,13 @@ public class FileEntity extends DataEntity {
 
   private static final String TYPE = "File";
 
-  public FileEntity(AFileEntityBuilder<?> entityBuilder) {
+  public FileEntity(AbstractFileEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addType(TYPE);
   }
 
-  abstract static class AFileEntityBuilder<T extends AFileEntityBuilder<T>> extends
-      ADataEntityBuilder<T> {
+  abstract static class AbstractFileEntityBuilder<T extends AbstractFileEntityBuilder<T>> extends
+      AbstractDataEntityBuilder<T> {
 
     public T setEncodingFormat(String encodingFormat) {
       this.addProperty("encodingFormat", encodingFormat);
@@ -22,10 +24,13 @@ public class FileEntity extends DataEntity {
     }
 
     @Override
-    abstract public FileEntity build();
+    public abstract FileEntity build();
   }
 
-  final static public class FileEntityBuilder extends AFileEntityBuilder<FileEntityBuilder> {
+  /**
+   * Builder class for the easier creation of the File entities.
+   */
+  public static final class FileEntityBuilder extends AbstractFileEntityBuilder<FileEntityBuilder> {
 
     @Override
     public FileEntityBuilder self() {

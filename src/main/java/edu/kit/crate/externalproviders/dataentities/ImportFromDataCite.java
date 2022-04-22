@@ -4,49 +4,89 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.OrganizationEntity;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.data.DataEntity;
-import edu.kit.crate.externalproviders.organizationprovider.RORProvider;
-import edu.kit.crate.externalproviders.personprovider.ORCIDProvider;
+import edu.kit.crate.externalproviders.organizationprovider.RorProvider;
+import edu.kit.crate.externalproviders.personprovider.OrcidProvider;
 import edu.kit.crate.objectmapper.MyObjectMapper;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+/**
+ * class used for importing from a datacite to an ROCrate.
+ * The idea is to provide a datacite url and
+ * all the entities relevant to it will be imported to the crate.
+ */
 public class ImportFromDataCite {
 
-  public static IROCrate createCrateFromDataCiteResource(String url) {
-    IROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+  /**
+   * This will take a DataCite entry and create a crate from it.
+   *
+   * @param url         the url of the dataCite entry. ex:
+  https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669
+   * @param name        the name the crate should have.
+   * @param description the description of the crate.
+   * @return the created crate.
+   */
+  public static Crate createCrateFromDataCiteResource(
+      String url, String name, String description) {
+
+    Crate crate = new RoCrate.RoCrateBuilder(name, description)
         .build();
     addDataCiteToCrate(url, crate);
     return crate;
   }
 
-  public static void addDataCiteToCrate(String url, IROCrate crate) {
-    var entities = getEntitiesFromDataCiteResource(Objects.requireNonNull(getJsonNodeFromDataCite(url)));
+  /**
+   * Adding a data cite entry to an existing crate.
+   * All the entities from the dataCite will be added to the crate.
+   *
+   * @param url the url of the DataCite resource.
+   * @param crate the existing crate.
+   */
+  public static void addDataCiteToCrate(String url, Crate crate) {
+    var entities =
+        getEntitiesFromDataCiteResource(Objects.requireNonNull(getJsonNodeFromDataCite(url)));
     crate.addFromCollection(entities);
   }
 
-  public static IROCrate createCrateFromDataCiteJson(JsonNode json) {
-    IROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+  /**
+   * Creating a crate from a DataCite resource, this time it is provided as a Json object.
+   *
+   * @param json the Json object of the DataCite resource.
+   * @param name the name of the crate that will be created.
+   * @param description the description of the crate that will be created.
+   * @return the created crate.
+   */
+  public static Crate createCrateFromDataCiteJson(
+      JsonNode json, String name, String description) {
+    Crate crate = new RoCrate.RoCrateBuilder(name, description)
         .build();
     addDataCiteToCrateFromJson(json, crate);
     return crate;
   }
 
-  public static void addDataCiteToCrateFromJson(JsonNode json, IROCrate crate) {
+  public static void addDataCiteToCrateFromJson(JsonNode json, Crate crate) {
     var entities = getEntitiesFromDataCiteResource(json);
     crate.addFromCollection(entities);
   }
@@ -71,8 +111,8 @@ public class ImportFromDataCite {
   private static List<AbstractEntity> getEntitiesFromDataCiteResource(JsonNode jsonNode) {
 
     List<AbstractEntity> entityList = new ArrayList<>();
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    Map<String, String> relationType = Stream.of(new String[][]{
+    final ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    final Map<String, String> relationType = Stream.of(new String[][]{
         {"IsCitedBy", "isPartOf"},
         {"Cites", "citation"},
         {"IsSupplementTo", "isPartOf"},
@@ -111,11 +151,11 @@ public class ImportFromDataCite {
         Collectors.toMap(data -> data[0], data -> data[1]),
         Collections::<String, String>unmodifiableMap));
 
-    Collection<AbstractEntity> citation = new HashSet<>();
-    Collection<AbstractEntity> hasPart = new HashSet<>();
-    Collection<AbstractEntity> IsBasedOn = new HashSet<>();
-    Collection<AbstractEntity> IsPartOf = new HashSet<>();
-    Collection<AbstractEntity> sameAs = new HashSet<>();
+    final Collection<AbstractEntity> citation = new HashSet<>();
+    final Collection<AbstractEntity> hasPart = new HashSet<>();
+    final Collection<AbstractEntity> IsBasedOn = new HashSet<>();
+    final Collection<AbstractEntity> IsPartOf = new HashSet<>();
+    final Collection<AbstractEntity> sameAs = new HashSet<>();
 
 
     // the id of the main entity
@@ -149,8 +189,8 @@ public class ImportFromDataCite {
 
     // publicationYear
     String publicationYear;
-    JsonNode pYear = jsonNode.get("publicationYear");
-    publicationYear = pYear != null ? pYear.asText() : null;
+    JsonNode pubYear = jsonNode.get("publicationYear");
+    publicationYear = pubYear != null ? pubYear.asText() : null;
 
     // the creators + their affiliations
     JsonNode creators = jsonNode.get("creators");
@@ -215,6 +255,8 @@ public class ImportFromDataCite {
               datePublished = dateString;
             }
             break;
+          default:
+            dateCreated = LocalDateTime.now().toString();
         }
       }
     }
@@ -306,7 +348,8 @@ public class ImportFromDataCite {
           String topRightLongitude = box.get("eastBoundLongitude").asText();
           String topRightLatitude = box.get("northBoundLatitude").asText();
 
-          boxString = bottomLeftLongitude + "," + bottomLeftLatitude + " " + topRightLongitude + "," + topRightLatitude;
+          boxString = bottomLeftLongitude + "," + bottomLeftLatitude + " "
+              + topRightLongitude + "," + topRightLatitude;
 
         }
         if (geoThing.get("geoLocationPolygon") != null) {
@@ -401,11 +444,12 @@ public class ImportFromDataCite {
         var funderId = el.get("funderIdentifierType");
         PersonEntity funder;
         if (funderId != null && funderId.asText().equals("ORCID")) {
-          funder = ORCIDProvider.getPerson(funderId.asText());
+          funder = OrcidProvider.getPerson(funderId.asText());
         } else {
           funder = new PersonEntity.PersonEntityBuilder()
               .addProperty("name", el.get("funderName"))
-              .setId(el.get("funderIdentifier") == null ? null : el.get("funderIdentifier").asText())
+              .setId(el.get("funderIdentifier") == null
+                  ? null : el.get("funderIdentifier").asText())
               .build();
         }
         funderSet.add(funder);
@@ -445,17 +489,17 @@ public class ImportFromDataCite {
         .addProperty("title", title)
         .addProperty("publicationYear", publicationYear)
         .addIdProperty("publisher", publisher)
-        .addIdFromCollectionOFEntities("creator", creatorsList)
-        .addIdFromCollectionOFEntities("contributor", contributorsList)
-        .addIdFromCollectionOFEntities("spatialCoverage", geoSet)
-        .addIdFromCollectionOFEntities("license", licenses)
-        .addIdFromCollectionOFEntities("funder", funderSet)
-        .addIdFromCollectionOFEntities("funding", grandSet)
-        .addIdFromCollectionOFEntities("isPartOf", IsPartOf)
-        .addIdFromCollectionOFEntities("citation", citation)
-        .addIdFromCollectionOFEntities("hasPart", hasPart)
-        .addIdFromCollectionOFEntities("isBasedOn", IsBasedOn)
-        .addIdFromCollectionOFEntities("sameAs", sameAs)
+        .addIdFromCollectionOfEntities("creator", creatorsList)
+        .addIdFromCollectionOfEntities("contributor", contributorsList)
+        .addIdFromCollectionOfEntities("spatialCoverage", geoSet)
+        .addIdFromCollectionOfEntities("license", licenses)
+        .addIdFromCollectionOfEntities("funder", funderSet)
+        .addIdFromCollectionOfEntities("funding", grandSet)
+        .addIdFromCollectionOfEntities("isPartOf", IsPartOf)
+        .addIdFromCollectionOfEntities("citation", citation)
+        .addIdFromCollectionOfEntities("hasPart", hasPart)
+        .addIdFromCollectionOfEntities("isBasedOn", IsBasedOn)
+        .addIdFromCollectionOfEntities("sameAs", sameAs)
         .addProperty("description", descriptionArray)
         .addProperty("dateCreated", dateCreated)
         .addProperty("dateModified", dateModified)
@@ -485,7 +529,8 @@ public class ImportFromDataCite {
         .build();
   }
 
-  private static AbstractEntity addPersonToListOfEntities(JsonNode personNode, Collection<AbstractEntity> entities) {
+  private static AbstractEntity addPersonToListOfEntities(JsonNode personNode,
+                                                          Collection<AbstractEntity> entities) {
     // if there is an Orcid provider use it to get the entity directly from orcid
     var creatorIdentifiers = personNode.get("nameIdentifiers");
     PersonEntity person = null;
@@ -493,7 +538,7 @@ public class ImportFromDataCite {
     if (creatorIdentifiers != null && !creatorIdentifiers.isEmpty()) {
       for (var identifier : creatorIdentifiers) {
         if (identifier.get("nameIdentifierScheme").asText().equals("ORCID")) {
-          person = ORCIDProvider.getPerson(identifier.get("nameIdentifier").asText());
+          person = OrcidProvider.getPerson(identifier.get("nameIdentifier").asText());
         } else {
           personUrl = identifier.get("nameIdentifier").asText();
         }
@@ -521,7 +566,7 @@ public class ImportFromDataCite {
         // if the scheme is ROR we can get the entity from there.
         OrganizationEntity organization;
         if (scheme != null && scheme.asText().equals("ROR")) {
-          organization = RORProvider.getOrganization(affiliationId.asText());
+          organization = RorProvider.getOrganization(affiliationId.asText());
         } else {
           organization = new OrganizationEntity.OrganizationEntityBuilder()
               .setId(affiliationId.asText())
@@ -531,8 +576,8 @@ public class ImportFromDataCite {
         organizationEntitySet.add(organization);
       }
     }
-    person.addIdListProperties("affiliation", organizationEntitySet.stream().map(AbstractEntity::getId).collect(Collectors.toList()));
-    // person.addIdListProperties();
+    person.addIdListProperties("affiliation",
+        organizationEntitySet.stream().map(AbstractEntity::getId).collect(Collectors.toList()));
     entities.addAll(organizationEntitySet);
     entities.add(person);
     return person;

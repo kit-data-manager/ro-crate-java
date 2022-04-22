@@ -1,12 +1,12 @@
 package edu.kit.crate.crate.realexamples;
 
-import edu.kit.crate.IROCrate;
+import edu.kit.crate.Crate;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.data.FileEntity;
-import edu.kit.crate.externalproviders.personprovider.ORCIDProvider;
+import edu.kit.crate.externalproviders.personprovider.OrcidProvider;
 import edu.kit.crate.reader.FolderReader;
-import edu.kit.crate.reader.ROCrateReader;
+import edu.kit.crate.reader.RoCrateReader;
 import edu.kit.crate.HelpFunctions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -22,9 +22,9 @@ public class RealTest {
   @Test
   void testWithIDRCProject(@TempDir Path temp) throws IOException {
 
-    ROCrateReader reader = new ROCrateReader(new FolderReader());
+    RoCrateReader reader = new RoCrateReader(new FolderReader());
     final String locationMetadataFile = "/crates/other/idrc_project/ro-crate-metadata.json";
-    IROCrate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
+    Crate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
 
     HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
 
@@ -40,7 +40,7 @@ public class RealTest {
         , true);
 
 
-    PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
+    PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
     crate.addContextualEntity(person);
 
     // problem

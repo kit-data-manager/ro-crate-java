@@ -8,20 +8,26 @@ import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.special.JsonUtilFunctions;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * @author Nikola Tzotchev on 6.2.2022 г.
- * @version 1
+ * The crate payload is the class containing all the entities in the crate.
  */
-public class ROCratePayload implements IROCratePayload {
+public class RoCratePayload implements CratePayload {
 
   private final HashMap<String, DataEntity> dataEntities;
   private final HashMap<String, ContextualEntity> contextualEntities;
   private final HashMap<String, Set<String>> associatedItems;
 
-  public ROCratePayload() {
+  /**
+   * The default constructor for instantiating a payload.
+   */
+  public RoCratePayload() {
     this.dataEntities = new HashMap<>();
     this.contextualEntities = new HashMap<>();
     this.associatedItems = new HashMap<>();
@@ -81,6 +87,12 @@ public class ROCratePayload implements IROCratePayload {
     }
   }
 
+  /**
+   * This method is used to add an entity  linked entities' ids to the map of associatedItems.
+   * This will be then used to make the removal of entities from the crate faster.
+   *
+   * @param abstractEntity the abstract entity passed to the method.
+   */
   public void addToAssociatedItems(AbstractEntity abstractEntity) {
     var set = abstractEntity.getLinkedTo();
     for (var e : set) {
@@ -147,8 +159,9 @@ public class ROCratePayload implements IROCratePayload {
     if (set != null) {
       for (var element : set) {
         var entity = this.getEntityById(element);
-        if (entity != null)
+        if (entity != null) {
           list.add(entity);
+        }
       }
     }
     return list;

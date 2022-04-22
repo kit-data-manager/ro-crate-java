@@ -3,11 +3,14 @@ package edu.kit.crate.entities.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Class used for validation of entities before their creation.
+ */
 public class EntityValidation {
 
-  private IEntityValidationStrategy strategy;
+  private final EntityValidationStrategy strategy;
 
-  public EntityValidation(IEntityValidationStrategy strategy) {
+  public EntityValidation(EntityValidationStrategy strategy) {
     this.strategy = strategy;
   }
 

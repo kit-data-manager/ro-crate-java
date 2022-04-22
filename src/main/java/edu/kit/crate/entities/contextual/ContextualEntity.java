@@ -3,24 +3,30 @@ package edu.kit.crate.entities.contextual;
 import edu.kit.crate.entities.AbstractEntity;
 
 /**
+ * This class represents the base class of the contextual entities.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
 public class ContextualEntity extends AbstractEntity {
 
-  public ContextualEntity(AContextualEntityBuilder<?> entityBuilder) {
+  public ContextualEntity(AbstractContextualEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
   }
 
-  abstract static class AContextualEntityBuilder<T extends AContextualEntityBuilder<T>> extends
-      AEntityBuilder<T> {
+  abstract static class AbstractContextualEntityBuilder
+      <T extends AbstractContextualEntityBuilder<T>> extends AbstractEntityBuilder<T> {
 
     @Override
-    abstract public ContextualEntity build();
+    public abstract ContextualEntity build();
   }
 
-  final static public class ContextualEntityBuilder extends
-      AContextualEntityBuilder<ContextualEntityBuilder> {
+  /**
+   * This is the Contextual entity builder base class,
+   * as of right now it does not contain any methods.
+   */
+  public static final class ContextualEntityBuilder extends
+      AbstractContextualEntityBuilder<ContextualEntityBuilder> {
 
     @Override
     public ContextualEntityBuilder self() {

@@ -2,7 +2,7 @@ package edu.kit.crate.crate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.contextual.PlaceEntity;
 import edu.kit.crate.entities.data.FileEntity;
@@ -16,7 +16,7 @@ public class TestRemoveAddEntity {
   @Test
   void testAddRemoveEntity() throws IOException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -53,7 +53,7 @@ public class TestRemoveAddEntity {
         .addAuthor(person.getId())
         .build();
 
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addContextualEntity(place)
         .addContextualEntity(person)
@@ -70,7 +70,7 @@ public class TestRemoveAddEntity {
     roCrate.deleteEntityById("#alice");
     roCrate.deleteEntityById("http://sws.geonames.org/8152662/");
 
-    ROCrate roCrate2 = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate2 = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity").build();
     HelpFunctions.compareTwoCrateJson(roCrate, roCrate2);
   }
@@ -96,7 +96,7 @@ public class TestRemoveAddEntity {
         .addAuthor(person.getId())
         .build();
 
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addContextualEntity(place)
         .addContextualEntity(person)
@@ -110,7 +110,7 @@ public class TestRemoveAddEntity {
         .setId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
         .build();
-    ROCrate second2 = new ROCrate.ROCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
+    RoCrate second2 = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
         .addDataEntity(file2)
         .build();
 

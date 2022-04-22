@@ -3,7 +3,7 @@ package edu.kit.crate.writer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.preview.AutomaticPreview;
@@ -57,7 +57,7 @@ public class ZipWriterTest {
         Charset.defaultCharset());
 
     // create the RO_Crate including the files that should be present in it
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
@@ -84,7 +84,7 @@ public class ZipWriterTest {
     // safe the crate in the test.zip file
     Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toString());
     Path res = tempDir.resolve("dest");
@@ -129,7 +129,7 @@ public class ZipWriterTest {
     Path falseFile = tempDir.resolve("new");
     FileUtils.writeStringToFile(falseFile.toFile(), "this file contains something else", Charset.defaultCharset());
     // create the RO_Crate including the files that should be present in it
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
@@ -155,7 +155,7 @@ public class ZipWriterTest {
     // safe the crate in the test.zip file
     Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
     Path res = tempDir.resolve("dest");

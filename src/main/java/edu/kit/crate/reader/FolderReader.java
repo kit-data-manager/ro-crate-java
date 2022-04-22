@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * A class for reading a crate from a folder.
+ *
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderReader implements IReaderStrategy {
+public class FolderReader implements ReaderStrategy {
 
   @Override
   public ObjectNode readMetadataJson(String location) {

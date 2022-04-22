@@ -2,8 +2,8 @@ package edu.kit.crate.crate.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.data.WorkflowEntity;
 import edu.kit.crate.objectmapper.MyObjectMapper;
 import edu.kit.crate.validation.JsonSchemaValidation;
@@ -23,7 +23,7 @@ public class ValidationTest {
 
   @Test
   void jsonSchemaValidationTest() throws IOException, URISyntaxException {
-    IROCrate crate = new ROCrate.ROCrateBuilder("workflowCrate", "this is a test")
+    Crate crate = new RoCrate.RoCrateBuilder("workflowCrate", "this is a test")
         .addDataEntity(
             new WorkflowEntity.WorkflowEntityBuilder()
                 .setId("https://www.example.com/entity")

@@ -1,10 +1,10 @@
 package edu.kit.crate.crate.preview;
 
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.preview.AutomaticPreview;
 import edu.kit.crate.preview.CustomPreview;
 import edu.kit.crate.writer.FolderWriter;
-import edu.kit.crate.writer.ROCrateWriter;
+import edu.kit.crate.writer.RoCrateWriter;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,10 +22,10 @@ public class PreviewCrateTest {
   @Test
   void testAutomaticPreview(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate1");
-    ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
         .setPreview(new AutomaticPreview())
         .build();
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().getAbsolutePath());
     assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
@@ -33,8 +33,8 @@ public class PreviewCrateTest {
   @Test
   void testAutomaticPreviewAddingLater(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate2");
-    ROCrate crate = new ROCrate.ROCrateBuilder("name", "description").build();
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
     assertFalse(location.resolve("ro-crate-preview.html").toFile().exists());
     crate.setRoCratePreview(new AutomaticPreview());
@@ -47,10 +47,10 @@ public class PreviewCrateTest {
     Path location = temp.resolve("ro_crate3");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
-    ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
         .setPreview(new CustomPreview(previewFile.toFile()))
         .build();
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
     assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
   }
@@ -63,10 +63,10 @@ public class PreviewCrateTest {
     Path dirHtml = temp.resolve("html_dir");
     Path css_file = dirHtml.resolve("test.css");
     FileUtils.writeStringToFile(css_file.toFile(), "random css it is not important that it is valid for know", Charset.defaultCharset());
-    ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
         .setPreview(new CustomPreview(previewFile.toFile(), dirHtml.toFile()))
         .build();
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
     assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
     assertTrue(location.resolve("ro-crate-preview_files").toFile().exists());

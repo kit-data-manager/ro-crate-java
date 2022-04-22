@@ -1,6 +1,5 @@
 package edu.kit.crate.entities.serializers;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -8,13 +7,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import edu.kit.crate.special.JsonUtilFunctions;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * Serialization class used with jackson to serialize the entity.
+ *
  * @author Nikola Tzotchev on 4.2.2022 г.
  * @version 1
  */
@@ -33,11 +33,11 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
       throws IOException {
 
     JsonNode node = JsonUtilFunctions.unwrapSingleArray(value);
-    Iterator<Entry<String, JsonNode>> fields = node.fields();
+    final Iterator<Entry<String, JsonNode>> fields = node.fields();
 
     while (fields.hasNext()) {
       Map.Entry<String, JsonNode> field = fields.next();
-      String fieldName = field.getKey();
+      final String fieldName = field.getKey();
       JsonNode fieldValue = field.getValue();
       if (fieldValue.isObject() && fieldValue.size() == 0) {
         continue;
@@ -53,7 +53,7 @@ public class ObjectNodeSerializer extends StdSerializer<ObjectNode> {
         }
         ArrayNode arrayNode = (ArrayNode) fieldValue;
         int size = arrayNode.size();
-        for (int i = size-1 ; i >= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
           var element = arrayNode.get(i);
           if (element.isObject() && element.isEmpty()) {
             arrayNode.remove(i);

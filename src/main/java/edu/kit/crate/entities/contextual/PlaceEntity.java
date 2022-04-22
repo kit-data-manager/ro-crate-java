@@ -1,6 +1,8 @@
 package edu.kit.crate.entities.contextual;
 
 /**
+ * A helping class for the Place entity creation.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
@@ -8,14 +10,19 @@ public class PlaceEntity extends ContextualEntity {
 
   private static final String TYPE = "Place";
 
-  public PlaceEntity(APlaceEntityBuilder<?> entityBuilder) {
+  /**
+   * Constructor for creating a place entity from a builder.
+   *
+   * @param entityBuilder the builder from which to create the entity.
+   */
+  public PlaceEntity(AbstractPlaceEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addIdProperty("geo", entityBuilder.geo);
     this.addType(TYPE);
   }
 
-  abstract static class APlaceEntityBuilder<T extends APlaceEntityBuilder<T>> extends
-      AContextualEntityBuilder<T> {
+  abstract static class AbstractPlaceEntityBuilder<T extends AbstractPlaceEntityBuilder<T>> extends
+      AbstractContextualEntityBuilder<T> {
 
     String geo;
 
@@ -30,10 +37,14 @@ public class PlaceEntity extends ContextualEntity {
       return self();
     }
 
-    abstract public PlaceEntity build();
+    public abstract PlaceEntity build();
   }
 
-  final static public class PlaceEntityBuilder extends APlaceEntityBuilder<PlaceEntityBuilder> {
+  /**
+   * A builder class for the easier Place entity construction.
+   */
+  public static final class PlaceEntityBuilder
+      extends AbstractPlaceEntityBuilder<PlaceEntityBuilder> {
 
     @Override
     public PlaceEntityBuilder self() {

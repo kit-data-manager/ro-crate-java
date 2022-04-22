@@ -3,13 +3,14 @@ package edu.kit.crate.entities.data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.kit.crate.entities.serializers.HasPartSerializer;
-
 import java.util.HashSet;
 import java.util.Set;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 /**
+ * A helping class for the creating of Data entities of type Dataset.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
@@ -21,14 +22,21 @@ public class DataSetEntity extends DataEntity {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public Set<String> hasPart;
 
-  public DataSetEntity(ADataSetBuilder<?> entityBuilder) {
+  /**
+   * Constructor for instantiating a Dataset entity from the builder.
+   *
+   * @param entityBuilder the builder passed as argument.
+   */
+  public DataSetEntity(AbstractDataSetBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.hasPart = entityBuilder.hasPart;
     this.addType(TYPE);
   }
+
   public void removeFromHasPart(String str) {
     this.hasPart.remove(str);
   }
+
   @Override
   public void saveToZip(ZipFile zipFile) throws ZipException {
     if (this.getSource() != null) {
@@ -44,13 +52,13 @@ public class DataSetEntity extends DataEntity {
     return this.hasPart.contains(id);
   }
 
-  abstract static class ADataSetBuilder<T extends ADataEntityBuilder<T>> extends
-      ADataEntityBuilder<T> {
+  abstract static class AbstractDataSetBuilder<T extends AbstractDataEntityBuilder<T>> extends
+      AbstractDataEntityBuilder<T> {
 
     Set<String> hasPart;
 
 
-    public ADataSetBuilder() {
+    public AbstractDataSetBuilder() {
       this.hasPart = new HashSet<>();
     }
 
@@ -76,10 +84,13 @@ public class DataSetEntity extends DataEntity {
     }
 
     @Override
-    abstract public DataSetEntity build();
+    public abstract DataSetEntity build();
   }
 
-  static final public class DataSetBuilder extends ADataSetBuilder<DataSetBuilder> {
+  /**
+   * Builder for the helping class DataSetEntity.
+   */
+  public static final class DataSetBuilder extends AbstractDataSetBuilder<DataSetBuilder> {
 
     @Override
     public DataSetBuilder self() {

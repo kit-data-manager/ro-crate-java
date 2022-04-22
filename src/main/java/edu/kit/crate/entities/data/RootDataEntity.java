@@ -5,19 +5,22 @@ import java.io.File;
 /**
  * The root DataEntity is basically a DataSet with a default id.
  * This class may be usefully for other functionalities later.
- * @author Nikola Tzotchev on 5.2.2022 г.
- * @version 1
+ *
  */
 public class RootDataEntity extends DataSetEntity {
 
   private static final String ID = "./";
 
-  public RootDataEntity(ADataSetBuilder<?> entityBuilder) {
+  public RootDataEntity(AbstractDataSetBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.setId(ID);
   }
 
-  static final public class RootDataEntityBuilder extends ADataSetBuilder<RootDataEntityBuilder> {
+  /**
+   * Builder class for easier creation of root data entities.
+   */
+  public static final class RootDataEntityBuilder
+      extends AbstractDataSetBuilder<RootDataEntityBuilder> {
 
     @Override
     public RootDataEntityBuilder self() {

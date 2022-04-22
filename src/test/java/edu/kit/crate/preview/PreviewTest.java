@@ -27,7 +27,7 @@ public class PreviewTest {
     FileUtils.writeStringToFile(fileInDir.toFile(), "dajkdlfjdsklafj alksfjdalk fjl", Charset.defaultCharset());
     CustomPreview customPreview = new CustomPreview(file1.toFile(), file2.toFile());
 
-    customPreview.saveALLToFolder(dir.resolve("result").toFile());
+    customPreview.saveAllToFolder(dir.resolve("result").toFile());
 
     var e = dir.resolve("result");
 
@@ -54,7 +54,7 @@ public class PreviewTest {
     FileUtils.writeStringToFile(fileInDir.toFile(), "dajkdlfjdsklafj alksfjdalk fjl", Charset.defaultCharset());
     CustomPreview customPreview = new CustomPreview(file1.toFile(), file2.toFile());
 
-    customPreview.saveALLToZip(new ZipFile(dir.resolve("destination.zip").toFile()));
+    customPreview.saveAllToZip(new ZipFile(dir.resolve("destination.zip").toFile()));
     new ZipFile(dir.resolve("destination.zip").toFile()).extractAll(dir.resolve("extracted").toAbsolutePath().toString());
 
     var e = dir.resolve("extracted");
@@ -83,10 +83,10 @@ public class PreviewTest {
     FileUtils.forceMkdir(crate.toFile());
     FileUtils.copyInputStreamToFile(crateJson, crate.resolve("ro-crate-metadata.json").toFile());
 
-    automaticPreview.saveALLToFolder(crate.toFile());
+    automaticPreview.saveAllToFolder(crate.toFile());
 
     // the program should not crash
-    automaticPreview.saveALLToFolder(fakeCrate.toFile());
+    automaticPreview.saveAllToFolder(fakeCrate.toFile());
 
     // there should be a html file generated
     assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));
@@ -104,11 +104,11 @@ public class PreviewTest {
     zipFile.addStream(crateJson, zipParameters);
     crateJson.close();
 
-    automaticPreview.saveALLToZip(zipFile);
+    automaticPreview.saveAllToZip(zipFile);
 
     // this should trow an exception but not stop the execution
     ZipFile randomZipFile = new ZipFile(dir.resolve("dddd.zip").toFile());
-    automaticPreview.saveALLToZip(randomZipFile);
+    automaticPreview.saveAllToZip(randomZipFile);
 
     zipFile.extractAll(crate.toString());
     assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));

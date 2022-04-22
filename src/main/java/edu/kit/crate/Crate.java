@@ -1,24 +1,25 @@
 package edu.kit.crate;
 
-import edu.kit.crate.context.IROCrateMetadataContext;
+import edu.kit.crate.context.CrateMetadataContext;
 import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.RootDataEntity;
-import edu.kit.crate.preview.IROCratePreview;
-
+import edu.kit.crate.preview.CratePreview;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * An interface describing an ROCrate.
+ *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
-public interface IROCrate {
-  IROCratePreview getPreview();
+public interface Crate {
+  CratePreview getPreview();
 
-  void setMetadataContext(IROCrateMetadataContext metadataContext);
+  void setMetadataContext(CrateMetadataContext metadataContext);
 
   RootDataEntity getRootDataEntity();
 
@@ -48,7 +49,7 @@ public interface IROCrate {
 
   void addFromCollection(Collection<AbstractEntity> entities);
 
-  void addItemFromDataCite(String locationURL);
+  void addItemFromDataCite(String locationUrl);
 
   List<File> getUntrackedFiles();
 }

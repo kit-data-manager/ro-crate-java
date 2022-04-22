@@ -1,12 +1,12 @@
 package edu.kit.crate.crate;
 
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.preview.CustomPreview;
 import edu.kit.crate.reader.FolderReader;
-import edu.kit.crate.reader.ROCrateReader;
+import edu.kit.crate.reader.RoCrateReader;
 import edu.kit.crate.writer.FolderWriter;
-import edu.kit.crate.writer.ROCrateWriter;
+import edu.kit.crate.writer.RoCrateWriter;
 import edu.kit.crate.HelpFunctions;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -29,17 +29,17 @@ public class ReadAndWriteTest {
     Path fileInDir = htmlDir.resolve("file.html");
     FileUtils.writeStringToFile(fileInDir.toFile(), "fileN2", Charset.defaultCharset());
 
-    ROCrate crate = new ROCrate.ROCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
         .setPreview(new CustomPreview(htmlFile.toFile(), htmlDir.toFile()))
         .build();
 
     Path writeDir = path.resolve("crate");
 
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, writeDir.toAbsolutePath().toString());
 
-    ROCrateReader reader = new ROCrateReader(new FolderReader());
-    IROCrate newCrate = reader.readCrate(writeDir.toAbsolutePath().toString());
+    RoCrateReader reader = new RoCrateReader(new FolderReader());
+    Crate newCrate = reader.readCrate(writeDir.toAbsolutePath().toString());
 
     // the preview files as well as the metadata file should not be included here
     assertEquals(0, newCrate.getUntrackedFiles().size());

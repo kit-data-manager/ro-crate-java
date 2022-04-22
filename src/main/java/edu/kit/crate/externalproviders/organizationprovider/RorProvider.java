@@ -10,17 +10,22 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
- * @author Nikola Tzotchev on 11.2.2022 г.
- * @version 1
+ * Class providing possibility to import organization entities from ror.com.
  */
-public class RORProvider {
+public class RorProvider {
 
+  /**
+   * The method that parses a ror entry to a crate entity.
+   *
+   * @param url the url of the ror entry.
+   * @return the created Organization entity.
+   */
   public static OrganizationEntity getOrganization(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.matches("https://ror.org/.*")) {
       throw new IllegalArgumentException("Should provide ror url");
     }
-    String newUrl = "https://api.ror.org/organizations/" + url.replaceAll("https://ror.org/","");
+    String newUrl = "https://api.ror.org/organizations/" + url.replaceAll("https://ror.org/", "");
     HttpGet request = new HttpGet(newUrl);
 
     try {

@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Nikola Tzotchev on 5.2.2022 г.
- * @version 1
+ * A helping class for the creation of workflow data entities.
  */
 public class WorkflowEntity extends FileEntity {
 
   private static final List<String> TYPES = List.of(
       new String[]{"SoftwareSourceCode", "ComputationalWorkflow"});
 
-  public WorkflowEntity(AWorkflowEntityBuilder<?> entityBuilder) {
+  /**
+   * Constructor for creating the workflow entity from a builder.
+   *
+   * @param entityBuilder the builder from which the entity should be created.
+   */
+  public WorkflowEntity(AbstractWorkflowEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     for (String str : TYPES) {
       this.addType(str);
@@ -21,8 +25,8 @@ public class WorkflowEntity extends FileEntity {
     this.addIdListProperties("output", entityBuilder.output);
   }
 
-  abstract static class AWorkflowEntityBuilder<T extends AWorkflowEntityBuilder<T>> extends
-      AFileEntityBuilder<T> {
+  abstract static class AbstractWorkflowEntityBuilder<T
+      extends AbstractWorkflowEntityBuilder<T>> extends AbstractFileEntityBuilder<T> {
 
     List<String> input = new ArrayList<>();
     List<String> output = new ArrayList<>();
@@ -38,11 +42,14 @@ public class WorkflowEntity extends FileEntity {
     }
 
     @Override
-    abstract public WorkflowEntity build();
+    public abstract WorkflowEntity build();
   }
 
-  final static public class WorkflowEntityBuilder extends
-      AWorkflowEntityBuilder<WorkflowEntityBuilder> {
+  /**
+   * A builder for easier creation of workflow entities.
+   */
+  public static final class WorkflowEntityBuilder extends
+      AbstractWorkflowEntityBuilder<WorkflowEntityBuilder> {
 
     @Override
     public WorkflowEntityBuilder self() {

@@ -1,6 +1,8 @@
 package edu.kit.crate.entities.contextual;
 
 /**
+ * A helping class for creating a Person Entity.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
@@ -8,7 +10,12 @@ public class PersonEntity extends ContextualEntity {
 
   private static final String TYPE = "Person";
 
-  public PersonEntity(APersonEntityBuilder<?> entityBuilder) {
+  /**
+   * Constructor for creating the Person entity from a builder.
+   *
+   * @param entityBuilder the builder from which to create the entity.
+   */
+  public PersonEntity(AbstractPersonEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addIdProperty("affiliation", entityBuilder.affiliation);
     this.addIdProperty("contactPoint", entityBuilder.contactPoint);
@@ -18,8 +25,9 @@ public class PersonEntity extends ContextualEntity {
     this.addType(TYPE);
   }
 
-  abstract static class APersonEntityBuilder<T extends APersonEntityBuilder<T>> extends
-      AContextualEntityBuilder<T> {
+  abstract static class AbstractPersonEntityBuilder
+      <T extends AbstractPersonEntityBuilder<T>>
+      extends AbstractContextualEntityBuilder<T> {
 
     String affiliation;
     String contactPoint;
@@ -53,10 +61,14 @@ public class PersonEntity extends ContextualEntity {
     }
 
     @Override
-    abstract public PersonEntity build();
+    public abstract PersonEntity build();
   }
 
-  final static public class PersonEntityBuilder extends APersonEntityBuilder<PersonEntityBuilder> {
+  /**
+   * Person Entity builder for easier creation of Person entities.
+   */
+  public static final class PersonEntityBuilder
+      extends AbstractPersonEntityBuilder<PersonEntityBuilder> {
 
     @Override
     public PersonEntityBuilder self() {

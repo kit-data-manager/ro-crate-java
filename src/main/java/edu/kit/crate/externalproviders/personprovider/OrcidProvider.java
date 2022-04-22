@@ -1,23 +1,12 @@
 package edu.kit.crate.externalproviders.personprovider;
 
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdOptions;
-import com.apicatalog.jsonld.document.Document;
-import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.entities.contextual.PersonEntity;
 import edu.kit.crate.entities.validation.EntityValidation;
 import edu.kit.crate.entities.validation.JsonSchemaValidation;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -25,11 +14,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
+ * Class for creating person entities from orcid uri.
+ *
  * @author Nikola Tzotchev on 10.2.2022 г.
  * @version 1
  */
-public class ORCIDProvider {
+public class OrcidProvider {
 
+  /**
+   * Static method for importing a person entity from his ORCID id.
+   *
+   * @param url the url of the orcid identifier of the person.
+   * @return the created PersonEntity.
+   */
   public static PersonEntity getPerson(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.matches("https://orcid.org.*")) {

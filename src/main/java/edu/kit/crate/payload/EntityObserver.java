@@ -1,10 +1,13 @@
 package edu.kit.crate.payload;
 
-public class EntityObserver implements IObserver {
+/**
+ * Implementation of the Observer pattern, used by the deletion of entities.
+ */
+public class EntityObserver implements Observer {
 
-  private final ROCratePayload payload;
+  private final RoCratePayload payload;
 
-  public EntityObserver(ROCratePayload payload) {
+  public EntityObserver(RoCratePayload payload) {
     this.payload = payload;
   }
 

@@ -3,7 +3,7 @@ package edu.kit.crate.writer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.DataSetEntity;
 import edu.kit.crate.entities.data.FileEntity;
@@ -47,7 +47,7 @@ public class FolderWriterTest {
         Charset.defaultCharset());
 
     // create the RO_Crate including the files that should be present in it
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
@@ -80,7 +80,7 @@ public class FolderWriterTest {
 
     Path result = tempDir.resolve("dest");
 
-    ROCrateWriter folderRoCrateWriter = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
     folderRoCrateWriter.save(roCrate, result.toFile().toString());
     // test if the names of the files in the crate are correct,
     // when there is an ID the file should be called the same as the entity.
@@ -91,7 +91,7 @@ public class FolderWriterTest {
 
   @Test
   void writeToFolderTest(@TempDir Path tempDir) throws IOException {
-    ROCrateWriter folderRoCrateWriter = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
     Path roDir = tempDir.resolve("ro_dir");
     FileUtils.forceMkdir(roDir.toFile());
 
@@ -121,7 +121,7 @@ public class FolderWriterTest {
         Charset.defaultCharset());
 
     // create the RO_Crate including the files that should be present in it
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
@@ -155,7 +155,7 @@ public class FolderWriterTest {
 
   @Test
   void writeToFolderWrongTest(@TempDir Path tempDir) throws IOException {
-    ROCrateWriter folderRoCrateWriter = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
     Path roDir = tempDir.resolve("ro_dir");
     FileUtils.forceMkdir(roDir.toFile());
 
@@ -187,7 +187,7 @@ public class FolderWriterTest {
     Path falseFile = tempDir.resolve("new");
     FileUtils.writeStringToFile(falseFile.toFile(), "this file contains something else", Charset.defaultCharset());
     // create the RO_Crate including the files that should be present in it
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("Example RO-Crate",
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()

@@ -1,10 +1,10 @@
 package edu.kit.crate.reader;
 
-import edu.kit.crate.IROCrate;
-import edu.kit.crate.ROCrate;
+import edu.kit.crate.Crate;
+import edu.kit.crate.RoCrate;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.writer.FolderWriter;
-import edu.kit.crate.writer.ROCrateWriter;
+import edu.kit.crate.writer.RoCrateWriter;
 import edu.kit.crate.writer.ZipWriter;
 import edu.kit.crate.HelpFunctions;
 import org.apache.commons.io.FileUtils;
@@ -21,17 +21,17 @@ public class ZipReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .build();
 
     Path zipPath = temp.resolve("result.zip");
 
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, zipPath.toString());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-    IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
+    Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
@@ -41,7 +41,7 @@ public class ZipReaderTest {
     Path cvs = temp.resolve("survey-responses-2019.csv");
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setSource(cvs.toFile())
@@ -54,12 +54,12 @@ public class ZipReaderTest {
 
     Path zipPath = temp.resolve("result.zip");
 
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, zipPath.toFile().getAbsolutePath());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-    IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
+    Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
 
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
@@ -68,7 +68,7 @@ public class ZipReaderTest {
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -82,16 +82,16 @@ public class ZipReaderTest {
 
     Path zipPath = temp.resolve("result.zip");
 
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, zipPath.toString());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-    IROCrate res = roCrateFolderReader.readCrate(zipPath.toString());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
+    Crate res = roCrateFolderReader.readCrate(zipPath.toString());
 
 
     Path locationSource = temp.resolve("expected");
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(roCrate, locationSource.toString());
 
     Path destinationDir = temp.resolve("result");
@@ -107,7 +107,7 @@ public class ZipReaderTest {
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("file.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    ROCrate roCrate = new ROCrate.ROCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -121,16 +121,16 @@ public class ZipReaderTest {
 
     Path zipPath = temp.resolve("result.zip");
 
-    ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, zipPath.toString());
 
-    ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-    IROCrate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
+    Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
 
 
     Path locationSource = temp.resolve("expected");
-    ROCrateWriter writer = new ROCrateWriter(new FolderWriter());
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(roCrate, locationSource.toString());
 
 

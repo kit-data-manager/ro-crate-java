@@ -1,6 +1,8 @@
 package edu.kit.crate.entities.contextual;
 
 /**
+ * A helping class for creating organization entities.
+ *
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
@@ -8,7 +10,12 @@ public class OrganizationEntity extends ContextualEntity {
 
   private static final String TYPE = "Organization";
 
-  public OrganizationEntity(AOrganizationEntityBuilder<?> entityBuilder) {
+  /**
+   * Constructor for creating an organization entity from a builder.
+   *
+   * @param entityBuilder the builder from which to create the entity.
+   */
+  public OrganizationEntity(AbstractOrganizationEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
     this.addProperty("address", entityBuilder.address);
     this.addProperty("email", entityBuilder.email);
@@ -17,8 +24,9 @@ public class OrganizationEntity extends ContextualEntity {
     this.addType(TYPE);
   }
 
-  abstract static class AOrganizationEntityBuilder<T extends AOrganizationEntityBuilder<T>> extends
-      AContextualEntityBuilder<T> {
+  abstract static class AbstractOrganizationEntityBuilder<T
+      extends AbstractOrganizationEntityBuilder<T>>
+      extends AbstractContextualEntityBuilder<T> {
 
     String address;
     String email;
@@ -46,11 +54,14 @@ public class OrganizationEntity extends ContextualEntity {
     }
 
     @Override
-    abstract public OrganizationEntity build();
+    public abstract OrganizationEntity build();
   }
 
-  final static public class OrganizationEntityBuilder extends
-      AOrganizationEntityBuilder<OrganizationEntityBuilder> {
+  /**
+   * A builder for the organization entity.
+   */
+  public static final class OrganizationEntityBuilder extends
+      AbstractOrganizationEntityBuilder<OrganizationEntityBuilder> {
 
     @Override
     public OrganizationEntityBuilder self() {

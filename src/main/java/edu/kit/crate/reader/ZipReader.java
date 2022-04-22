@@ -3,21 +3,19 @@ package edu.kit.crate.reader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.crate.objectmapper.MyObjectMapper;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
+import net.lingala.zip4j.ZipFile;
+import org.apache.commons.io.FileUtils;
 
 /**
- * @author Nikola Tzotchev on 9.2.2022 г.
- * @version 1
+ * Implementation of the reader strategy, providing a way of reading crates from a zip archive.
  */
-public class ZipReader implements IReaderStrategy {
+public class ZipReader implements ReaderStrategy {
+
   private boolean read = false;
 
-  public void readCrate(String location) {
+  private void readCrate(String location) {
     try {
       File temp = new File("temp");
       if (temp.exists()) {

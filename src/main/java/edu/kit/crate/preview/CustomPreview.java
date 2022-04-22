@@ -8,10 +8,13 @@ import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
 /**
+ * This class represents the custom preview of a crate,
+ * which means html files created from outside sources.
+ *
  * @author Nikola Tzotchev on 12.2.2022 г.
  * @version 1
  */
-public class CustomPreview implements IROCratePreview {
+public class CustomPreview implements CratePreview {
 
   private final File metadataHtml;
   private final File otherFiles;
@@ -27,7 +30,7 @@ public class CustomPreview implements IROCratePreview {
   }
 
   @Override
-  public void saveALLToZip(ZipFile zipFile) {
+  public void saveAllToZip(ZipFile zipFile) {
     if (this.metadataHtml != null) {
       try {
         ZipParameters zipParameters = new ZipParameters();
@@ -40,7 +43,7 @@ public class CustomPreview implements IROCratePreview {
     if (this.otherFiles != null) {
       try {
         zipFile.addFolder(this.otherFiles);
-        zipFile.renameFile(this.otherFiles.getName()+"/", "ro-crate-preview_files/");
+        zipFile.renameFile(this.otherFiles.getName() + "/", "ro-crate-preview_files/");
       } catch (ZipException e) {
         System.err.println("Exception writing preview files to zip");
       }
@@ -48,7 +51,7 @@ public class CustomPreview implements IROCratePreview {
   }
 
   @Override
-  public void saveALLToFolder(File folder) {
+  public void saveAllToFolder(File folder) {
     try {
       if (this.metadataHtml != null) {
         File fileInCrate = folder.toPath().resolve("ro-crate-preview.html").toFile();

@@ -45,14 +45,14 @@ public class HelpFunctions {
     }
   }
 
-  public static void compareTwoMetadataJsonNotEqual(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
+  public static void compareTwoMetadataJsonNotEqual(Crate crate1, Crate crate2) throws JsonProcessingException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode node1 = objectMapper.readTree(crate1.getJsonMetadata());
     JsonNode node2 = objectMapper.readTree(crate2.getJsonMetadata());
     compare(node1, node2, false);
   }
 
-  public static void compareTwoMetadataJsonNotEqual(IROCrate crate1, String jsonFileString) throws IOException {
+  public static void compareTwoMetadataJsonNotEqual(Crate crate1, String jsonFileString) throws IOException {
     InputStream inputStream = HelpFunctions.class.getResourceAsStream(
         jsonFileString);
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
@@ -61,7 +61,7 @@ public class HelpFunctions {
     compare(node1, node2, false);
   }
 
-  public static void compareTwoCrateJson(IROCrate crate1, IROCrate crate2) throws JsonProcessingException {
+  public static void compareTwoCrateJson(Crate crate1, Crate crate2) throws JsonProcessingException {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode node1 = objectMapper.readTree(crate1.getJsonMetadata());
     JsonNode node2 = objectMapper.readTree(crate2.getJsonMetadata());
@@ -75,7 +75,7 @@ public class HelpFunctions {
     compare(node1, node2, true);
   }
 
-  public static void compareCrateJsonToFileInResources(IROCrate crate1, String jsonFileString) throws IOException {
+  public static void compareCrateJsonToFileInResources(Crate crate1, String jsonFileString) throws IOException {
     InputStream inputStream = HelpFunctions.class.getResourceAsStream(
         jsonFileString);
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
