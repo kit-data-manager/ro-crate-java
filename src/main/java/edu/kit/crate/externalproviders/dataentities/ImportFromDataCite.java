@@ -100,7 +100,6 @@ public class ImportFromDataCite {
       CloseableHttpResponse response = httpClient.execute(request);
       jsonNode = objectMapper.readValue(response.getEntity().getContent(),
           ObjectNode.class);
-      System.out.println(jsonNode.toPrettyString());
     } catch (IOException e) {
       e.printStackTrace();
       return null;

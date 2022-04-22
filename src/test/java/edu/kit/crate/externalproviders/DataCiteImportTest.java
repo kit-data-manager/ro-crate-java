@@ -1,0 +1,69 @@
+package edu.kit.crate.externalproviders;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.crate.RoCrate;
+import edu.kit.crate.externalproviders.dataentities.ImportFromDataCite;
+import edu.kit.crate.objectmapper.MyObjectMapper;
+import edu.kit.crate.validation.JsonSchemaValidation;
+import edu.kit.crate.validation.Validator;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DataCiteImportTest {
+
+  @Test
+  void dataCiteImportNewCrate() {
+    var crate = ImportFromDataCite
+        .createCrateFromDataCiteResource(
+            "https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669",
+            "importedCrate", "description");
+    Validator validator = new Validator(new JsonSchemaValidation());
+    assertTrue(validator.validate(crate));
+  }
+
+  @Test
+  void dataCiteImportToExistingCrate() {
+    var crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    ImportFromDataCite.addDataCiteToCrate("https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669", crate);
+    Validator validator = new Validator(new JsonSchemaValidation());
+    assertTrue(validator.validate(crate));
+  }
+
+  @Test
+  void dataCiteImportFromExistingJson() {
+    String url = "https://api.datacite.org/application/vnd.datacite.datacite+json/10.5061/dryad.91741";
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    HttpGet request = new HttpGet(url);
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    JsonNode jsonNode;
+    try {
+      CloseableHttpResponse response = httpClient.execute(request);
+      jsonNode = objectMapper.readValue(response.getEntity().getContent(),
+          JsonNode.class);
+
+      var crate = ImportFromDataCite.createCrateFromDataCiteJson(jsonNode, "name", "description");
+      Validator validator = new Validator(new JsonSchemaValidation());
+      assertTrue(validator.validate(crate));
+
+      String anotherUrl = "https://api.datacite.org/application/vnd.datacite.datacite+json/10.5061/dryad.dr554m2";
+      request = new HttpGet(anotherUrl);
+      response = httpClient.execute(request);
+      jsonNode = objectMapper.readValue(response.getEntity().getContent(),
+          JsonNode.class);
+      assertTrue(validator.validate(crate));
+
+      ImportFromDataCite.addDataCiteToCrateFromJson(jsonNode, crate);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+}
