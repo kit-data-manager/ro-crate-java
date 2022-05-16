@@ -1,5 +1,7 @@
 # ro-crate-java
 
+[![Java CI with Gradle](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/gradle.yml)
+
 A Java library to create and modify RO-Crates.
 
 ## Quickstart

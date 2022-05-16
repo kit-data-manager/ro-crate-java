@@ -5,7 +5,7 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Build & Tests
 
 on:
   push:
@@ -19,23 +19,24 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        jdk: [ 11, 17 ]  # (open)JDK releases
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 11
+    - name: Set up openJDK version
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'temurin'
+        java-version: ${{ matrix.jdk }}
+        distribution: 'zulu'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Install Dependencies
       run: npm install -g ro-crate-html-js
     - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+      uses: gradle/wrapper-validation-action@v1
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+      uses: gradle/gradle-build-action@v2
       with:
         arguments: build
         # - name: Execute Gradle test
