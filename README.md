@@ -6,6 +6,11 @@ A Java library to create and modify RO-Crates.
 Read [Quickstart](#quickstart) for a short overview of the API
 or take a look at [how to adapt the examples from the official specification](#adapting-the-specification-examples).
 
+Build and run tests: `./gradlew build`  
+Build documentation: `./gradlew javadoc`
+
+On windows, replace `./gradlew` with `gradlew.bat`.
+
 ## Quickstart
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
 ```java
