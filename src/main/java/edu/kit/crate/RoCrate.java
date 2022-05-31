@@ -216,6 +216,22 @@ public class RoCrate implements Crate {
     }
 
     /**
+     * A default constructor without any params where the root data entity will be plain.
+     */
+    public RoCrateBuilder() {
+      this.payload = new RoCratePayload();
+      this.untrackedFiles = new ArrayList<>();
+      this.metadataContext = new RoCrateMetadataContext();
+      rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
+          .build();
+      jsonDescriptor = new ContextualEntity.ContextualEntityBuilder()
+          .setId(ID)
+          .addType("CreativeWork")
+          .addIdProperty("about", "./")
+          .addIdProperty("conformsTo", RO_SPEC)
+          .build();
+    }
+    /**
      * Adding a data entity to the crate.
      * The important part here is to also add its id to the RootData Entity hasPart.
      *

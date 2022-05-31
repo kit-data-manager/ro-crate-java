@@ -367,6 +367,10 @@ public class AbstractEntity {
       return self();
     }
 
+    public T addProperty(String key, boolean value) {
+      this.properties.put(key, value);
+      return self();
+    }
     /**
      * ID properties are often used when referencing other entities within the ROCrate.
      * This method adds automatically such one.
