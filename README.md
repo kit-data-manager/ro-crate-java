@@ -14,14 +14,14 @@ On windows, replace `./gradlew` with `gradlew.bat`.
 ## Quickstart
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
 ```java
-ROCrate roCrate = new ROCrate.ROCrateBuilder("name", "description").build();
+RoCrate roCrate = new RoCrateBuilder("name", "description").build();
 ```
 
 ### Example adding a File (Data Entity) and a context pair
 ```java
-ROCrate roCrate = new ROCrate.ROCrateBuilder("name", "description")
+RoCrate roCrate = new RoCrateBuilder("name", "description")
     .addValuePairToContext("Station", "www.station.com")
-    .addURLToContext("contextUrl")
+    .addUrlToContext("contextUrl")
     .addDataEntity(
       new FileEntity.FileEntityBuilder()
         .setId("survey-responses-2019.csv")
@@ -49,7 +49,7 @@ If another type of `DataEntity` is required, the base class `DataEntity` can be 
 ```java
 new DataEntity.DataEntityBuilder()
     .addType("CreativeWork")
-    .addId("ID")
+    .setId("ID")
     .addProperty("property from schema.org/Creativework", "value")
     .build();
 ```
@@ -89,13 +89,13 @@ OrganizationEntity organization = RORProvider.getOrganization("https://ror.org/*
 
 Writing to folder:
 ```java
-ROCrateWriter folderRoCrateWriter = new ROCrateWriter(new FolderWriter());
+RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
 folderRoCrateWriter.save(roCrate, "destination");
 ```
 
 Writing to zip file:
 ```java
-ROCrateWriter roCrateZipWriter = new ROCrateWriter(new ZipWriter());
+RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
 roCrateZipWriter.save(roCrate, "destination");
 ```
 
@@ -105,14 +105,14 @@ More writing strategies can be implemented, if required.
 
 Reading from folder:
 ```java
-ROCrateReader roCrateFolderReader = new ROCrateReader(new FolderReader());
-ROCrate res = roCrateFolderReader.readCrate("source");
+RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+RoCrate res = roCrateFolderReader.readCrate("source");
 ```
 
 Reading from zip file:
 ```java
-ROCrateReader roCrateFolderReader = new ROCrateReader(new ZipReader());
-ROCrate crate = roCrateFolderReader.readCrate("source");
+RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
+RoCrate crate = roCrateFolderReader.readCrate("source");
 ```
 
 ### RO-Crate Website (HTML preview file)
@@ -120,7 +120,7 @@ By setting the preview to an `AutomaticPreview`, the library will automatically 
 It has to be installed using `npm install --global ro-crate-html-js` in order to use it.
 If you want to use a custom-made preview, you can set it using the `CustomPreview` class. `AutomaticPreview` is currently **not** set by default.
 ```java
-ROCrate roCrate = new ROCrate.ROCrateBuilder("name", "description")
+RoCrate roCrate = new RoCrateBuilder("name", "description")
     .setPreview(new AutomaticPreview())
     .build();
 ```
@@ -129,8 +129,8 @@ ROCrate roCrate = new ROCrate.ROCrateBuilder("name", "description")
 Right now, the only implemented way of validating a RO-crate is to use a [JSON-Schema](https://json-schema.org/) that the crates metadata JSON file should match. JSON-Schema is an established standard and therefore a good choice for a crate profile. Example:
 
 ```java
-Validator validator = new Validator(new JsonSchemaValidation(String locationOfSchema));
-bool valid = validator.validate(crate);
+Validator validator = new Validator(new JsonSchemaValidation("./schema.json"));
+boolean valid = validator.validate(crate);
 ```
 
 ## Adapting the specification examples
