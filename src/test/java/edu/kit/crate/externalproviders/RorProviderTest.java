@@ -14,23 +14,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Nikola Tzotchev on 11.2.2022 г.
  * @version 1
  */
-public class RORProviderTest {
+public class RorProviderTest {
 
   @Test
-  void testExternalRORProvider() throws IOException {
+  void testExternalRorProvider() throws IOException {
     OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/04t3en479");
     HelpFunctions.compareEntityWithFile(organizationEntity, "/json/entities/contextual/rorkit.json");
   }
 
   @Test
-  void testInvalidRORUrl() {
+  void testInvalidRorUrl() {
     Exception exception = assertThrows(IllegalArgumentException.class, () -> {
       OrganizationEntity organizationEntity = RorProvider.getOrganization("https://notror.org/04t3en479");
     });
   }
 
   @Test
-  void testInvalidRORId() {
+  void testInvalidRorId() {
     OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/42");
     assertNull(organizationEntity);
   }
