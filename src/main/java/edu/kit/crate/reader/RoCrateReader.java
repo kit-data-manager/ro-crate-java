@@ -3,7 +3,7 @@ package edu.kit.crate.reader;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.crate.Crate;
+
 import edu.kit.crate.RoCrate;
 import edu.kit.crate.context.CrateMetadataContext;
 import edu.kit.crate.context.RoCrateMetadataContext;
@@ -27,7 +27,7 @@ import java.util.Set;
 public class RoCrateReader {
 
   private final ReaderStrategy reader;
-  private Crate crate;
+  private RoCrate crate;
 
   public RoCrateReader(ReaderStrategy reader) {
     this.reader = reader;
@@ -40,7 +40,7 @@ public class RoCrateReader {
    * @param location the location of the ro-crate to be read
    * @return the read RO-crate
    */
-  public Crate readCrate(String location) {
+  public RoCrate readCrate(String location) {
     crate = new RoCrate();
     // get the ro-crate-medata.json
     ObjectNode metadataJson = reader.readMetadataJson(location);
@@ -153,3 +153,4 @@ public class RoCrateReader {
     return graphCopy;
   }
 }
+
