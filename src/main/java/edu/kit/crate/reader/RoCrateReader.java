@@ -116,7 +116,7 @@ public class RoCrateReader {
       JsonNode type = node.get("conformsTo");
       if (type != null) {
         String uri = type.get("@id").asText();
-        if (uri.matches("https://w3id.org/ro/crate/.*")) {
+        if (uri.startsWith("https://w3id.org/ro/crate/")) {
           this.crate.setJsonDescriptor(
               new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
           graphCopy.remove(i);

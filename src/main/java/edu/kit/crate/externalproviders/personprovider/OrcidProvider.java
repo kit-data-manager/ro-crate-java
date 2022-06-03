@@ -29,7 +29,7 @@ public class OrcidProvider {
    */
   public static PersonEntity getPerson(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
-    if (!url.matches("https://orcid.org.*")) {
+    if (!url.startsWith("https://orcid.org")) {
       throw new IllegalArgumentException("Should provide orcid link");
     }
     HttpGet request = new HttpGet(url);
