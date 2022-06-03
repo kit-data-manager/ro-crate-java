@@ -30,7 +30,7 @@ public class OrcidProvider {
   public static PersonEntity getPerson(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.startsWith("https://orcid.org")) {
-      throw new IllegalArgumentException("Should provide orcid link");
+      throw new IllegalArgumentException("Should provide orcid url");
     }
     HttpGet request = new HttpGet(url);
     request.addHeader(HttpHeaders.ACCEPT, "application/ld+json");
