@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Nikola Tzotchev on 10.2.2022 г.
  * @version 1
  */
-public class OrcidTest {
+public class OrcidProviderTest {
 
   @Test
   void testAddingPersonEntity() throws IOException {
