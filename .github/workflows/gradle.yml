@@ -41,4 +41,30 @@ jobs:
         arguments: build
         # - name: Execute Gradle test
         #run: ./gradlew test --tests PreviewTest
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Test Results (Gradle ${{ matrix.jdk }})
+        path: build/reports/jacoco/test/jacocoTestReport.xml
+
+  publish-test-results:
+    name: "Publish Test Results"
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    if: always()
+
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+    - name: Publish Test Coverage Results
+      uses: madrapps/jacoco-report@v1.2
+      with:
+        # We only show the coverage from one of the Gradle 17 runs, they should all be the same anyway
+        paths: "artifacts/Test Results (Gradle 17)/jacocoTestReport.xml"
+        token: ${{ secrets.GITHUB_TOKEN }}
 
