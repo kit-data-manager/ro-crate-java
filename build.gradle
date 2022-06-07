@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'jvm-test-suite'
+    id 'jacoco'
 }
 
 group 'org.example'
@@ -38,7 +39,7 @@ sourceSets {
 
     test {
         java {
-           // compileClasspath += sourceSets.main.output
+            // compileClasspath += sourceSets.main.output
             //runtimeClasspath += sourceSets.main.output
             srcDirs = ['src/test/java']
         }
@@ -99,6 +100,20 @@ task performanceReadWriteMultipleCratesBenchmark(type: JavaExec) {
 }
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        csv.required = true
+        xml.required = true
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 // maxParallelForks(2)
 // failFast = true
