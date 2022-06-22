@@ -115,4 +115,31 @@ public class DataEntityTest {
     assertEquals(outputStreamCaptor.toString().trim(), "");
     System.setOut(standardOut);
   }
+  @Test
+  void testEncodedUrl() {
+    // get the std output redirected, so we can see if there is something written
+    PrintStream standardOut = System.out;
+    ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outputStreamCaptor));
+
+    // this entity id is a valid URL so there should not be any console information
+    DataEntity dataValid = new DataEntity.DataEntityBuilder()
+            .addType("File")
+            .setId("https%3A%2F%2Fgithub.com%2Fkit-data-manager%2Fro-crate-java%2Fissues%2F5")
+            .build();
+
+
+    assertEquals(outputStreamCaptor.toString().trim(), "");
+    URL url =
+            HelpFunctions.class.getResource("/json/crate/simple2.json");
+    assert url != null;
+
+    // this data entity is not a remote one, so there should not be any messages
+    DataEntity dataWithFile = new DataEntity.DataEntityBuilder()
+            .addType("File")
+            .setSource(new File(url.getFile()))
+            .build();
+
+    System.setOut(standardOut);
+  }
 }

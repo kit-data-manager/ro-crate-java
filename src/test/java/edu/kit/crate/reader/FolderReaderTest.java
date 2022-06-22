@@ -2,13 +2,18 @@ package edu.kit.crate.reader;
 
 import edu.kit.crate.Crate;
 import edu.kit.crate.RoCrate;
+import edu.kit.crate.entities.data.DataEntity;
 import edu.kit.crate.entities.data.FileEntity;
 import edu.kit.crate.writer.FolderWriter;
 import edu.kit.crate.writer.RoCrateWriter;
 import edu.kit.crate.HelpFunctions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -64,6 +69,42 @@ public class FolderReaderTest {
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
     Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
+  }
+
+  @Test
+  void testWithFileUrlEncoded(@TempDir Path temp) throws IOException {
+
+    // get the std output redirected, so we can see if there is something written
+    PrintStream standardOut = System.out;
+    ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outputStreamCaptor));
+
+    Path csv = temp.resolve("survey responses 2019.csv"); // This URL will be encoded because of whitespaces
+    FileUtils.touch(csv.toFile());
+    FileUtils.writeStringToFile(csv.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
+
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+            .addDataEntity(
+                    new FileEntity.FileEntityBuilder()
+                            .setSource(csv.toFile())
+                            .addProperty("name", "Survey responses")
+                            .addProperty("contentSize", "26452")
+                            .addProperty("encodingFormat", "text/csv")
+                            .build()
+            )
+            .build();
+
+    Path f = temp.resolve("ro-crate-metadata.json");
+    FileUtils.touch(f.toFile());
+    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
+
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    HelpFunctions.compareTwoCrateJson(roCrate, res);
+
+    // Make sure we did not print any errors
+    assertEquals(outputStreamCaptor.toString().trim(), "");
+    System.setOut(standardOut);
   }
 
   @Test

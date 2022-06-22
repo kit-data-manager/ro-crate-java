@@ -13,6 +13,8 @@ import edu.kit.crate.entities.data.RootDataEntity;
 import edu.kit.crate.validation.JsonSchemaValidation;
 import edu.kit.crate.validation.Validator;
 import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,7 +98,8 @@ public class RoCrateReader {
   }
 
   private File checkFolderHasFile(String id, File file) {
-    Path path = file.toPath().resolve(id);
+    // Path path = file.toPath().resolve(id);
+    Path path = file.toPath().resolve(URLDecoder.decode(id, StandardCharsets.UTF_8));
     if (path.toFile().exists()) {
       return path.toFile();
     }

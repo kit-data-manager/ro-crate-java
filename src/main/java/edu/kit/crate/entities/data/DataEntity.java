@@ -5,6 +5,9 @@ import edu.kit.crate.entities.AbstractEntity;
 import edu.kit.crate.entities.contextual.ContextualEntity;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import net.lingala.zip4j.ZipFile;
@@ -37,7 +40,7 @@ public class DataEntity extends AbstractEntity {
     this.source = entityBuilder.location;
     if (this.getSource() == null) {
       UrlValidator urlValidator = new UrlValidator();
-      if (!urlValidator.isValid(this.getId())) {
+      if (!urlValidator.isValid(URLDecoder.decode(this.getId(), StandardCharsets.UTF_8))) {
         System.out.println("This Data Entity remote ID does not resolve to a valid URL.");
       }
     }
@@ -96,7 +99,7 @@ public class DataEntity extends AbstractEntity {
     public T setSource(File file) {
       if (file != null) {
         if (this.getId() == null) {
-          this.setId(file.getName());
+          this.setId(URLEncoder.encode(file.getName(), StandardCharsets.UTF_8));
         }
         this.location = file;
       }
