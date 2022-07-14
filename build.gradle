@@ -6,6 +6,8 @@ plugins {
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
     id 'net.researchgate.release' version '3.0.0'
+
+    id "com.github.kt3k.coveralls" version "2.12.0"
 }
 
 group 'org.example'
@@ -112,6 +114,8 @@ jacocoTestReport {
     reports {
         csv.required = true
         xml.required = true
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
     }
 }
 
