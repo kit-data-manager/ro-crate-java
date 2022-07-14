@@ -1,16 +1,22 @@
 plugins {
     id 'java'
     id 'jvm-test-suite'
+
     id 'jacoco'
+    // Adds coveralls task for CI to send results to the coveralls service.
+    id "com.github.kt3k.coveralls" version "2.12.0"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
     id 'net.researchgate.release' version '3.0.0'
-
-    id "com.github.kt3k.coveralls" version "2.12.0"
+    id "maven-publish"
+    // Publishing of JAR to Nexus instances (e.g., OSSRH)
+    // https://github.com/gradle-nexus/publish-plugin
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
-group 'org.example'
+group 'edu.kit.datamanager'
+description = "A library for easy creation and modification of valid RO-Crates."
 
 repositories {
     mavenCentral()
@@ -57,10 +63,6 @@ sourceSets {
             srcDirs = ['src/performanceTest/java']
         }
     }
-}
-
-release {
-    tagTemplate = 'v${version}'
 }
 
 configurations {
@@ -127,3 +129,8 @@ jacoco {
 
 // maxParallelForks(2)
 // failFast = true
+
+if (project.hasProperty('release')) {
+    println 'Using release profile for building ' + project.getName()
+    apply from: 'gradle/profile-release.gradle'
+}
