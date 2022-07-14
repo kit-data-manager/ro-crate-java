@@ -11,7 +11,6 @@ plugins {
 }
 
 group 'org.example'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -59,6 +58,11 @@ sourceSets {
         }
     }
 }
+
+release {
+    tagTemplate = 'v${version}'
+}
+
 configurations {
     performanceTestImplementation.extendsFrom implementation
 }
@@ -113,9 +117,7 @@ jacocoTestReport {
     dependsOn test
     reports {
         csv.required = true
-        xml.required = true
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
+        xml.required = true // coveralls plugin depends on xml format report
     }
 }
 
