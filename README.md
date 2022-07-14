@@ -10,9 +10,9 @@ or take a look at [how to adapt the examples from the official specification](#a
 Build and run tests: `./gradlew build`  
 Build documentation: `./gradlew javadoc`
 
-On windows, replace `./gradlew` with `gradlew.bat`.
+On Windows, replace `./gradlew` with `gradlew.bat`.
 
-## Quickstart
+## Quick-start
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
 ```java
 RoCrate roCrate = new RoCrateBuilder("name", "description").build();
@@ -248,7 +248,7 @@ For the following examples, more convenient creation methods are used.
 Here we use the inner builder classes for the construction of the crate.
 Doing so, the Metadata File Descriptor and the Root Data Entity entities are added automatically.
 `setSource()` is used to provide the actual location of these Data Entities (if they are not remote).
-The Data Entity file in the crate will have the name of the entity's id.
+The Data Entity file in the crate will have the name of the entity's ID.
 
 ```java
   RoCrate crate = new RoCrate.RoCrateBuilder()
@@ -394,7 +394,7 @@ The web resource does not use `.setSource()`, but uses the ID to indicate the fi
 }
 ```
 
-If there is no special method for including relative entities (id properties) one can use `.addIdProperty("key","value")`.
+If there is no special method for including relative entities (ID properties) one can use `.addIdProperty("key","value")`.
 
 ```java
  PersonEntity alice = new PersonEntity.PersonEntityBuilder()
