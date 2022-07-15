@@ -140,6 +140,8 @@ public class DataEntityTest {
             .setSource(new File(url.getFile()))
             .build();
 
+    assertEquals(outputStreamCaptor.toString().trim(), "");
+
     System.setOut(standardOut);
   }
 }
