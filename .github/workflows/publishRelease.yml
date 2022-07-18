@@ -1,7 +1,9 @@
-name: Publish releases to the Maven Central Repository
+name: Publish to Maven Central / OSSRH
 on:
   release:
-    types: [created]
+    types: [published]
+  workflow_dispatch:
+
 jobs:
   publish:
     runs-on: ubuntu-latest
