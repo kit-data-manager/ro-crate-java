@@ -140,7 +140,7 @@ public class RoCrate implements Crate {
   public void addDataEntity(DataEntity entity, Boolean toHasPart) {
     this.metadataContext.checkEntity(entity);
     this.roCratePayload.addDataEntity(entity);
-    if (toHasPart) {
+    if (Boolean.TRUE.equals(toHasPart)) {
       this.rootDataEntity.addToHasPart(entity.getId());
     }
   }
