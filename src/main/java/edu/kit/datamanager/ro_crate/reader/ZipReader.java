@@ -23,7 +23,9 @@ public class ZipReader implements ReaderStrategy {
       if (temp.exists()) {
         FileUtils.cleanDirectory(new File("temp"));
       }
-      new ZipFile(location).extractAll("temp");
+      try (ZipFile zf = new ZipFile(location)) {
+        zf.extractAll("temp");
+      }
       FileUtils.forceDeleteOnExit(new File("temp"));
       this.read = true;
     } catch (IOException e) {
