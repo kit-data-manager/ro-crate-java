@@ -1,11 +1,11 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
-import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,13 +18,15 @@ public class RootDataEntityTest {
 
   @Test
   void testSerialization() throws IOException {
+    String id1 = "file1_id";
     FileEntity file1 = new FileEntity.FileEntityBuilder()
-        .setId("file1_id")
+        .setId(id1)
         .setSource(new File("does_not_matter"))
         .build();
 
+    String id2 = "file2_id";
     FileEntity file2 = new FileEntity.FileEntityBuilder()
-        .setId("file2_id")
+        .setId(id2)
         .addIdProperty("name", "dsklfajs")
         .addIdProperty("name", "11111111")
         .setSource(new File("does_not_matter"))
@@ -43,6 +45,8 @@ public class RootDataEntityTest {
         .addAuthor("a2")
         .build();
 
+    assertTrue(rootDataEntity.hasInHasPart(id1));
+    assertTrue(rootDataEntity.hasInHasPart(id2));
     HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/root.json");
   }
 }

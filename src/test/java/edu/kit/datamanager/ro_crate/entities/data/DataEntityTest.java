@@ -10,13 +10,14 @@ import java.io.PrintStream;
 import java.net.URL;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity.DataEntityBuilder;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Nikola Tzotchev on 4.2.2022 г.
@@ -46,7 +47,7 @@ public class DataEntityTest {
         // this should not be included since it does not follow the json flatten form of the RO-Crate
         .addProperty("test", bigJson)
         .build();
-
+    assertNull(file.getProperty("test"));
     HelpFunctions.compareEntityWithFile(file, "/json/entities/data/fileEntity.json");
   }
 
@@ -64,8 +65,6 @@ public class DataEntityTest {
     data.setProperties(json);
     HelpFunctions.compareEntityWithFile(data, "/json/entities/data/fileEntity.json");
 
-    ObjectNode bigJson = objectMapper.createObjectNode();
-    bigJson.put("onefield", "dalkfa");
     ObjectNode address = objectMapper.createObjectNode();
     address.put("street", "x");
     address.put("city", "other");
@@ -74,6 +73,7 @@ public class DataEntityTest {
     json.set("nestedObject", address);
     // this should not be included into the entity since it does not follow the basic RO-Crate structure
     data.setProperties(json);
+    assertNotEquals("", data.getId());
     HelpFunctions.compareEntityWithFile(data, "/json/entities/data/fileEntity.json");
   }
 
@@ -86,35 +86,35 @@ public class DataEntityTest {
 
     // create data entity with random ID that is not a remote URI
     // this should create a warning in the console
-    DataEntity dataInvalid = new DataEntity.DataEntityBuilder()
+    new DataEntity.DataEntityBuilder()
         .addType("File")
         .setId("dfkjdfkj")
         .build();
 
-    assertEquals(outputStreamCaptor.toString().trim(), "This Data Entity remote ID does not resolve to a valid URL.");
+    assertEquals("This Data Entity remote ID does not resolve to a valid URL.", outputStreamCaptor.toString().trim());
     // also clear the stream so that we get it ready for the next comparison
     outputStreamCaptor.reset();
 
     // this entity id is a valid URL so there should not be any console information
-    DataEntity dataValid = new DataEntity.DataEntityBuilder()
+    new DataEntity.DataEntityBuilder()
         .addType("File")
         .setId("https://www.example.com/19")
         .build();
 
 
-    assertEquals(outputStreamCaptor.toString().trim(), "");
+    assertEquals("", outputStreamCaptor.toString().trim());
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
 
     // this data entity is not a remote one, so there should not be any messages
-    DataEntity dataWithFile = new DataEntity.DataEntityBuilder()
+    new DataEntity.DataEntityBuilder()
         .addType("File")
         .setSource(new File(url.getFile()))
         .build();
 
     outputStreamCaptor.reset();
-    assertEquals(outputStreamCaptor.toString().trim(), "");
+    assertEquals("", outputStreamCaptor.toString().trim());
     System.setOut(standardOut);
   }
   @Test
@@ -125,24 +125,24 @@ public class DataEntityTest {
     System.setOut(new PrintStream(outputStreamCaptor));
 
     // this entity id is a valid URL so there should not be any console information
-    DataEntity dataValid = new DataEntity.DataEntityBuilder()
+    new DataEntity.DataEntityBuilder()
             .addType("File")
             .setId("https%3A%2F%2Fgithub.com%2Fkit-data-manager%2Fro-crate-java%2Fissues%2F5")
             .build();
 
 
-    assertEquals(outputStreamCaptor.toString().trim(), "");
+    assertEquals("", outputStreamCaptor.toString().trim());
     URL url =
             HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
 
     // this data entity is not a remote one, so there should not be any messages
-    DataEntity dataWithFile = new DataEntity.DataEntityBuilder()
+    new DataEntity.DataEntityBuilder()
             .addType("File")
             .setSource(new File(url.getFile()))
             .build();
 
-    assertEquals(outputStreamCaptor.toString().trim(), "");
+    assertEquals("", outputStreamCaptor.toString().trim());
 
     System.setOut(standardOut);
   }

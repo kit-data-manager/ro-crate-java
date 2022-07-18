@@ -6,12 +6,12 @@ import java.net.URL;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
-import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity.FileEntityBuilder;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Nikola Tzotchev on 4.2.2022 г.
@@ -28,12 +28,15 @@ public class FileEntityTest {
    */
   @Test
   void testSerialization() throws IOException {
+    String name = "RO-Crate specification";
     FileEntity file = new FileEntityBuilder()
         .setId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
-        .addProperty("name", "RO-Crate specification")
+        .addProperty("name", name)
         .setEncodingFormat("application/pdf")
         .addProperty("url", "https://zenodo.org/record/3541888")
         .build();
+
+    assertEquals(name, file.getProperty("name").asText());
     HelpFunctions.compareEntityWithFile(file, "/json/entities/data/fileEntity.json");
   }
 
@@ -72,7 +75,7 @@ public class FileEntityTest {
 
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
-    assert url != null;
+    assertNotNull(url);
     FileEntity file = new FileEntityBuilder()
         .setId("example.json")
         .setSource(new File(url.getFile()))

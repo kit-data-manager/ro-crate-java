@@ -4,8 +4,6 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
-import edu.kit.datamanager.ro_crate.reader.ZipReader;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 import edu.kit.datamanager.ro_crate.writer.ZipWriter;
@@ -14,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -33,8 +32,11 @@ public class ZipReaderTest {
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, zipPath.toString());
 
+    File zipFile = zipPath.toFile();
+    assertTrue(zipFile.isFile());
+
     RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-    Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+    Crate res = roCrateFolderReader.readCrate(zipFile.getAbsolutePath());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
@@ -54,6 +56,8 @@ public class ZipReaderTest {
                 .build()
         )
         .build();
+
+    assertEquals(1, roCrate.getAllDataEntities().size());
 
     Path zipPath = temp.resolve("result.zip");
 

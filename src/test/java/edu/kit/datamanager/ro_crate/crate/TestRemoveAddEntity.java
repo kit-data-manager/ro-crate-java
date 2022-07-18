@@ -1,14 +1,12 @@
 package edu.kit.datamanager.ro_crate.crate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +15,6 @@ import java.io.IOException;
 public class TestRemoveAddEntity {
   @Test
   void testAddRemoveEntity() throws IOException {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()

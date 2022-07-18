@@ -3,19 +3,15 @@ package edu.kit.datamanager.ro_crate.reader;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
-import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
-import edu.kit.datamanager.ro_crate.reader.FolderReader;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
+
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -46,7 +42,6 @@ public class FolderReaderTest {
     assertTrue(FileUtils.contentEquals(f.toFile(), r.toFile()));
   }
 
-
   @Test
   void testWithFile(@TempDir Path temp) throws IOException {
     Path cvs = temp.resolve("survey-responses-2019.csv");
@@ -63,6 +58,8 @@ public class FolderReaderTest {
                 .build()
         )
         .build();
+
+    assertEquals(1, roCrate.getAllDataEntities().size());
 
     Path f = temp.resolve("ro-crate-metadata.json");
     FileUtils.touch(f.toFile());
@@ -105,7 +102,7 @@ public class FolderReaderTest {
     HelpFunctions.compareTwoCrateJson(roCrate, res);
 
     // Make sure we did not print any errors
-    assertEquals(outputStreamCaptor.toString().trim(), "");
+    assertEquals("", outputStreamCaptor.toString().trim());
     System.setOut(standardOut);
   }
 
@@ -149,7 +146,6 @@ public class FolderReaderTest {
     assertTrue(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
-
 
   @Test
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {

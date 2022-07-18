@@ -7,6 +7,7 @@ import edu.kit.datamanager.ro_crate.externalproviders.personprovider.OrcidProvid
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -19,13 +20,14 @@ public class OrcidProviderTest {
   @Test
   void testAddingPersonEntity() throws IOException {
     PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
+    assertNotNull(person);
     HelpFunctions.compareEntityWithFile(person, "/json/entities/contextual/orcidperson.json");
   }
 
   @Test
   void testInvalidOrcidUrl() {
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      PersonEntity person = OrcidProvider.getPerson("https://notorcid.org/1234");
+    assertThrows(IllegalArgumentException.class, () -> {
+      OrcidProvider.getPerson("https://notorcid.org/1234");
     });
   }
 
