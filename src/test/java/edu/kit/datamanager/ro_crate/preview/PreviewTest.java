@@ -58,7 +58,9 @@ public class PreviewTest {
     CustomPreview customPreview = new CustomPreview(file1.toFile(), file2.toFile());
 
     customPreview.saveAllToZip(new ZipFile(dir.resolve("destination.zip").toFile()));
-    new ZipFile(dir.resolve("destination.zip").toFile()).extractAll(dir.resolve("extracted").toAbsolutePath().toString());
+    try (ZipFile zf = new ZipFile(dir.resolve("destination.zip").toFile())) {
+      zf.extractAll(dir.resolve("extracted").toAbsolutePath().toString());
+    }
 
     var e = dir.resolve("extracted");
     var roPreview = e.resolve("ro-crate-preview.html");

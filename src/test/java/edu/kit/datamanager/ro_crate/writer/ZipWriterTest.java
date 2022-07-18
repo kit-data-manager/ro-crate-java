@@ -89,7 +89,9 @@ public class ZipWriterTest {
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toString());
     Path res = tempDir.resolve("dest");
-    new ZipFile(test.toFile()).extractAll(res.toString());
+    try (ZipFile zf = new ZipFile(test.toFile())) {
+        zf.extractAll(res.toString());
+    }
     assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
@@ -160,8 +162,9 @@ public class ZipWriterTest {
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
     Path res = tempDir.resolve("dest");
-    new ZipFile(test.toFile()).extractAll(res.toFile().getAbsolutePath());
-
+    try (ZipFile zf = new ZipFile(test.toFile())) {
+        zf.extractAll(res.toFile().getAbsolutePath());
+    }
     assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
     // just so we know the metadata is still valid
