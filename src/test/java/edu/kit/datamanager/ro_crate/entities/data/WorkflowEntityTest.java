@@ -1,10 +1,11 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.entities.data.WorkflowEntity;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,10 +17,9 @@ public class WorkflowEntityTest {
 
   @Test
   void testSerialization() throws IOException {
-
-
+    String id = "workflow/alignment.knime";
     WorkflowEntity entity = new WorkflowEntity.WorkflowEntityBuilder()
-        .setId("workflow/alignment.knime")
+        .setId(id)
         .setSource(new File("src"))
         .addIdProperty("conformsTo", "https://bioschemas.org/profiles/ComputationalWorkflow/0.5-DRAFT-2020_07_21/")
         .addProperty("name", "Sequence alignment workflow")
@@ -35,6 +35,7 @@ public class WorkflowEntityTest {
         .addIdProperty("sdPublisher", "#workflow-hub")
         .build();
 
+    assertEquals(id, entity.getId());
     HelpFunctions.compareEntityWithFile(entity, "/json/entities/data/workflow.json");
   }
 }

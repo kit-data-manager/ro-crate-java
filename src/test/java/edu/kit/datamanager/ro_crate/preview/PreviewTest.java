@@ -6,9 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
-import edu.kit.datamanager.ro_crate.preview.CustomPreview;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

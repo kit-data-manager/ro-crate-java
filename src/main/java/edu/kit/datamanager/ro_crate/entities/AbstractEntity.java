@@ -188,11 +188,10 @@ public class AbstractEntity {
   }
 
   private static boolean addProperty(ObjectNode whereToAdd, String key, JsonNode value) {
-    if (key != null && value != null) {
-      if (entityValidation.fieldValidation(value)) {
-        whereToAdd.set(key, value);
-        return true;
-      }
+    boolean validInput = key != null && value != null;
+    if (validInput && entityValidation.fieldValidation(value)) {
+      whereToAdd.set(key, value);
+      return true;
     }
     return false;
   }
@@ -289,7 +288,7 @@ public class AbstractEntity {
     private ObjectNode properties;
     private String id;
 
-    public AbstractEntityBuilder() {
+    protected AbstractEntityBuilder() {
       this.properties = MyObjectMapper.getMapper().createObjectNode();
       this.relatedItems = new HashSet<>();
     }
@@ -305,10 +304,10 @@ public class AbstractEntity {
      * @return the generic builder.
      */
     public T setId(String id) {
+      // TODO document why this has been implemented this way.
       if (id != null) {
         this.id = id;
       }
-      //this.properties.put("@id", id);
       return self();
     }
 

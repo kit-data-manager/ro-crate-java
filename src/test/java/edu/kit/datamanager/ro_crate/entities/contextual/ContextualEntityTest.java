@@ -1,9 +1,10 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,7 @@ public class ContextualEntityTest {
   void testSerialization() throws IOException {
     // this does not make any difference for our testcase it just shows how the GeoCoordinates entity will look
     ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()
+        .setId("#b4168a98-8534-4c6d-a568-64a55157b656")
         .addType("GeoCoordinates")
         .addProperty("latitude", "-33.7152")
         .addProperty("longitude", "150.30119")
@@ -37,9 +39,10 @@ public class ContextualEntityTest {
         .addProperty("uri", "https://www.geonames.org/8152662/catalina-park.html")
         .addProperty("name", "Catalina Park")
         // here we can also do .setGeo(geo)
-        .addIdProperty("geo", "#b4168a98-8534-4c6d-a568-64a55157b656")
+        .addIdProperty("geo", geo)
         .build();
 
+    assertTrue(place.getLinkedTo().contains(geo.getId()));
     HelpFunctions.compareEntityWithFile(place, "/json/entities/contextual/place.json");
   }
 }

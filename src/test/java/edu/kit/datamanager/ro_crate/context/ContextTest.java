@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
@@ -79,7 +78,7 @@ public class ContextTest {
     assertFalse(newContext.checkEntity(contextualEntityWrongField));
     // the two example context should be nevertheless added to the final result
     var jsonNode = newContext.getContextJsonEntity();
-    assertEquals(jsonNode.get("@context").size(), 2);
+    assertEquals(2, jsonNode.get("@context").size());
   }
 
   @Test

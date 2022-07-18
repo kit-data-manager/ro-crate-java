@@ -8,7 +8,6 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
-import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -116,7 +115,7 @@ public class PayloadTest {
     this.payload.addDataEntity(dataEntity1);
     this.payload.addDataEntity(dataEntity2);
 
-    assertEquals(this.payload.getAllEntities().size(), 1);
+    assertEquals(1, this.payload.getAllEntities().size());
     var retrieve = this.payload.getEntityById("https://www.example.com/entity1");
     assertEquals(retrieve, dataEntity2);
   }
@@ -135,13 +134,13 @@ public class PayloadTest {
     this.payload.addDataEntity(dataEntity1);
     this.payload.addDataEntity(dataEntity2);
 
-    assertEquals(this.payload.getAllEntities().size(), 2);
+    assertEquals(2, this.payload.getAllEntities().size());
 
     this.payload.removeEntityById("https://www.example.com/entity1");
-    assertEquals(this.payload.getAllEntities().size(), 1);
+    assertEquals(1, this.payload.getAllEntities().size());
 
     this.payload.removeEntityById("https://www.example.com/entity2");
-    assertEquals(this.payload.getAllEntities().size(), 0);
+    assertEquals(0, this.payload.getAllEntities().size());
   }
 
   @Test
@@ -152,7 +151,7 @@ public class PayloadTest {
         .build();
 
     this.payload.addDataEntity(dataEntity1);
-    assertEquals(dataEntity1.getLinkedTo().size(), 0 );
+    assertEquals(0, dataEntity1.getLinkedTo().size() );
 
     var entity2 = new DataSetEntity.DataSetBuilder()
         .setId("set")
@@ -161,7 +160,7 @@ public class PayloadTest {
         .build();
 
     this.payload.addDataEntity(entity2);
-    assertEquals(entity2.getLinkedTo().size(), 1);
+    assertEquals(1, entity2.getLinkedTo().size());
 
     // we delete the first entity
     this.payload.removeEntityById("https://www.example.com/entity1");

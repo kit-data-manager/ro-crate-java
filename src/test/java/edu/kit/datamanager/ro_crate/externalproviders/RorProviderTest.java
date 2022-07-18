@@ -8,6 +8,7 @@ import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorPr
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,13 +21,14 @@ public class RorProviderTest {
   @Test
   void testExternalRorProvider() throws IOException {
     OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/04t3en479");
+    assertNotNull(organizationEntity);
     HelpFunctions.compareEntityWithFile(organizationEntity, "/json/entities/contextual/rorkit.json");
   }
 
   @Test
   void testInvalidRorUrl() {
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      OrganizationEntity organizationEntity = RorProvider.getOrganization("https://notror.org/04t3en479");
+    assertThrows(IllegalArgumentException.class, () -> {
+      RorProvider.getOrganization("https://notror.org/04t3en479");
     });
   }
 
