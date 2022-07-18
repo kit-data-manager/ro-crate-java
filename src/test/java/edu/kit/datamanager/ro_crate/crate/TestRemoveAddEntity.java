@@ -10,6 +10,8 @@ import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 
 public class TestRemoveAddEntity {
@@ -27,8 +29,12 @@ public class TestRemoveAddEntity {
         .build();
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/onlyOneFile.json");
 
+    assertEquals(0, roCrate.getAllContextualEntities().size());
+    assertEquals(1, roCrate.getAllDataEntities().size());
+
     // remove entity and check if equals to the basic crate
     roCrate.deleteEntityById("survey-responses-2019.csv");
+    assertEquals(0, roCrate.getAllDataEntities().size());
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
   }
 
@@ -64,10 +70,20 @@ public class TestRemoveAddEntity {
 
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/twoFiles.json");
 
+    assertEquals(2, roCrate.getAllDataEntities().size());
+    assertEquals(2, roCrate.getAllContextualEntities().size());
+
     roCrate.deleteEntityById("data1.txt");
+    assertEquals(1, roCrate.getAllDataEntities().size());
+
     roCrate.deleteEntityById("data2.txt");
+    assertEquals(0, roCrate.getAllDataEntities().size());
+    
     roCrate.deleteEntityById("#alice");
+    assertEquals(1, roCrate.getAllContextualEntities().size());
+
     roCrate.deleteEntityById("http://sws.geonames.org/8152662/");
+    assertEquals(0, roCrate.getAllContextualEntities().size());
 
     RoCrate roCrate2 = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity").build();
@@ -102,8 +118,15 @@ public class TestRemoveAddEntity {
         .addDataEntity(file)
         .build();
 
+    assertEquals(1, roCrate.getAllDataEntities().size());
+    assertEquals(2, roCrate.getAllContextualEntities().size());
+
     roCrate.deleteEntityById(person.getId());
+    assertEquals(1, roCrate.getAllContextualEntities().size());
+    
     roCrate.deleteEntityById(place.getId());
+    assertEquals(0, roCrate.getAllContextualEntities().size());
+    assertEquals(1, roCrate.getAllDataEntities().size());
 
     FileEntity file2 = new FileEntity.FileEntityBuilder()
         .setId("data1.txt")

@@ -38,6 +38,8 @@ public interface Crate {
 
   ContextualEntity getContextualEntityById(java.lang.String id);
 
+  List<ContextualEntity> getAllContextualEntities();
+
   AbstractEntity getEntityById(java.lang.String id);
 
   void addDataEntity(DataEntity entity, Boolean toHasPart);
