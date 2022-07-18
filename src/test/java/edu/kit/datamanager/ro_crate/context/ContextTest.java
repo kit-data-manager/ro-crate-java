@@ -85,14 +85,16 @@ public class ContextTest {
   void creationFromPairsJsonTest() {
     var objectMapper = MyObjectMapper.getMapper();
 
-    ObjectNode res = objectMapper.createObjectNode();
-    ObjectNode node = objectMapper.createObjectNode();
-    node.put("house", "www.example.con/house");
-    node.put("road", "www.example.con/road");
+    ObjectNode rawContext = objectMapper.createObjectNode();
+    rawContext.put("house", "www.example.con/house");
+    rawContext.put("road", "www.example.con/road");
+    
+    ObjectNode rawCrate = objectMapper.createObjectNode();
+    rawCrate.set("@context", rawContext);
+    RoCrateMetadataContext newContext = new RoCrateMetadataContext(rawContext);
+    assertNotNull(newContext);
 
-    res.set("@context", node);
-    RoCrateMetadataContext newContext = new RoCrateMetadataContext(node);
-    HelpFunctions.compare(newContext.getContextJsonEntity(), res, true);
+    HelpFunctions.compare(newContext.getContextJsonEntity(), rawCrate, true);
   }
 
   @Test

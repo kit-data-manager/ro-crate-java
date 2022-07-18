@@ -132,6 +132,11 @@ public class RoCrate implements Crate {
   }
 
   @Override
+  public List<ContextualEntity> getAllContextualEntities() {
+    return this.roCratePayload.getAllContextualEntities();
+  }
+
+  @Override
   public AbstractEntity getEntityById(String id) {
     return this.roCratePayload.getEntityById(id);
   }
