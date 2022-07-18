@@ -16,6 +16,8 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class RorProvider {
 
+  private RorProvider() {}
+
   /**
    * The method that parses a ror entry to a crate entity.
    *
@@ -23,23 +25,22 @@ public class RorProvider {
    * @return the created Organization entity.
    */
   public static OrganizationEntity getOrganization(String url) {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.startsWith("https://ror.org/")) {
       throw new IllegalArgumentException("Should provide ror url");
     }
     String newUrl = "https://api.ror.org/organizations/" + url.replaceAll("https://ror.org/", "");
     HttpGet request = new HttpGet(newUrl);
 
-    try {
-      CloseableHttpResponse response = httpClient.execute(request);
-      ObjectNode jsonNode = MyObjectMapper.getMapper().readValue(response.getEntity().getContent(),
-          ObjectNode.class);
-      return new OrganizationEntity.OrganizationEntityBuilder()
-          .setId(jsonNode.get("id").asText())
-          .addProperty("name", jsonNode.get("name"))
-          .addProperty("email", jsonNode.get("email_address"))
-          .addProperty("url", jsonNode.get("links"))
-          .build();
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        CloseableHttpResponse response = httpClient.execute(request);
+        ObjectNode jsonNode = MyObjectMapper.getMapper().readValue(response.getEntity().getContent(),
+            ObjectNode.class);
+        return new OrganizationEntity.OrganizationEntityBuilder()
+            .setId(jsonNode.get("id").asText())
+            .addProperty("name", jsonNode.get("name"))
+            .addProperty("email", jsonNode.get("email_address"))
+            .addProperty("url", jsonNode.get("links"))
+            .build();
     } catch (IOException e) {
       e.printStackTrace();
     }

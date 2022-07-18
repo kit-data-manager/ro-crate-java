@@ -9,7 +9,6 @@ import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -25,9 +24,25 @@ public class ZipWriter implements WriterStrategy {
 
   @Override
   public void save(Crate crate, String destination) {
-    File file = new File(destination);
-    ZipFile zipFile = new ZipFile(destination);
+    try (ZipFile zipFile = new ZipFile(destination)) {
+      saveMetadataJson(crate, zipFile);
+      saveDataEntities(crate, zipFile);
+    } catch (IOException e) {
+      // can not close ZipFile (threw Exception)
+    }
+  }
 
+  private void saveDataEntities(Crate crate, ZipFile zipFile) {
+    for (DataEntity dataEntity : crate.getAllDataEntities()) {
+      try {
+        dataEntity.saveToZip(zipFile);
+      } catch (ZipException e) {
+        System.out.println("could not save " + dataEntity.getId() + " to zip file!");
+      }
+    }
+  }
+
+  private void saveMetadataJson(Crate crate, ZipFile zipFile) {
     try {
       // write the metadata.json file
       ZipParameters zipParameters = new ZipParameters();
@@ -48,15 +63,6 @@ public class ZipWriter implements WriterStrategy {
       e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
-    }
-
-    // save all the data entities
-    for (DataEntity dataEntity : crate.getAllDataEntities()) {
-      try {
-        dataEntity.saveToZip(zipFile);
-      } catch (ZipException e) {
-        System.out.println("could not save " + dataEntity.getId() + " to zip file!");
-      }
     }
   }
 }
