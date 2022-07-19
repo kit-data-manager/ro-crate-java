@@ -32,6 +32,9 @@ java {
     withJavadocJar()
     //package Sources as part of publication
     withSourcesJar()
+    // set java version compatibility
+    sourceCompatibility = 11
+    targetCompatibility = 11
 }
 
 //for javadoc task
