@@ -118,26 +118,6 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return finalNode;
   }
 
-  /*
-  public ObjectNode getFromSchema(String type) {
-    CloseableHttpClient httpclient = HttpClients.createDefault();
-    String url = this.contextMap.get(type);
-    HttpGet httpGet = new HttpGet(url);
-    CloseableHttpResponse response;
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    try {
-      response = httpclient.execute(httpGet);
-      Document doc = Jsoup.parse(EntityUtils.toString(response.getEntity()));
-      Element el = doc.selectFirst("script[type]");
-      assert el != null;
-      return objectMapper.readValue(el.data(), ObjectNode.class);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  */
-
   @Override
   public boolean checkEntity(AbstractEntity entity) {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
