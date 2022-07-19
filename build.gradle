@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.github.fslev:json-compare:2.42'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
 
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.35'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
 
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.1.0'
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66"
