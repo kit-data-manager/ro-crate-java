@@ -37,7 +37,7 @@ dependencies {
 
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
 
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.1.0'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.1'
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
