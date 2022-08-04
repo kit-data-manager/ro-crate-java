@@ -9,8 +9,8 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 
 import org.apache.commons.io.FileUtils;
-import ro.skyah.comparator.JSONCompare;
-import ro.skyah.comparator.JsonComparator;
+import io.json.compare.JSONCompare;
+import io.json.compare.JsonComparator;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,9 +41,9 @@ public class HelpFunctions {
       }
     };
     if (equals) {
-      JSONCompare.assertEquals(node1, node2, comparator);
+      JSONCompare.assertMatches(node1, node2, comparator);
     } else {
-      JSONCompare.assertNotEquals(node1, node2, comparator);
+      JSONCompare.assertNotMatches(node1, node2, comparator);
     }
   }
 
