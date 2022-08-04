@@ -23,6 +23,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         jdk: [ 11, 17 ]  # (open)JDK releases
+        exclude:  # to save time and resources
+          - os: windows-latest
+            jdk: 11
+          - os: macOS-latest
+            jdk: 11
     runs-on: ${{ matrix.os }}
 
     steps:
