@@ -33,6 +33,9 @@ public class RorProvider {
 
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
         CloseableHttpResponse response = httpClient.execute(request);
+        if (response.getStatusLine().getStatusCode() != 200) {
+          throw new IOException(String.format("Identifier not found: %s", response.getStatusLine().toString()));
+        }
         ObjectNode jsonNode = MyObjectMapper.getMapper().readValue(response.getEntity().getContent(),
             ObjectNode.class);
         return new OrganizationEntity.OrganizationEntityBuilder()
