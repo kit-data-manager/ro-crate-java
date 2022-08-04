@@ -9,7 +9,7 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 
 import org.junit.jupiter.api.Test;
-import ro.skyah.comparator.JSONCompare;
+import io.json.compare.JSONCompare;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class UtilFunctionsTest {
     JsonNode expectedResult = objectMapper.readTree(
         UtilFunctionsTest.class.getResourceAsStream("/json/unwrap/simpleResult.json")
     );
-    JSONCompare.assertEquals(node, expectedResult);
+    JSONCompare.assertMatches(node, expectedResult);
   }
 
   @Test
