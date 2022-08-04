@@ -23,23 +23,31 @@ repositories {
 }
 
 dependencies {
+    // JUnit setup for testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-
+    // JSON object mapping / (de-)serialization
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+    // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+    // common file system operations
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.1'
+    // compare json documents in tests
     implementation 'com.github.fslev:json-compare:2.42'
+    // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
-
+    // logging
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
-
+    // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.1'
+    // metadata validation, profiles based on JSON schema
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.66"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+
 sourceSets {
     main {
         java {
