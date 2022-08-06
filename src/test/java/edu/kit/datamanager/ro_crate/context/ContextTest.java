@@ -68,13 +68,15 @@ public class ContextTest {
 
   @Test
   void creationUrlTest() {
-    RoCrateMetadataContext newContext = new RoCrateMetadataContext(List.of("www.example.com", "www.example.com/context"));
+    RoCrateMetadataContext newContext = new RoCrateMetadataContext(
+        List.of("www.example.com", "www.example.com/context"));
 
     var contextualEntityWrongField = new ContextualEntity.ContextualEntityBuilder()
         .setId("dkfaj")
         .addType("Accommodation")
         .build();
-    // this will be false since here there is no default context, and the example context could not be retrieved
+    // this will be false since here there is no default context, and the example
+    // context could not be retrieved
     assertFalse(newContext.checkEntity(contextualEntityWrongField));
     // the two example context should be nevertheless added to the final result
     var jsonNode = newContext.getContextJsonEntity();
@@ -88,13 +90,25 @@ public class ContextTest {
     ObjectNode rawContext = objectMapper.createObjectNode();
     rawContext.put("house", "www.example.con/house");
     rawContext.put("road", "www.example.con/road");
-    
+
     ObjectNode rawCrate = objectMapper.createObjectNode();
     rawCrate.set("@context", rawContext);
     RoCrateMetadataContext newContext = new RoCrateMetadataContext(rawContext);
     assertNotNull(newContext);
 
     HelpFunctions.compare(newContext.getContextJsonEntity(), rawCrate, true);
+  }
+
+  @Test
+  void deletePairTest() {
+    RoCrateMetadataContext context = new RoCrateMetadataContext();
+    RoCrateMetadataContext emptyContext = new RoCrateMetadataContext();
+
+    context.addToContext("key", "value");
+
+    context.deleteValuePairFromContext("key");
+
+    HelpFunctions.compare(context.getContextJsonEntity(), emptyContext.getContextJsonEntity(), true);
   }
 
   @Test

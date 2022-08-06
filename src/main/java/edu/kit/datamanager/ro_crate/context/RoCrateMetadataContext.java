@@ -137,7 +137,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     }
 
     // check if the fields of the entity are present in the context
-    for (var names = node.fieldNames(); names.hasNext(); ) {
+    for (var names = node.fieldNames(); names.hasNext();) {
       String s = names.next();
       if (this.contextMap.get(s) == null) {
         System.err.println("entity " + s + " is missing from context;");
@@ -147,87 +147,6 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return true;
   }
 
-  /*
-  @Override
-  public boolean checkEntity(AbstractEntity entity) {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-
-    // expand our node
-    ObjectNode node = entity.getProperties().deepCopy();
-    node.remove("@id");
-    node.remove("@type");
-    node.put("@context", "https://schema.org/");
-
-    ArrayNode expandedNode = null;
-    try {
-      com.apicatalog.jsonld.document.Document document = JsonDocument
-          .of(new ByteArrayInputStream(node.toString().getBytes(StandardCharsets.UTF_8)));
-
-      expandedNode = (ArrayNode) objectMapper.readTree(JsonLd.expand(document).get().toString());
-    } catch (JsonLdError | JsonProcessingException e) {
-      e.printStackTrace();
-    }
-
-    // get the context
-    Set<String> types = objectMapper.convertValue(entity.getProperties().get("@type"),
-        new TypeReference<>() {
-        });
-
-    ArrayNode comp = objectMapper.createArrayNode();
-    // get the schema for every one of the types
-    for (String type : types) {
-
-      JsonNode jsonArr = this.getFromSchema(type).deepCopy();
-      jsonArr = jsonArr.get("@graph");
-
-      for (var elements = jsonArr.elements(); elements.hasNext(); ) {
-
-        var el = elements.next();
-        ObjectNode filtered = objectMapper.createObjectNode();
-        for (var fields = el.fields(); fields.hasNext(); ) {
-
-          var value = fields.next();
-          if (Pattern.matches("@id", value.getKey())) {
-            filtered.set(value.getKey(), value.getValue());
-          }
-
-        }
-        comp.add(filtered);
-      }
-    }
-
-    ObjectNode contextNode = objectMapper.createObjectNode();
-    contextNode.put("@context", "https://schema.org/");
-    contextNode.set("array", comp);
-    Set<String> ent = new HashSet<>();
-
-    try {
-      com.apicatalog.jsonld.document.Document document = JsonDocument
-          .of(new ByteArrayInputStream(contextNode.toString().getBytes(StandardCharsets.UTF_8)));
-      JsonNode expandedContextNode = objectMapper.readTree(
-          JsonLd.expand(document).get().toString());
-
-      for (var e : expandedContextNode.findValues("@id")) {
-        ent.add(e.asText());
-      }
-    } catch (JsonLdError | JsonProcessingException e) {
-      e.printStackTrace();
-    }
-
-    assert expandedNode != null;
-    if (expandedNode.isEmpty()) {
-      return true;
-    }
-    var json = expandedNode.get(0);
-    for (var names = json.fieldNames(); names.hasNext(); ) {
-      String s = names.next();
-      if (!ent.contains(s) && this.other.get(s) == null) {
-        System.err.println("entity " + s + " is missing from context;");
-      }
-    }
-    return true;
-  }
-*/
   @Override
   public void addToContextFromUrl(String url) {
     this.url.add(url);
@@ -272,5 +191,11 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   public void addToContext(String key, String value) {
     this.contextMap.put(key, value);
     this.other.put(key, value);
+  }
+
+  @Override
+  public void deleteValuePairFromContext(String key) {
+    this.contextMap.remove(key);
+    this.other.remove(key);
   }
 }
