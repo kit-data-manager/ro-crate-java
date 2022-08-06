@@ -82,7 +82,8 @@ public class RoCrate implements Crate {
   }
 
   /**
-   * A constructor for creating the crate using a Crate builder for easier creation.
+   * A constructor for creating the crate using a Crate builder for easier
+   * creation.
    *
    * @param roCrateBuilder the builder to use.
    */
@@ -203,7 +204,7 @@ public class RoCrate implements Crate {
     /**
      * The default constructor of a builder.
      *
-     * @param name the name of the crate.
+     * @param name        the name of the crate.
      * @param description the description of the crate.
      */
     public RoCrateBuilder(String name, String description) {
@@ -223,7 +224,8 @@ public class RoCrate implements Crate {
     }
 
     /**
-     * A default constructor without any params where the root data entity will be plain.
+     * A default constructor without any params where the root data entity will be
+     * plain.
      */
     public RoCrateBuilder() {
       this.payload = new RoCratePayload();
@@ -238,6 +240,21 @@ public class RoCrate implements Crate {
           .addIdProperty("conformsTo", RO_SPEC)
           .build();
     }
+
+    /**
+     * A constructor with a crate as template.
+     *
+     * @param crate the crate to copy.
+     */
+    public RoCrateBuilder(RoCrate crate) {
+      this.payload = crate.roCratePayload;
+      this.preview = crate.roCratePreview;
+      this.metadataContext = crate.metadataContext;
+      this.rootDataEntity = crate.rootDataEntity;
+      this.jsonDescriptor = crate.jsonDescriptor;
+      this.untrackedFiles = crate.untrackedFiles;
+    }
+
     /**
      * Adding a data entity to the crate.
      * The important part here is to also add its id to the RootData Entity hasPart.
