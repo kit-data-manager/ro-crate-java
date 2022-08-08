@@ -10,9 +10,10 @@ import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,23 +29,20 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class RoCrateMetadataContext implements CrateMetadataContext {
 
-  private static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
-  private static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
-  private static JsonNode defaultContext = null;
+  protected static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+  protected static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
+  protected static JsonNode defaultContext = null;
 
-  private final List<String> url;
-  private final HashMap<String, String> contextMap;
+  protected final Set<String> url = new HashSet<>();
+  protected final HashMap<String, String> contextMap = new HashMap<>();
   // we need to keep the ones that are no coming from url
   // for the final representation
-  private final HashMap<String, String> other;
+  protected final HashMap<String, String> other = new HashMap<>();
 
   /**
    * Default constructor for the creation of the default context.
    */
   public RoCrateMetadataContext() {
-    this.url = new ArrayList<>();
-    this.contextMap = new HashMap<>();
-    this.other = new HashMap<>();
     this.addToContextFromUrl(DEFAULT_CONTEXT);
   }
 
@@ -54,9 +52,6 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    * @param url the url list with different context.
    */
   public RoCrateMetadataContext(List<String> url) {
-    this.url = new ArrayList<>();
-    this.contextMap = new HashMap<>();
-    this.other = new HashMap<>();
     for (String e : url) {
       this.addToContextFromUrl(e);
     }
@@ -68,9 +63,6 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    * @param context the Json object of the context.
    */
   public RoCrateMetadataContext(JsonNode context) {
-    this.url = new ArrayList<>();
-    this.other = new HashMap<>();
-    this.contextMap = new HashMap<>();
 
     Consumer<JsonNode> addPairs = x -> {
       var iterate = x.fields();
@@ -104,7 +96,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     for (String e : url) {
       array.add(e);
     }
-    for (HashMap.Entry<String, String> s : other.entrySet()) {
+    for (Map.Entry<String, String> s : other.entrySet()) {
       jsonNode.put(s.getKey(), s.getValue());
     }
     if (!jsonNode.isEmpty()) {
