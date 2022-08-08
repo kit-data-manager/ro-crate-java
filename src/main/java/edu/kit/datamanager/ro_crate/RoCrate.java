@@ -174,6 +174,11 @@ public class RoCrate implements Crate {
   }
 
   @Override
+  public void deleteValuePairFromContext(String key) {
+    this.metadataContext.deleteValuePairFromContext(key);
+  }
+
+  @Override
   public void addFromCollection(Collection<AbstractEntity> entities) {
     this.roCratePayload.addEntities(entities);
   }

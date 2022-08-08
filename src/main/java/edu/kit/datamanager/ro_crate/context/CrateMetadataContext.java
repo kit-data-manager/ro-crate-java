@@ -22,4 +22,5 @@ public interface CrateMetadataContext {
 
   void addToContext(String key, String value);
 
+  void deleteValuePairFromContext(String key);
 }

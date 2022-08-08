@@ -54,5 +54,7 @@ public interface Crate {
 
   void addItemFromDataCite(String locationUrl);
 
+  public void deleteValuePairFromContext(String key);
+
   List<File> getUntrackedFiles();
 }
