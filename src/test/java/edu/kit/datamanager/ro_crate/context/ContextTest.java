@@ -1,5 +1,6 @@
 package edu.kit.datamanager.ro_crate.context;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -132,6 +133,26 @@ public class ContextTest {
 
     HelpFunctions.compare(context.getContextJsonEntity(), emptyContext.getContextJsonEntity(), true);
 
+  }
+
+  @Test
+  void doubledContextUrlsTest() throws JsonProcessingException {
+    String url = "www.example.com";
+    RoCrateMetadataContext context = new RoCrateMetadataContext();
+    assertFalse(context.url.contains(url));
+    context.addToContextFromUrl(url);
+    assertTrue(context.url.contains(url));
+
+    RoCrateMetadataContext contextDoubled = new RoCrateMetadataContext();
+    contextDoubled.addToContextFromUrl(url);
+    contextDoubled.addToContextFromUrl(url);
+    
+    HelpFunctions.compare(context.getContextJsonEntity(), contextDoubled.getContextJsonEntity(), true);
+
+    RoCrateMetadataContext emptyContext = new RoCrateMetadataContext();
+    contextDoubled.deleteUrlFromContext(url);
+
+    HelpFunctions.compare(emptyContext.getContextJsonEntity(), contextDoubled.getContextJsonEntity(), true);
   }
 
   @Test
