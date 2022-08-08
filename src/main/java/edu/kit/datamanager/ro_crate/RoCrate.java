@@ -247,6 +247,20 @@ public class RoCrate implements Crate {
     }
 
     /**
+     * A constructor with a crate as template.
+     *
+     * @param crate the crate to copy.
+     */
+    public RoCrateBuilder(RoCrate crate) {
+      this.payload = crate.roCratePayload;
+      this.preview = crate.roCratePreview;
+      this.metadataContext = crate.metadataContext;
+      this.rootDataEntity = crate.rootDataEntity;
+      this.jsonDescriptor = crate.jsonDescriptor;
+      this.untrackedFiles = crate.untrackedFiles;
+    }
+
+    /**
      * Adding a data entity to the crate.
      * The important part here is to also add its id to the RootData Entity hasPart.
      *
