@@ -18,4 +18,16 @@ public class TestRemoveAddContext {
     HelpFunctions.compareTwoCrateJson(crate, defaultCrate);
 
   }
+
+  @Test
+  void testAddRemoveUrl() throws JsonProcessingException {
+    RoCrate crate = new RoCrate.RoCrateBuilder().addUrlToContext("https://example.com").build();
+    RoCrate defaultCrate = new RoCrate.RoCrateBuilder().build();
+
+    crate.deleteUrlFromContext("https://example.com");
+
+    HelpFunctions.compareTwoCrateJson(crate, defaultCrate);
+
+  }
+
 }
