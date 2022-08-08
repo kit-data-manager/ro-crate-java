@@ -112,6 +112,39 @@ public class ContextTest {
   }
 
   @Test
+  void deleteNonExistingPairTest() {
+    RoCrateMetadataContext context = new RoCrateMetadataContext();
+    RoCrateMetadataContext emptyContext = new RoCrateMetadataContext();
+
+    context.deleteValuePairFromContext("key");
+
+    HelpFunctions.compare(context.getContextJsonEntity(), emptyContext.getContextJsonEntity(), true);
+  }
+
+  @Test
+  void deleteUrlTest() {
+    RoCrateMetadataContext context = new RoCrateMetadataContext();
+    RoCrateMetadataContext emptyContext = new RoCrateMetadataContext();
+
+    context.addToContextFromUrl("www.example.com");
+
+    context.deleteUrlFromContext("www.example.com");
+
+    HelpFunctions.compare(context.getContextJsonEntity(), emptyContext.getContextJsonEntity(), true);
+
+  }
+
+  @Test
+  void deleteNonExistentUrlTest() {
+    RoCrateMetadataContext context = new RoCrateMetadataContext();
+    RoCrateMetadataContext emptyContext = new RoCrateMetadataContext();
+
+    context.deleteUrlFromContext("www.example.com");
+
+    HelpFunctions.compare(context.getContextJsonEntity(), emptyContext.getContextJsonEntity(), true);
+  }
+
+  @Test
   void creationFromUrlAndPairsTest() {
 
     var objectMapper = MyObjectMapper.getMapper();

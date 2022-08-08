@@ -198,4 +198,10 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     this.contextMap.remove(key);
     this.other.remove(key);
   }
+
+  @Override
+  public void deleteUrlFromContext(String url) {
+    this.url.remove(url);
+  }
+
 }

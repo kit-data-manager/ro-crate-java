@@ -56,5 +56,7 @@ public interface Crate {
 
   public void deleteValuePairFromContext(String key);
 
+  public void deleteUrlFromContext(String url);
+
   List<File> getUntrackedFiles();
 }
