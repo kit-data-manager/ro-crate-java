@@ -33,6 +33,7 @@ import java.util.List;
 public class RoCrate implements Crate {
 
   private static final String ID = "ro-crate-metadata.json";
+  private static final String RO_SPEC = "https://w3id.org/ro/crate/1.1";
 
   private final CratePayload roCratePayload;
   private CrateMetadataContext metadataContext;
@@ -205,7 +206,7 @@ public class RoCrate implements Crate {
         .setId(ID)
         .addType("CreativeWork")
         .addIdProperty("about", "./")
-        .addIdProperty("conformsTo", RoCrateMetadataContext.DEFAULT_CONTEXT)
+        .addIdProperty("conformsTo", RoCrate.RO_SPEC)
         .build();
   }
 
