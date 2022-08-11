@@ -92,6 +92,14 @@ public class AbstractEntity {
   }
 
   /**
+   * Returns the types of this entity.
+   * @return a set of type strings.
+   */
+  public Set<String> getTypes() {
+    return types;
+  }
+
+  /**
    * Returns a Json object containing the properties of the entity.
    *
    * @return ObjectNode representing the properties.
