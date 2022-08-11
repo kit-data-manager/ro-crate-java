@@ -1,5 +1,7 @@
 package edu.kit.datamanager.ro_crate.crate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,10 +23,21 @@ public class BuilderTest {
         .build();
 
     RoCrate crate = new RoCrate.RoCrateBuilder().addContextualEntity(license).build();
-
     RoCrate crate1 = new RoCrate.RoCrateBuilder(crate).build();
 
+    assertEquals(crate.getAllDataEntities(), crate1.getAllDataEntities());
+    assertEquals(crate.getAllContextualEntities(), crate1.getAllContextualEntities());
     HelpFunctions.compareTwoCrateJson(crate1, crate);
 
+  }
+
+  @Test
+  void testEmptyCrates() throws JsonProcessingException {
+    RoCrate built = new RoCrate.RoCrateBuilder().build();
+    RoCrate constructed = new RoCrate();
+
+    assertEquals(built.getAllDataEntities(), constructed.getAllDataEntities());
+    assertEquals(built.getAllContextualEntities(), constructed.getAllContextualEntities());
+    HelpFunctions.compareTwoCrateJson(built, constructed);
   }
 }

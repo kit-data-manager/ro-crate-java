@@ -29,7 +29,7 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class RoCrateMetadataContext implements CrateMetadataContext {
 
-  protected static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
+  public static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
   protected static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
   protected static JsonNode defaultContext = null;
 
