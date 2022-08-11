@@ -38,6 +38,8 @@ public class BuilderTest {
 
     assertEquals(built.getAllDataEntities(), constructed.getAllDataEntities());
     assertEquals(built.getAllContextualEntities(), constructed.getAllContextualEntities());
+    assertEquals(built.getJsonDescriptor().getTypes(), constructed.getJsonDescriptor().getTypes());
+    assertEquals(built.getJsonDescriptor().getProperties(), constructed.getJsonDescriptor().getProperties());
     HelpFunctions.compareTwoCrateJson(built, constructed);
   }
 }
