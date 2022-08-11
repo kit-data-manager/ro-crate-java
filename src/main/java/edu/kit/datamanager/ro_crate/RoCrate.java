@@ -33,7 +33,6 @@ import java.util.List;
 public class RoCrate implements Crate {
 
   private static final String ID = "ro-crate-metadata.json";
-  private static final String RO_SPEC = "https://w3id.org/ro/crate/1.1";
 
   private final CratePayload roCratePayload;
   private CrateMetadataContext metadataContext;
@@ -77,8 +76,11 @@ public class RoCrate implements Crate {
    */
   public RoCrate() {
     this.roCratePayload = new RoCratePayload();
-    this.metadataContext = new RoCrateMetadataContext();
     this.untrackedFiles = new ArrayList<>();
+    this.metadataContext = new RoCrateMetadataContext();
+    rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
+        .build();
+    jsonDescriptor = createDefaultJsonDescriptor();
   }
 
   /**
@@ -198,6 +200,15 @@ public class RoCrate implements Crate {
     return this.untrackedFiles;
   }
 
+  protected static ContextualEntity createDefaultJsonDescriptor() {
+    return new ContextualEntity.ContextualEntityBuilder()
+        .setId(ID)
+        .addType("CreativeWork")
+        .addIdProperty("about", "./")
+        .addIdProperty("conformsTo", RoCrateMetadataContext.DEFAULT_CONTEXT)
+        .build();
+  }
+
   /**
    * The inner class builder for the easier creation of a ROCrate.
    */
@@ -225,12 +236,7 @@ public class RoCrate implements Crate {
           .addProperty("name", name)
           .addProperty("description", description)
           .build();
-      jsonDescriptor = new ContextualEntity.ContextualEntityBuilder()
-          .setId(ID)
-          .addType("CreativeWork")
-          .addIdProperty("about", "./")
-          .addIdProperty("conformsTo", RO_SPEC)
-          .build();
+      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
     }
 
     /**
@@ -243,12 +249,7 @@ public class RoCrate implements Crate {
       this.metadataContext = new RoCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .build();
-      jsonDescriptor = new ContextualEntity.ContextualEntityBuilder()
-          .setId(ID)
-          .addType("CreativeWork")
-          .addIdProperty("about", "./")
-          .addIdProperty("conformsTo", RO_SPEC)
-          .build();
+      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
     }
 
     /**
