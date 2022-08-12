@@ -23,14 +23,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The reader used for reading crates from the outside into the library.
- * The class has a field using a strategy to support different ways of importing the crates.
+ * This class allows reading crates from the outside into the library in order
+ * to inspect or modify it.
+ * 
+ * The class takes a strategy to support different ways of importing the crates.
  * (from zip, folder, etc.)
  */
 public class RoCrateReader {
 
   private final ReaderStrategy reader;
-  private RoCrate crate;
 
   public RoCrateReader(ReaderStrategy reader) {
     this.reader = reader;
@@ -44,7 +45,7 @@ public class RoCrateReader {
    * @return the read RO-crate
    */
   public RoCrate readCrate(String location) {
-    crate = new RoCrate();
+    RoCrate crate = new RoCrate();
     // get the ro-crate-medata.json
     ObjectNode metadataJson = reader.readMetadataJson(location);
     // get the content of the crate
@@ -59,15 +60,15 @@ public class RoCrateReader {
     JsonNode context = metadataJson.get("@context");
 
     CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
-    this.crate.setMetadataContext(crateContext);
+    crate.setMetadataContext(crateContext);
     JsonNode graph = metadataJson.get("@graph");
 
     if (graph.isArray()) {
 
-      graph = setRootEntities((ArrayNode) graph);
+      graph = setRootEntities(crate, (ArrayNode) graph);
       for (JsonNode node : graph) {
         // if the id is in the root has part we should add this entity as data entity
-        if (this.crate.getRootDataEntity().hasInHasPart(node.get("@id").asText())) {
+        if (crate.getRootDataEntity().hasInHasPart(node.get("@id").asText())) {
           File loc = checkFolderHasFile(node.get("@id").asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
@@ -77,10 +78,10 @@ public class RoCrateReader {
               .setAll(node.deepCopy())
               .setSource(loc)
               .build();
-          this.crate.addDataEntity(dataEntity, false);
+          crate.addDataEntity(dataEntity, false);
         } else {
           // contextual entity
-          this.crate.addContextualEntity(
+          crate.addContextualEntity(
               new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
         }
       }
@@ -92,10 +93,10 @@ public class RoCrateReader {
         list.add(f);
       }
     }
-    this.crate.setUntrackedFiles(list);
+    crate.setUntrackedFiles(list);
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
-    defaultValidation.validate(this.crate);
-    return this.crate;
+    defaultValidation.validate(crate);
+    return crate;
   }
 
   private File checkFolderHasFile(String id, File file) {
@@ -108,7 +109,7 @@ public class RoCrateReader {
 
   // gets the entities that every crate should have
   // we will need the root dataset to distinguish between data entities and contextual entities
-  private ArrayNode setRootEntities(ArrayNode graph) {
+  private ArrayNode setRootEntities(RoCrate crate, ArrayNode graph) {
 
     // for now, we make an empty ArrayNode and putt all the entities
     // that still need to be processed there
@@ -120,7 +121,7 @@ public class RoCrateReader {
       if (type != null) {
         String uri = type.get("@id").asText();
         if (uri.startsWith("https://w3id.org/ro/crate/")) {
-          this.crate.setJsonDescriptor(
+          crate.setJsonDescriptor(
               new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
           graphCopy.remove(i);
           String id = node.get("about").get("@id").asText();
@@ -140,7 +141,7 @@ public class RoCrateReader {
                 }
               }
               secondIteration.remove("hasPart");
-              this.crate.setRootDataEntity(
+              crate.setRootDataEntity(
                   new RootDataEntity.RootDataEntityBuilder()
                       .setAll(secondIteration.deepCopy())
                       .setHasPart(hasPartSet)
