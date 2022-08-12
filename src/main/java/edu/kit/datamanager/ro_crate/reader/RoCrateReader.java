@@ -67,8 +67,9 @@ public class RoCrateReader {
 
       graph = setRootEntities(crate, (ArrayNode) graph);
       for (JsonNode node : graph) {
-        // if the id is in the root has part we should add this entity as data entity
-        if (crate.getRootDataEntity().hasInHasPart(node.get("@id").asText())) {
+        // if the id is in the root hasPart list, we know this entity is a data entity
+        RootDataEntity root = crate.getRootDataEntity();
+        if (root != null && root.hasInHasPart(node.get("@id").asText())) {
           File loc = checkFolderHasFile(node.get("@id").asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
