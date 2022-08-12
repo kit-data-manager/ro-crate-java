@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.reader;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
+import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
@@ -25,21 +26,61 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class FolderReaderTest {
 
+  private Path writeMetadataToFile(Path temp, RoCrate c1) throws IOException {
+    // Write metadata to file
+    Path f = temp.resolve("ro-crate-metadata.json");
+    FileUtils.touch(f.toFile());
+    FileUtils.writeStringToFile(f.toFile(), c1.getJsonMetadata(), Charset.defaultCharset());
+    return f;
+  }
+
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .build();
-    Path f = temp.resolve("ro-crate-metadata.json");
-    FileUtils.touch(f.toFile());
-    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
-
+    Path f = writeMetadataToFile(temp, roCrate);
+    // Read from written file
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
-
+    RoCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    // Write metadata again
     Path r = temp.resolve("output.txt");
     FileUtils.touch(r.toFile());
     FileUtils.writeStringToFile(r.toFile(), res.getJsonMetadata(), Charset.defaultCharset());
+    // See if it is the same
     assertTrue(FileUtils.contentEquals(f.toFile(), r.toFile()));
+  }
+
+  @Test
+  void testMultipleReads(@TempDir Path temp1, @TempDir Path temp2) throws IOException {
+    String id = "https://orcid.org/0000-0001-6121-5409";
+    PersonEntity person = new PersonEntity.PersonEntityBuilder()
+        .setId(id)
+        .setContactPoint("mailto:tim.luckett@uts.edu.au")
+        .setAffiliation("https://ror.org/03f0f6041")
+        .setFamilyName("Luckett")
+        .setGivenName("Tim")
+        .addProperty("name", "Tim Luckett")
+        .build();
+    RoCrate c1 = new RoCrate.RoCrateBuilder("mini", "test").build();
+    RoCrate c2 = new RoCrate.RoCrateBuilder("other", "with file")
+        .addContextualEntity(person)
+        .build();
+    writeMetadataToFile(temp1, c1);
+    writeMetadataToFile(temp2, c2);
+    // some first checks...
+    assertEquals(0, c1.getAllContextualEntities().size());
+    assertEquals(1, c2.getAllContextualEntities().size());
+    // read both with the same reader
+    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    RoCrate c1_read = roCrateFolderReader.readCrate(temp1.toFile().toString());
+    RoCrate c2_read = roCrateFolderReader.readCrate(temp2.toFile().toString());
+    // check that the reference is not the same
+    assertNotEquals(c1, c1_read);
+    assertNotEquals(c2, c2_read);
+    assertNotEquals(c1_read, c2_read);
+    assertEquals(0, c1_read.getAllContextualEntities().size());
+    assertEquals(1, c2_read.getAllContextualEntities().size());
+    HelpFunctions.compareTwoMetadataJsonNotEqual(c1_read, c2_read);
   }
 
   @Test
@@ -61,12 +102,10 @@ public class FolderReaderTest {
 
     assertEquals(1, roCrate.getAllDataEntities().size());
 
-    Path f = temp.resolve("ro-crate-metadata.json");
-    FileUtils.touch(f.toFile());
-    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
+    writeMetadataToFile(temp, roCrate);
 
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    RoCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
@@ -93,9 +132,7 @@ public class FolderReaderTest {
             )
             .build();
 
-    Path f = temp.resolve("ro-crate-metadata.json");
-    FileUtils.touch(f.toFile());
-    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
+    writeMetadataToFile(temp, roCrate);
 
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
     Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
@@ -127,10 +164,7 @@ public class FolderReaderTest {
 
     writer.save(roCrate, locationSource.toFile().toString());
 
-    Path f = temp.resolve("ro-crate-metadata.json");
-
-    FileUtils.touch(f.toFile());
-    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
+    writeMetadataToFile(temp, roCrate);
 
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
 
@@ -168,10 +202,7 @@ public class FolderReaderTest {
 
     writer.save(roCrate, locationSource.toFile().toString());
 
-    Path f = temp.resolve("ro-crate-metadata.json");
-
-    FileUtils.touch(f.toFile());
-    FileUtils.writeStringToFile(f.toFile(), roCrate.getJsonMetadata(), Charset.defaultCharset());
+    writeMetadataToFile(temp, roCrate);
 
     RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
 
