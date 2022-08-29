@@ -8,7 +8,7 @@ plugins {
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
-    id 'net.researchgate.release' version '3.0.0'
+    id 'net.researchgate.release' version '3.0.1'
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
