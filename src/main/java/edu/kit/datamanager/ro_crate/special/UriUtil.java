@@ -29,14 +29,14 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given String is decoded and can be used as an identifier
+     * Returns true, if the given String can not be used as an identifier
      * in RO-Crate.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
      * @return true if url is decoded, false if it is not.
      */
-    public static boolean isDecoded(String uri) {
-        return !isEncoded(uri);
+    public static boolean isNotValidUri(String uri) {
+        return !isValidUri(uri);
     }
 
     /**
@@ -46,7 +46,7 @@ public class UriUtil {
      * @param uri the given URI. Usually a URL or relative file path.
      * @return trie if the url is encoded, false if it is not.
      */
-    public static boolean isEncoded(String uri) {
+    public static boolean isValidUri(String uri) {
         return UriUtils.isURI(uri) || isLdBlankNode(uri);
     }
 
@@ -109,7 +109,7 @@ public class UriUtil {
      * @return the encoded version of the given string, if possible.
      */
     public static Optional<String> encode(String uri) {
-        if (isEncoded(uri) || isLdBlankNode(uri)) {
+        if (isValidUri(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
         // according to
@@ -121,14 +121,14 @@ public class UriUtil {
         result = result.replace("\\", "/");
         result = result.replace("%", "%25");
         result = result.replace(" ", "%20");
-        if (isEncoded(result)) {
+        if (isValidUri(result)) {
             return Optional.of(result);
         }
         // from here on, our soft-encoding failed and we will fully encode the url or
         // path.
         result = URLEncoder.encode(result, StandardCharsets.UTF_8);
 
-        if (isEncoded(result)) {
+        if (isValidUri(result)) {
             return Optional.of(result);
         } else {
             return Optional.empty();
@@ -136,7 +136,7 @@ public class UriUtil {
     }
 
     public static Optional<String> decode(String uri) {
-        if (isEncoded(uri) || isLdBlankNode(uri)) {
+        if (isNotValidUri(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
         return Optional.of(URLDecoder.decode(uri, StandardCharsets.UTF_8));
@@ -161,7 +161,7 @@ public class UriUtil {
      */
     public static boolean hasValidDomain(String url) {
         UrlValidator validator = new UrlValidator();
-        if (isDecoded(url)) {
+        if (isNotValidUri(url)) {
             String encoded = URLEncoder.encode(url, StandardCharsets.UTF_8);
             return validator.isValid(encoded);
         }

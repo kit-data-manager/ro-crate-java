@@ -59,10 +59,10 @@ public class UriUtilTest {
      */
     @Test
     void testIsEncodedWithRoCrateSpecExamples() {
-        assertTrue(UriUtil.isEncoded(file_chinese));
-        assertTrue(UriUtil.isEncoded(file_chinese_encoded));
-        assertFalse(UriUtil.isEncoded(file_path_spaces));
-        assertTrue(UriUtil.isEncoded(file_path_spaces_encoded));
+        assertTrue(UriUtil.isValidUri(file_chinese));
+        assertTrue(UriUtil.isValidUri(file_chinese_encoded));
+        assertFalse(UriUtil.isValidUri(file_path_spaces));
+        assertTrue(UriUtil.isValidUri(file_path_spaces_encoded));
     }
 
     /**
@@ -70,10 +70,10 @@ public class UriUtilTest {
      */
     @Test
     void testIsDecodedWithRoCrateSpecExamples() {
-        assertFalse(UriUtil.isDecoded(file_chinese));
-        assertFalse(UriUtil.isDecoded(file_chinese_encoded));
-        assertTrue(UriUtil.isDecoded(file_path_spaces));
-        assertFalse(UriUtil.isDecoded(file_path_spaces_encoded));
+        assertFalse(UriUtil.isNotValidUri(file_chinese));
+        assertFalse(UriUtil.isNotValidUri(file_chinese_encoded));
+        assertTrue(UriUtil.isNotValidUri(file_path_spaces));
+        assertFalse(UriUtil.isNotValidUri(file_path_spaces_encoded));
     }
 
     /**
@@ -146,7 +146,7 @@ public class UriUtilTest {
     void testEncode(String example_unencoded, String example_encoded) {
         Optional<String> encoded = UriUtil.encode(example_unencoded);
         assertEquals(example_encoded, encoded.get());
-        assertTrue(UriUtil.isEncoded(encoded.get()));
+        assertTrue(UriUtil.isValidUri(encoded.get()));
     }
 
     /**
@@ -159,6 +159,5 @@ public class UriUtilTest {
     void testDecode(String example_unencoded, String example_encoded) {
         Optional<String> decoded = UriUtil.decode(example_encoded);
         assertEquals(example_unencoded, decoded.get());
-        assertTrue(UriUtil.isDecoded(decoded.get()));
     }
 }
