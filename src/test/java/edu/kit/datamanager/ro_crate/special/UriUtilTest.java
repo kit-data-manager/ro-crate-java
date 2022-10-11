@@ -18,12 +18,37 @@ public class UriUtilTest {
     // note: "\" becomes "/" (unix style):
     private static String file_path_spaces_encoded = "Results%20and%20Diagrams/almost-50%25.png";
 
+    // taken from
+    // https://www.researchobject.org/ro-crate/1.1/appendix/jsonld.html#describing-entities-in-json-ld
+    private static final String url_simple_valid = "http://example.com/";
+    private static final String url_orcid_valid = "https://orcid.org/0000-0002-1825-0097";
+    private static final String entity_reference_simple = "#alice";
+    private static final String entity_reference_generated = "#ac0bd781-7d91-4cdf-b2ad-7305921c7650";
+    private static final String entity_blank_node_id = "_:alice";
+
+
+    void assertEncodingIsTheSame(String uri) {
+        // The uri should not be changed when encoding (no double encoding)
+        Optional<String> encoded = UriUtil.encode(uri);
+        assertEquals(uri, encoded.get());
+        // The uri should be recognized as encoded
+        assertTrue(UriUtil.isEncoded(uri));
+    }
+
     @Test
     void testIsEncodedWithRoCrateSpecExamples() {
         assertTrue(UriUtil.isEncoded(file_chinese));
         assertTrue(UriUtil.isEncoded(file_chinese_encoded));
         assertFalse(UriUtil.isEncoded(file_path_spaces));
         assertTrue(UriUtil.isEncoded(file_path_spaces_encoded));
+    }
+
+    @Test
+    void testIsDecodedWithRoCrateSpecExamples() {
+        assertFalse(UriUtil.isDecoded(file_chinese));
+        assertFalse(UriUtil.isDecoded(file_chinese_encoded));
+        assertTrue(UriUtil.isDecoded(file_path_spaces));
+        assertFalse(UriUtil.isDecoded(file_path_spaces_encoded));
     }
 
     @Test
@@ -59,5 +84,30 @@ public class UriUtilTest {
     void testEncodeFilePathSpaces() {
         Optional<String> encoded = UriUtil.encode(file_path_spaces);
         assertEquals(file_path_spaces_encoded, encoded.get());
+    }
+
+    @Test
+    void testEncodeSimpleEntityReference() {
+        assertEncodingIsTheSame(entity_reference_simple);
+    }
+
+    @Test
+    void testEncodeGeneratedEntityReference() {
+        assertEncodingIsTheSame(entity_reference_generated);
+    }
+
+    @Test
+    void testEncodeBlankNodeReference() {
+        assertEncodingIsTheSame(entity_blank_node_id);
+    }
+
+    @Test
+    void testEncodeUrlSimple() {
+        assertEncodingIsTheSame(url_simple_valid);
+    }
+
+    @Test
+    void testEncodeUrlOrcid() {
+        assertEncodingIsTheSame(url_orcid_valid);
     }
 }
