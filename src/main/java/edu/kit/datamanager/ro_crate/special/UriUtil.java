@@ -30,7 +30,7 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given String is decoded.
+     * Returns true, if the given String is decoded and can be used as an identifier in RO-Crate.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
      * @return true if url is decoded, false if it is not.
@@ -40,13 +40,13 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given String is encoded.
+     * Returns true, if the given String is encoded and can be used as an identifier in RO-Crate.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
      * @return trie if the url is encoded, false if it is not.
      */
     public static boolean isEncoded(String uri) {
-        return UriUtils.isURI(uri);
+        return UriUtils.isURI(uri) || isLdBlankNode(uri);
     }
 
     /**
@@ -108,7 +108,7 @@ public class UriUtil {
      * @return the encoded version of the given string, if possible.
      */
     public static Optional<String> encode(String uri) {
-        if (isEncoded(uri)) {
+        if (isEncoded(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
 
@@ -135,6 +135,17 @@ public class UriUtil {
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns true if the given string is a blank node identifier in the Linked
+     * Data world.
+     * 
+     * @param uri the given String
+     * @return true if the string is a blank node. False if not.
+     */
+    private static boolean isLdBlankNode(String uri) {
+        return uri.startsWith("_:");
     }
 
     /**
