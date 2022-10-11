@@ -30,6 +30,7 @@ dependencies {
     // JUnit setup for testing
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation('org.junit.jupiter:junit-jupiter')
+    testImplementation('org.junit.jupiter:junit-jupiter-params')
     // JSON object mapping / (de-)serialization
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'

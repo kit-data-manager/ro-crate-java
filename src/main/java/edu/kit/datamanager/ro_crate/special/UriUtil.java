@@ -1,9 +1,8 @@
 package edu.kit.datamanager.ro_crate.special;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
@@ -30,7 +29,8 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given String is decoded and can be used as an identifier in RO-Crate.
+     * Returns true, if the given String is decoded and can be used as an identifier
+     * in RO-Crate.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
      * @return true if url is decoded, false if it is not.
@@ -40,7 +40,8 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given String is encoded and can be used as an identifier in RO-Crate.
+     * Returns true, if the given String is encoded and can be used as an identifier
+     * in RO-Crate.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
      * @return trie if the url is encoded, false if it is not.
@@ -111,34 +112,34 @@ public class UriUtil {
         if (isEncoded(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
+        // according to
+        // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
+        // a file path may not be fully encoded and may contain international unicode
+        // characters. So we try a "soft"-encoding first, and if this is not yet valid,
+        // we really fully encode it.
+        String result = uri;
+        result = result.replace("\\", "/");
+        result = result.replace("%", "%25");
+        result = result.replace(" ", "%20");
+        if (isEncoded(result)) {
+            return Optional.of(result);
+        }
+        // from here on, our soft-encoding failed and we will fully encode the url or
+        // path.
+        result = URLEncoder.encode(result, StandardCharsets.UTF_8);
 
-        Optional<URL> url = asUrl(uri);
-        Optional<Path> p = asPath(uri);
-        if (url.isPresent()) {
-            try {
-                URI u = url.get().toURI();
-                return Optional.of(u.toASCIIString());
-            } catch (URISyntaxException e) {
-                return Optional.empty();
-            }
-        } else if (p.isPresent()) {
-            // according to
-            // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
-            // a file path may not be fully encoded and may contain international unicode
-            // characters. So we try a "soft"-encoding first, and if this is not yet valid,
-            // we really fully encode it.
-            String result = p.get().toString();
-            result = result.replace("\\", "/");
-            result = result.replace("%", "%25");
-            result = result.replace(" ", "%20");
-            if (isEncoded(result)) {
-                return Optional.of(result);
-            } else {
-                return Optional.of(URLEncoder.encode(result, StandardCharsets.UTF_8));
-            }
+        if (isEncoded(result)) {
+            return Optional.of(result);
         } else {
             return Optional.empty();
         }
+    }
+
+    public static Optional<String> decode(String uri) {
+        if (isEncoded(uri) || isLdBlankNode(uri)) {
+            return Optional.of(uri);
+        }
+        return Optional.of(URLDecoder.decode(uri, StandardCharsets.UTF_8));
     }
 
     /**
