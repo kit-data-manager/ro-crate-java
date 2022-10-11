@@ -131,7 +131,11 @@ public class UriUtil {
             result = result.replace("\\", "/");
             result = result.replace("%", "%25");
             result = result.replace(" ", "%20");
-            return Optional.of(result);
+            if (isEncoded(result)) {
+                return Optional.of(result);
+            } else {
+                return Optional.of(URLEncoder.encode(result, StandardCharsets.UTF_8));
+            }
         } else {
             return Optional.empty();
         }
