@@ -8,7 +8,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.Optional;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -44,7 +43,7 @@ public class UriUtil {
      * Returns true, if the given String is encoded.
      * 
      * @param uri the given URI. Usually a URL or relative file path.
-     * @return trie if the url is decoded, false if it is not.
+     * @return trie if the url is encoded, false if it is not.
      */
     public static boolean isEncoded(String uri) {
         return UriUtils.isURI(uri);

@@ -12,9 +12,9 @@ public class UriUtilTest {
 
     // Strings taken from
     // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
-    private static String file_chinese = "面试.mp4";
-    private static String file_chinese_encoded = "%E9%9D%A2%E8%AF%95.mp4";
-    private static String file_path_spaces = "Results and Diagrams\\almost-50%.png";
+    private static final String file_chinese = "面试.mp4";
+    private static final String file_chinese_encoded = "%E9%9D%A2%E8%AF%95.mp4";
+    private static final String file_path_spaces = "Results and Diagrams\\almost-50%.png";
     // note: "\" becomes "/" (unix style):
     private static String file_path_spaces_encoded = "Results%20and%20Diagrams/almost-50%25.png";
 
@@ -42,7 +42,7 @@ public class UriUtilTest {
         assertTrue(UriUtil.isPath(file_path_spaces_encoded));
 
     }
-    
+
     @Test
     void testIsPathWithUrlExamples() {
         assertFalse(UriUtil.isPath("https://example.com/"));
@@ -51,13 +51,12 @@ public class UriUtilTest {
     }
 
     @Test
-    void testUriEncodingFileChinese() {
-        Optional<String> encoded = UriUtil.encode(file_chinese);
-        assertEquals(file_chinese, encoded.get());
+    void testEncodePreferReadableAboutFullEncoding() {
+        assertEncodingIsTheSame(file_chinese);
     }
 
     @Test
-    void testUriEncodingFilePathSpaces() {
+    void testEncodeFilePathSpaces() {
         Optional<String> encoded = UriUtil.encode(file_path_spaces);
         assertEquals(file_path_spaces_encoded, encoded.get());
     }
