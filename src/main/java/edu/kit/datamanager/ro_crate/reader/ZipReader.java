@@ -7,26 +7,33 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
+
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Implementation of the reader strategy, providing a way of reading crates from a zip archive.
+ * Implementation of the reader strategy, providing a way of reading crates from
+ * a zip archive.
  */
 public class ZipReader implements ReaderStrategy {
+
+  private String uuid = UUID.randomUUID().toString();
+
+  private String tempFolder = "./temp/" + uuid + "/";
 
   private boolean read = false;
 
   private void readCrate(String location) {
     try {
-      File temp = new File("temp");
+      File temp = new File(tempFolder);
       if (temp.exists()) {
-        FileUtils.cleanDirectory(new File("temp"));
+        FileUtils.cleanDirectory(new File(tempFolder));
       }
       try (ZipFile zf = new ZipFile(location)) {
-        zf.extractAll("temp");
+        zf.extractAll(tempFolder);
       }
-      FileUtils.forceDeleteOnExit(new File("temp"));
+      FileUtils.forceDeleteOnExit(new File(tempFolder));
       this.read = true;
     } catch (IOException e) {
       e.printStackTrace();
@@ -38,12 +45,12 @@ public class ZipReader implements ReaderStrategy {
     if (!read) {
       this.readCrate(location);
     }
+
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ObjectNode objectNode;
-    File jsonMetadata = new File("temp/ro-crate-metadata.json");
+    File jsonMetadata = new File(tempFolder + "ro-crate-metadata.json");
+    
     try {
-      objectNode = objectMapper.readTree(jsonMetadata).deepCopy();
-      return objectNode;
+      return objectMapper.readTree(jsonMetadata).deepCopy();
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -55,6 +62,6 @@ public class ZipReader implements ReaderStrategy {
     if (!read) {
       this.readCrate(location);
     }
-    return new File("temp");
+    return new File(tempFolder);
   }
 }
