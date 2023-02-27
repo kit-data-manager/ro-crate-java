@@ -12,7 +12,7 @@ plugins {
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.2.0"
 }
 
 group 'edu.kit.datamanager'
