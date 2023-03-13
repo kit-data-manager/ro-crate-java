@@ -4,7 +4,7 @@ plugins {
 
     id 'jacoco'
     // Adds coveralls task for CI to send results to the coveralls service.
-    id "com.github.kt3k.coveralls" version "2.12.0"
+    id "com.github.kt3k.coveralls" version "2.12.2"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
