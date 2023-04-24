@@ -49,7 +49,7 @@ dependencies {
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.2'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.79"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.80"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
