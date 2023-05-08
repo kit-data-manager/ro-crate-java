@@ -138,12 +138,10 @@ public class RoCrateReader {
    * We will need the root dataset to distinguish between data entities and
    * contextual entities.
    * 
-   * @param crate the crate, which will have the entities set, if available in the
+   * @param crate the crate, which will receive the entities, if available in the
    *              graph.
    * @param graph the graph of the Metadata JSON file, where the entities are
-   *              extracted from.
-   * @return the given graph, but without the root data entity and the Metadata
-   *         File Descriptor (JSON descriptor).
+   *              extracted and removed from.
    */
   protected void moveRootEntitiesFromGraphToCrate(RoCrate crate, ArrayNode graph) {
     // use the algorithm described here:
