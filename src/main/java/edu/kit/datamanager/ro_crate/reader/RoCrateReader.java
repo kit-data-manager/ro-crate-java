@@ -81,7 +81,7 @@ public class RoCrateReader {
 
     if (graph.isArray()) {
 
-      graph = setRootEntities(crate, (ArrayNode) graph);
+      moveRootEntitiesFromGraphToCrate(crate, (ArrayNode) graph);
       for (JsonNode node : graph) {
         // if the id is in the root hasPart list, we know this entity is a data entity
         RootDataEntity root = crate.getRootDataEntity();
@@ -125,10 +125,10 @@ public class RoCrateReader {
   }
 
   /**
-   * Sets the entities that every crate should have.
+   * Moves the descriptor and the root entity from the graph to the crate.
    * 
-   * Extracts the root data entity and the Metadata File Descriptor (JSON
-   * descriptor) from the graph and inserts them into the crate object.
+   * Extracts the root data entity and the Metadata File Descriptor from the graph
+   * and inserts them into the crate object. It also deletes it from the graph.
    * We will need the root dataset to distinguish between data entities and
    * contextual entities.
    * 
@@ -139,8 +139,7 @@ public class RoCrateReader {
    * @return the given graph, but without the root data entity and the Metadata
    *         File Descriptor (JSON descriptor).
    */
-  protected ArrayNode setRootEntities(RoCrate crate, ArrayNode graph) {
-    var graphCopy = graph.deepCopy();
+  protected void moveRootEntitiesFromGraphToCrate(RoCrate crate, ArrayNode graph) {
     // use the algorithm described here:
     // https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
     Optional<JsonNode> maybeDescriptor = StreamSupport.stream(graph.spliterator(), false)
@@ -154,10 +153,10 @@ public class RoCrateReader {
         .findFirst();
 
     maybeDescriptor.ifPresent(descriptor -> {
-      removeJsonNodeFromArrayNode(graphCopy, descriptor);
+      removeJsonNodeFromArrayNode(graph, descriptor);
       setCrateDescriptor(crate, descriptor);
 
-      Optional<ObjectNode> maybeRoot = extractRoot(graphCopy, descriptor);
+      Optional<ObjectNode> maybeRoot = extractRoot(graph, descriptor);
 
       maybeRoot.ifPresent(root -> {
         Set<String> hasPartIds = extractHasPartIds(root);
@@ -168,11 +167,9 @@ public class RoCrateReader {
                 .setHasPart(hasPartIds)
                 .build());
 
-        removeJsonNodeFromArrayNode(graphCopy, root);
+        removeJsonNodeFromArrayNode(graph, root);
       });
     });
-
-    return graphCopy;
   }
 
   private Optional<ObjectNode> extractRoot(ArrayNode graph, JsonNode descriptor) {
