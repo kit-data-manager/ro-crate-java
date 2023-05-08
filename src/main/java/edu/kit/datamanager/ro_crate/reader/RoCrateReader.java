@@ -172,10 +172,20 @@ public class RoCrateReader {
     });
   }
 
+  /**
+   * Extracts the root entity from the graph, using the information from the
+   * descriptor.
+   * 
+   * Basically implements step 5 of the algorithm described here:
+   * https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
+   * 
+   * @param graph      the graph from the metadata JSON-LD file
+   * @param descriptor the RO-Crate descriptor
+   * @return the root entity, if found
+   */
   private Optional<ObjectNode> extractRoot(ArrayNode graph, JsonNode descriptor) {
     String rootId = descriptor.get(PROP_ABOUT).get(PROP_ID).asText();
-    return StreamSupport.stream(graph.spliterator(), false)
-        // convert to object note, if it is an object
+        // root is an object (filter + conversion)
         .filter(JsonNode::isObject)
         .map(JsonNode::<ObjectNode>deepCopy)
         // "5. if the entity has an @id URI that matches root return it"
