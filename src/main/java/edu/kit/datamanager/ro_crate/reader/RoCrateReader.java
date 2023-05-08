@@ -34,6 +34,12 @@ import java.util.stream.StreamSupport;
  */
 public class RoCrateReader {
 
+  /**
+   * If the number of JSON entities in the crate is larger than this number,
+   * parallelization will be used.
+   */
+  private static final int PARALLELIZATION_THRESHOLD = 100;
+
   private static final String FILE_PREVIEW_FILES = "ro-crate-preview_files";
   private static final String FILE_PREVIEW_HTML = "ro-crate-preview.html";
   private static final String FILE_METADATA_JSON = "ro-crate-metadata.json";
@@ -142,7 +148,8 @@ public class RoCrateReader {
   protected void moveRootEntitiesFromGraphToCrate(RoCrate crate, ArrayNode graph) {
     // use the algorithm described here:
     // https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
-    Optional<JsonNode> maybeDescriptor = StreamSupport.stream(graph.spliterator(), false)
+    boolean isParallel = graph.size() > PARALLELIZATION_THRESHOLD;
+    Optional<JsonNode> maybeDescriptor = StreamSupport.stream(graph.spliterator(), isParallel)
         // "2. if the conformsTo property is a URI that starts with
         // https://w3id.org/ro/crate/"
         .filter(node -> node.path(PROP_CONFORMS_TO).path(PROP_ID).asText().startsWith(SPECIFICATION_PREFIX))
@@ -185,6 +192,8 @@ public class RoCrateReader {
    */
   private Optional<ObjectNode> extractRoot(ArrayNode graph, JsonNode descriptor) {
     String rootId = descriptor.get(PROP_ABOUT).get(PROP_ID).asText();
+    boolean isParallel = graph.size() > PARALLELIZATION_THRESHOLD;
+    return StreamSupport.stream(graph.spliterator(), isParallel)
         // root is an object (filter + conversion)
         .filter(JsonNode::isObject)
         .map(JsonNode::<ObjectNode>deepCopy)
@@ -195,7 +204,8 @@ public class RoCrateReader {
 
   private Set<String> extractHasPartIds(ObjectNode root) {
     JsonNode hasPartNode = root.path(PROP_HAS_PART);
-    Set<String> hasPartIds = StreamSupport.stream(hasPartNode.spliterator(), false)
+    boolean isParallel = hasPartNode.isArray() && hasPartNode.size() > PARALLELIZATION_THRESHOLD;
+    Set<String> hasPartIds = StreamSupport.stream(hasPartNode.spliterator(), isParallel)
         .map(hasPart -> hasPart.path(PROP_ID).asText())
         .filter(text -> !text.isBlank())
         .collect(Collectors.toSet());
