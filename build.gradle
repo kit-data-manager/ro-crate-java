@@ -37,7 +37,7 @@ dependencies {
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.12.0'
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
