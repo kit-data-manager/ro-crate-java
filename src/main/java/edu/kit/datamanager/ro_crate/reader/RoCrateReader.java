@@ -10,6 +10,7 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
@@ -158,7 +159,7 @@ public class RoCrateReader {
         .findFirst();
 
     maybeDescriptor.ifPresent(descriptor -> {
-      removeJsonNodeFromArrayNode(graph, descriptor);
+      JsonUtilFunctions.removeJsonNodeFromArrayNode(graph, descriptor);
       setCrateDescriptor(crate, descriptor);
 
       Optional<ObjectNode> maybeRoot = extractRoot(graph, descriptor);
@@ -172,7 +173,7 @@ public class RoCrateReader {
                 .setHasPart(hasPartIds)
                 .build());
 
-        removeJsonNodeFromArrayNode(graph, root);
+        JsonUtilFunctions.removeJsonNodeFromArrayNode(graph, root);
       });
     });
   }
@@ -211,15 +212,6 @@ public class RoCrateReader {
       hasPartIds.add(hasPartNode.path(PROP_ID).asText());
     }
     return hasPartIds;
-  }
-
-  private void removeJsonNodeFromArrayNode(ArrayNode array, JsonNode node) {
-    for (int i = 0; i < array.size(); i++) {
-      if (array.get(i).equals(node)) {
-        array.remove(i);
-        return;
-      }
-    }
   }
 
   private void setCrateDescriptor(RoCrate crate, JsonNode descriptor) {

@@ -122,4 +122,22 @@ public class JsonUtilFunctions {
     }
     return set;
   }
+
+  /**
+   * Removes the first instance in the given array that equals the given node.
+   * 
+   * @param array the array from which to remove the node
+   * @param node  the node to remove
+   * @return true if an equal node was found and removed, false if no equal node
+   *         was found.
+   */
+  public static boolean removeJsonNodeFromArrayNode(ArrayNode array, JsonNode node) {
+    for (int i = 0; i < array.size(); i++) {
+      if (array.get(i).equals(node)) {
+        array.remove(i);
+        return true;
+      }
+    }
+    return false;
+  }
 }
