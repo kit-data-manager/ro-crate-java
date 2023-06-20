@@ -145,22 +145,11 @@ public class RoCrateReader {
    *              extracted and removed from.
    */
   protected void moveRootEntitiesFromGraphToCrate(RoCrate crate, ArrayNode graph) {
-    // use the algorithm described here:
-    // https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
-    boolean isParallel = graph.size() > PARALLELIZATION_THRESHOLD;
-    Optional<JsonNode> maybeDescriptor = StreamSupport.stream(graph.spliterator(), isParallel)
-        // "2. if the conformsTo property is a URI that starts with
-        // https://w3id.org/ro/crate/"
-        .filter(node -> node.path(PROP_CONFORMS_TO).path(PROP_ID).asText().startsWith(SPECIFICATION_PREFIX))
-        // "3. from this entity’s about object keep the @id URI as variable root"
-        .filter(node -> node.path(PROP_ABOUT).path(PROP_ID).isTextual())
-        // There should be only one descriptor. If multiple exist, we take the first
-        // one.
-        .findFirst();
+    Optional<JsonNode> maybeDescriptor = getMetadataDescriptor(graph);
 
     maybeDescriptor.ifPresent(descriptor -> {
-      JsonUtilFunctions.removeJsonNodeFromArrayNode(graph, descriptor);
       setCrateDescriptor(crate, descriptor);
+      JsonUtilFunctions.removeJsonNodeFromArrayNode(graph, descriptor);
 
       Optional<ObjectNode> maybeRoot = extractRoot(graph, descriptor);
 
@@ -176,6 +165,35 @@ public class RoCrateReader {
         JsonUtilFunctions.removeJsonNodeFromArrayNode(graph, root);
       });
     });
+  }
+
+  /**
+   * Find the metadata descriptor.
+   * 
+   * Currently prefers algorithm of version 1.1 over the one of 1.2-DRAFT.
+   * 
+   * @param graph the graph to search the descriptor in.
+   * @return the metadata descriptor of the crate.
+   */
+  protected Optional<JsonNode> getMetadataDescriptor(ArrayNode graph) {
+    boolean isParallel = graph.size() > PARALLELIZATION_THRESHOLD;
+    // use the algorithm described here:
+    // https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
+    Optional<JsonNode> maybeDescriptor = StreamSupport.stream(graph.spliterator(), isParallel)
+        // "2. if the conformsTo property is a URI that starts with
+        // https://w3id.org/ro/crate/"
+        .filter(node -> node.path(PROP_CONFORMS_TO).path(PROP_ID).asText().startsWith(SPECIFICATION_PREFIX))
+        // "3. from this entity’s about object keep the @id URI as variable root"
+        .filter(node -> node.path(PROP_ABOUT).path(PROP_ID).isTextual())
+        // There should be only one descriptor. If multiple exist, we take the first
+        // one.
+        .findFirst();
+    return maybeDescriptor.or( () ->
+      // from https://www.researchobject.org/ro-crate/1.2-DRAFT/root-data-entity.html#finding-the-root-data-entity
+      StreamSupport.stream(graph.spliterator(), isParallel)
+          .filter(node -> node.path(PROP_ID).asText().equals(FILE_METADATA_JSON))
+          .findFirst()
+    );
   }
 
   /**
