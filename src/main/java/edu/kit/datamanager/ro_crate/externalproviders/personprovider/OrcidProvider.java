@@ -6,14 +6,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.validation.EntityValidation;
 import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
+import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.IOException;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for creating person entities from orcid uri.
@@ -23,6 +28,10 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class OrcidProvider {
 
+  private static Logger logger = LoggerFactory.getLogger(OrcidProvider.class);
+
+  private OrcidProvider() {}
+
   /**
    * Static method for importing a person entity from his ORCID id.
    *
@@ -30,14 +39,25 @@ public class OrcidProvider {
    * @return the created PersonEntity.
    */
   public static PersonEntity getPerson(String url) {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
     if (!url.startsWith("https://orcid.org")) {
       throw new IllegalArgumentException("Should provide orcid url");
     }
     HttpGet request = new HttpGet(url);
     request.addHeader(HttpHeaders.ACCEPT, "application/ld+json");
-    try {
+
+    try (
+      CloseableHttpClient httpClient = HttpClients.createDefault();
       CloseableHttpResponse response = httpClient.execute(request);
+    ) {
+      boolean isOk = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+      boolean isJson = response.containsHeader(HttpHeaders.CONTENT_TYPE)
+        && response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue() == ContentType.TEXT_HTML.toString();
+      if (isOk && isJson) {
+        String errorMessage = String.format("Identifier not found: %s", response.getStatusLine().toString());
+        logger.error(errorMessage);
+        return null;
+      }
+
       ObjectMapper objectMapper = MyObjectMapper.getMapper();
       ObjectNode jsonNode = objectMapper.readValue(response.getEntity().getContent(),
           ObjectNode.class);
@@ -54,8 +74,9 @@ public class OrcidProvider {
       }
       return new PersonEntity.PersonEntityBuilder().setAll(node).build();
     } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+      String errorMessage = String.format("IO error: %s", e.getMessage());
+      logger.error(errorMessage);
     }
+    return null;
   }
 }
