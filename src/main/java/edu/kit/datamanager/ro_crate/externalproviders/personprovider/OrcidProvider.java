@@ -51,7 +51,7 @@ public class OrcidProvider {
     ) {
       boolean isOk = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
       boolean isJson = response.containsHeader(HttpHeaders.CONTENT_TYPE)
-        && response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue() == ContentType.TEXT_HTML.toString();
+        && response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue().equals(ContentType.TEXT_HTML.toString());
       if (isOk && isJson) {
         String errorMessage = String.format("Identifier not found: %s", response.getStatusLine().toString());
         logger.error(errorMessage);
