@@ -8,6 +8,7 @@ import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
@@ -15,11 +16,13 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;
 import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +34,6 @@ import java.util.List;
  * @version 1
  */
 public class RoCrate implements Crate {
-
-  private static final String ID = "ro-crate-metadata.json";
-  private static final String RO_SPEC = "https://w3id.org/ro/crate/1.1";
 
   private final CratePayload roCratePayload;
   private CrateMetadataContext metadataContext;
@@ -81,7 +81,7 @@ public class RoCrate implements Crate {
     this.metadataContext = new RoCrateMetadataContext();
     rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
         .build();
-    jsonDescriptor = createDefaultJsonDescriptor();
+    jsonDescriptor = new JsonDescriptor();
   }
 
   /**
@@ -201,19 +201,10 @@ public class RoCrate implements Crate {
     return this.untrackedFiles;
   }
 
-  protected static ContextualEntity createDefaultJsonDescriptor() {
-    return new ContextualEntity.ContextualEntityBuilder()
-        .setId(ID)
-        .addType("CreativeWork")
-        .addIdProperty("about", "./")
-        .addIdProperty("conformsTo", RoCrate.RO_SPEC)
-        .build();
-  }
-
   /**
    * The inner class builder for the easier creation of a ROCrate.
    */
-  public static final class RoCrateBuilder {
+  public static class RoCrateBuilder {
 
     CratePayload payload;
     CratePreview preview;
@@ -237,7 +228,7 @@ public class RoCrate implements Crate {
           .addProperty("name", name)
           .addProperty("description", description)
           .build();
-      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
+      jsonDescriptor = new JsonDescriptor();
     }
 
     /**
@@ -250,7 +241,7 @@ public class RoCrate implements Crate {
       this.metadataContext = new RoCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .build();
-      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
+      jsonDescriptor = new JsonDescriptor();
     }
 
     /**
@@ -327,4 +318,57 @@ public class RoCrate implements Crate {
     }
   }
 
+  /**
+   * Builder for Crates, supporting all Features from v1.1 on.
+   */
+  public static class BuilderV1p1 extends RoCrateBuilder {
+    // for consistency
+  }
+
+  /**
+   * Builder for Crates, supporting all Features from v1.2 on.
+   * 
+   * NOTE: Changes may happen as this is a draft!
+   */
+  public static class BuilderV1p2Draft extends RoCrateBuilder {
+
+    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder()
+        .setVersion(CrateVersion.V1P2_DRAFT);
+
+    /**
+     * A default constructor without any params where the root data entity will be
+     * plain.
+     */
+    public BuilderV1p2Draft() {
+      this.payload = new RoCratePayload();
+      this.untrackedFiles = new ArrayList<>();
+      this.metadataContext = new RoCrateMetadataContext();
+      rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
+          .build();
+      jsonDescriptor = new JsonDescriptor.Builder()
+          .setVersion(CrateVersion.V1P2_DRAFT)
+          .build();
+    }
+
+    /**
+     * Indicate this crate also conforms to the given specification, in addition to
+     * the version this builder creates.
+     * 
+     * This is helpful for profiles or other specifications the crate conforms to.
+     * Can be called multiple times to add more specifications.
+     * 
+     * @param specification a specification or profile this crate conforms to.
+     * @return the builder
+     */
+    public BuilderV1p2Draft alsoConformsTo(URI specification) {
+      descriptorBuilder.addConformsTo(specification);
+      return this;
+    }
+
+    @Override
+    public RoCrate build() {
+      this.jsonDescriptor = this.descriptorBuilder.build();
+      return new RoCrate(this);
+    }
+  }
 }
