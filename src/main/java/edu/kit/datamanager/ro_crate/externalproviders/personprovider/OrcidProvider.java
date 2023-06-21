@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.validation.EntityValidation;
 import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
-import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.IOException;
