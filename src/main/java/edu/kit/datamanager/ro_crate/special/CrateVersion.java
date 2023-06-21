@@ -7,8 +7,8 @@ import java.util.Optional;
 /**
  * Represents a crate version and has information for each version available.
  * 
- * It offers also convenience functionality like version comparison using
- * "<", "==", "<=", etc.
+ * It offers also convenience functionality like version comparison similar to
+ * numbers.
  */
 public enum CrateVersion {
     // NOTE: Java defines compareTo for enums to work in the order of the defined
@@ -19,6 +19,7 @@ public enum CrateVersion {
     // data and read the comment below the versions.
     V1P1("https://w3id.org/ro/crate/1.1"),
     V1P2_DRAFT("https://w3id.org/ro/crate/1.2-DRAFT");
+
     // NOTE: Do not forget to adjust the following when adding a version:
     public static final CrateVersion LATEST_STABLE = CrateVersion.V1P1;
     public static final CrateVersion LATEST_UNSTABLE = CrateVersion.V1P2_DRAFT;
