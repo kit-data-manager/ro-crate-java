@@ -53,7 +53,7 @@ public enum CrateVersion {
      * Private constructor which is being used for the internally given information
      * above.
      * 
-     * @param spec
+     * @param spec the specification URI / conformsTo value
      */
     private CrateVersion(String spec) {
         this.conformsTo = spec;
