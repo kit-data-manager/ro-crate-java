@@ -104,7 +104,7 @@ public class RoCrate implements Crate {
     this.metadataContext = roCrateBuilder.metadataContext;
     this.roCratePreview = roCrateBuilder.preview;
     this.rootDataEntity = roCrateBuilder.rootDataEntity;
-    this.jsonDescriptor = roCrateBuilder.jsonDescriptor;
+    this.jsonDescriptor = roCrateBuilder.descriptorBuilder.build();
     this.untrackedFiles = roCrateBuilder.untrackedFiles;
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
     defaultValidation.validate(this);
@@ -252,8 +252,9 @@ public class RoCrate implements Crate {
     CrateMetadataContext metadataContext;
     ContextualEntity license;
     RootDataEntity rootDataEntity;
-    ContextualEntity jsonDescriptor;
     List<File> untrackedFiles;
+
+    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
 
     /**
      * The default constructor of a builder.
@@ -269,7 +270,6 @@ public class RoCrate implements Crate {
           .addProperty("name", name)
           .addProperty("description", description)
           .build();
-      jsonDescriptor = new JsonDescriptor();
     }
 
     /**
@@ -282,7 +282,6 @@ public class RoCrate implements Crate {
       this.metadataContext = new RoCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .build();
-      jsonDescriptor = new JsonDescriptor();
     }
 
     /**
@@ -295,8 +294,8 @@ public class RoCrate implements Crate {
       this.preview = crate.roCratePreview;
       this.metadataContext = crate.metadataContext;
       this.rootDataEntity = crate.rootDataEntity;
-      this.jsonDescriptor = crate.jsonDescriptor;
       this.untrackedFiles = crate.untrackedFiles;
+      this.descriptorBuilder = new JsonDescriptor.Builder(crate);
     }
 
     /**
@@ -377,8 +376,6 @@ public class RoCrate implements Crate {
    */
   public static class BuilderWithDraftFeatures extends RoCrateBuilder {
 
-    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
-
     /**
      * @see RoCrateBuilder#RoCrateBuilder()
      */
@@ -417,12 +414,6 @@ public class RoCrate implements Crate {
           // usage of a draft feature results in draft version numbers of the crate
           .setVersion(CrateVersion.LATEST_UNSTABLE);
       return this;
-    }
-
-    @Override
-    public RoCrate build() {
-      this.jsonDescriptor = this.descriptorBuilder.build();
-      return new RoCrate(this);
     }
   }
 }
