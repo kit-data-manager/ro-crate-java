@@ -306,13 +306,12 @@ public class AbstractEntity {
     }
 
     /**
-     * Setting the id property of the entity.
+     * Setting the id property of the entity, if the given value is not null.
      *
      * @param id the String representing the id.
      * @return the generic builder.
      */
     public T setId(String id) {
-      // TODO document why this has been implemented this way.
       if (id != null) {
         this.id = id;
       }

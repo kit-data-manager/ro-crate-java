@@ -1,5 +1,6 @@
 package edu.kit.datamanager.ro_crate;
 
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,6 +9,7 @@ import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
@@ -15,25 +17,32 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;
 import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * The class that represents a single ROCrate.
+ * 
+ * To build or modify it, use a instance of {@link RoCrateBuilder}. In the case
+ * features of RO-Crate DRAFT specifications are needed, refer to
+ * {@link BuilderWithDraftFeatures} and its documentation.
  *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
  */
 public class RoCrate implements Crate {
-
-  private static final String ID = "ro-crate-metadata.json";
-  private static final String RO_SPEC = "https://w3id.org/ro/crate/1.1";
 
   private final CratePayload roCratePayload;
   private CrateMetadataContext metadataContext;
@@ -81,7 +90,7 @@ public class RoCrate implements Crate {
     this.metadataContext = new RoCrateMetadataContext();
     rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
         .build();
-    jsonDescriptor = createDefaultJsonDescriptor();
+    jsonDescriptor = new JsonDescriptor();
   }
 
   /**
@@ -95,10 +104,42 @@ public class RoCrate implements Crate {
     this.metadataContext = roCrateBuilder.metadataContext;
     this.roCratePreview = roCrateBuilder.preview;
     this.rootDataEntity = roCrateBuilder.rootDataEntity;
-    this.jsonDescriptor = roCrateBuilder.jsonDescriptor;
+    this.jsonDescriptor = roCrateBuilder.descriptorBuilder.build();
     this.untrackedFiles = roCrateBuilder.untrackedFiles;
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
     defaultValidation.validate(this);
+  }
+
+  @Override
+  public Optional<CrateVersion> getVersion() {
+    JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
+    if (conformsTo.isArray()) {
+      return StreamSupport.stream(conformsTo.spliterator(), false)
+        .filter(TreeNode::isObject)
+        .map(obj -> obj.path("@id").asText())
+        .map(CrateVersion::fromSpecUri)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+    } else if (conformsTo.isObject()) {
+      return CrateVersion.fromSpecUri(conformsTo.get("@id").asText());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public Collection<String> getProfiles() {
+    JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
+    if (conformsTo.isArray()) {
+      return StreamSupport.stream(conformsTo.spliterator(), false)
+        .filter(TreeNode::isObject)
+        .map(obj -> obj.path("@id").asText())
+        .filter(txt -> !CrateVersion.fromSpecUri(txt).isPresent())
+        .collect(Collectors.toSet());
+    } else {
+      return Collections.emptySet();
+    }
   }
 
   @Override
@@ -201,27 +242,19 @@ public class RoCrate implements Crate {
     return this.untrackedFiles;
   }
 
-  protected static ContextualEntity createDefaultJsonDescriptor() {
-    return new ContextualEntity.ContextualEntityBuilder()
-        .setId(ID)
-        .addType("CreativeWork")
-        .addIdProperty("about", "./")
-        .addIdProperty("conformsTo", RoCrate.RO_SPEC)
-        .build();
-  }
-
   /**
    * The inner class builder for the easier creation of a ROCrate.
    */
-  public static final class RoCrateBuilder {
+  public static class RoCrateBuilder {
 
     CratePayload payload;
     CratePreview preview;
     CrateMetadataContext metadataContext;
     ContextualEntity license;
     RootDataEntity rootDataEntity;
-    ContextualEntity jsonDescriptor;
     List<File> untrackedFiles;
+
+    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
 
     /**
      * The default constructor of a builder.
@@ -237,7 +270,6 @@ public class RoCrate implements Crate {
           .addProperty("name", name)
           .addProperty("description", description)
           .build();
-      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
     }
 
     /**
@@ -250,7 +282,6 @@ public class RoCrate implements Crate {
       this.metadataContext = new RoCrateMetadataContext();
       rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
           .build();
-      jsonDescriptor = RoCrate.createDefaultJsonDescriptor();
     }
 
     /**
@@ -263,8 +294,8 @@ public class RoCrate implements Crate {
       this.preview = crate.roCratePreview;
       this.metadataContext = crate.metadataContext;
       this.rootDataEntity = crate.rootDataEntity;
-      this.jsonDescriptor = crate.jsonDescriptor;
       this.untrackedFiles = crate.untrackedFiles;
+      this.descriptorBuilder = new JsonDescriptor.Builder(crate);
     }
 
     /**
@@ -322,9 +353,67 @@ public class RoCrate implements Crate {
       return this;
     }
 
+    /**
+     * Returns a crate with the information from this builder.
+     */
     public RoCrate build() {
       return new RoCrate(this);
     }
   }
 
+  /**
+   * Builder for Crates, supporting features which are not in a final
+   * specification yet.
+   * 
+   * NOTE: This will change the specification version of your crate.
+   * 
+   * We only add features we expect to be in the new specification in the
+   * end.
+   * In case a feature will not make it into the specification, we will mark it as
+   * deprecated and remove it in new major versions.
+   * If a feature is finalized, it will be added to the stable
+   * {@link RoCrateBuilder} and marked as deprecated in this class.
+   */
+  public static class BuilderWithDraftFeatures extends RoCrateBuilder {
+
+    /**
+     * @see RoCrateBuilder#RoCrateBuilder()
+     */
+    public BuilderWithDraftFeatures() {
+      super();
+    }
+
+    /**
+     * @see RoCrateBuilder#RoCrateBuilder(String, String)
+     */
+    public BuilderWithDraftFeatures(String name, String description) {
+      super();
+    }
+
+    /**
+     * @see RoCrateBuilder#RoCrateBuilder(RoCrate)
+     */
+    public BuilderWithDraftFeatures(RoCrate crate) {
+      super(crate);
+      this.descriptorBuilder = new JsonDescriptor.Builder(crate);
+    }
+
+    /**
+     * Indicate this crate also conforms to the given specification, in addition to
+     * the version this builder adds.
+     * 
+     * This is helpful for profiles or other specifications the crate conforms to.
+     * Can be called multiple times to add more specifications.
+     * 
+     * @param specification a specification or profile this crate conforms to.
+     * @return the builder
+     */
+    public BuilderWithDraftFeatures alsoConformsTo(URI specification) {
+      descriptorBuilder
+          .addConformsTo(specification)
+          // usage of a draft feature results in draft version numbers of the crate
+          .setVersion(CrateVersion.LATEST_UNSTABLE);
+      return this;
+    }
+  }
 }
