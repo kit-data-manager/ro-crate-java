@@ -7,6 +7,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
 
@@ -44,6 +45,15 @@ public class JsonDescriptor extends ContextualEntity {
     public static final class Builder {
         CrateVersion version = CrateVersion.LATEST_STABLE;
         Set<String> otherConformsToValues = new HashSet<>();
+
+        public Builder() {
+            // default
+        }
+
+        public Builder(Crate crate) {
+            crate.getVersion().ifPresent(v -> this.version = v);
+            this.otherConformsToValues.addAll(crate.getProfiles());
+        }
 
         public Builder setVersion(CrateVersion version) {
             this.version = version;

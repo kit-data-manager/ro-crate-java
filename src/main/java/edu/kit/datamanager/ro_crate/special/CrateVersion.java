@@ -45,7 +45,7 @@ public enum CrateVersion {
      *                   https://w3id.org/ro/crate/1.1
      * @return the matching CrateVersion enum, if the URI matches any. Empty if not.
      */
-    public Optional<CrateVersion> fromSpecUri(String conformsTo) {
+    public static Optional<CrateVersion> fromSpecUri(String conformsTo) {
         return Optional.ofNullable(crateVersionOfConformsTo(conformsTo));
     }
 

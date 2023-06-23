@@ -1,5 +1,6 @@
 package edu.kit.datamanager.ro_crate;
 
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,7 +26,12 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 
 /**
  * The class that represents a single ROCrate.
@@ -99,6 +105,38 @@ public class RoCrate implements Crate {
     this.untrackedFiles = roCrateBuilder.untrackedFiles;
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
     defaultValidation.validate(this);
+  }
+
+  @Override
+  public Optional<CrateVersion> getVersion() {
+    JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
+    if (conformsTo.isArray()) {
+      return StreamSupport.stream(conformsTo.spliterator(), false)
+        .filter(TreeNode::isObject)
+        .map(obj -> obj.path("@id").asText())
+        .map(CrateVersion::fromSpecUri)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+    } else if (conformsTo.isObject()) {
+      return CrateVersion.fromSpecUri(conformsTo.get("@id").asText());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public Collection<String> getProfiles() {
+    JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
+    if (conformsTo.isArray()) {
+      return StreamSupport.stream(conformsTo.spliterator(), false)
+        .filter(TreeNode::isObject)
+        .map(obj -> obj.path("@id").asText())
+        .filter(txt -> !CrateVersion.fromSpecUri(txt).isPresent())
+        .collect(Collectors.toSet());
+    } else {
+      return Collections.emptySet();
+    }
   }
 
   @Override
@@ -319,40 +357,51 @@ public class RoCrate implements Crate {
   }
 
   /**
-   * Builder for Crates, supporting all Features from v1.1 on.
-   */
-  public static class BuilderV1p1 extends RoCrateBuilder {
-    // for consistency
-  }
-
-  /**
-   * Builder for Crates, supporting all Features from v1.2 on.
+   * Builder for Crates, supporting features which are not in a final
+   * specification yet.
    * 
-   * NOTE: Changes may happen as this is a draft!
+   * NOTE: This will change the specification version of your crate.
+   * 
+   * We only add features we expect to be in the new specification in the
+   * end.
+   * In case a feature will not make it into the specification, we will mark it as
+   * deprecated and remove it in new major versions.
+   * If a feature is finalized, it will be added to the stable
+   * {@link RoCrateBuilder} and marked as deprecated in this class.
    */
-  public static class BuilderV1p2Draft extends RoCrateBuilder {
+  public static class BuilderWithDraftFeatures extends RoCrateBuilder {
 
-    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder()
-        .setVersion(CrateVersion.V1P2_DRAFT);
+    JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
 
     /**
-     * A default constructor without any params where the root data entity will be
-     * plain.
+     * {@inheritDoc}
+     * @see RoCrateBuilder#RoCrateBuilder()
      */
-    public BuilderV1p2Draft() {
-      this.payload = new RoCratePayload();
-      this.untrackedFiles = new ArrayList<>();
-      this.metadataContext = new RoCrateMetadataContext();
-      rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
-          .build();
-      jsonDescriptor = new JsonDescriptor.Builder()
-          .setVersion(CrateVersion.V1P2_DRAFT)
-          .build();
+    public BuilderWithDraftFeatures() {
+      super();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param name {@inheritDoc}
+     * @param description {@inheritDoc}
+     */
+    public BuilderWithDraftFeatures(String name, String description) {
+      super();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param crate {@inheritDoc}
+     */
+    public BuilderWithDraftFeatures(RoCrate crate) {
+      super(crate);
+      this.descriptorBuilder = new JsonDescriptor.Builder(crate);
     }
 
     /**
      * Indicate this crate also conforms to the given specification, in addition to
-     * the version this builder creates.
+     * the version this builder adds.
      * 
      * This is helpful for profiles or other specifications the crate conforms to.
      * Can be called multiple times to add more specifications.
@@ -360,8 +409,11 @@ public class RoCrate implements Crate {
      * @param specification a specification or profile this crate conforms to.
      * @return the builder
      */
-    public BuilderV1p2Draft alsoConformsTo(URI specification) {
-      descriptorBuilder.addConformsTo(specification);
+    public BuilderWithDraftFeatures alsoConformsTo(URI specification) {
+      descriptorBuilder
+          .addConformsTo(specification)
+          // usage of a draft feature results in draft version numbers of the crate
+          .setVersion(CrateVersion.LATEST_UNSTABLE);
       return this;
     }
 

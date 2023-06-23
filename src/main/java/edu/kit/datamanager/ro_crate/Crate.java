@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
@@ -10,6 +11,7 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.special.CrateVersion;
 
 /**
  * An interface describing an ROCrate.
@@ -18,6 +20,33 @@ import edu.kit.datamanager.ro_crate.preview.CratePreview;
  * @version 1
  */
 public interface Crate {
+
+  /**
+   * Read version from the crate descriptor and return it as a class
+   * representation.
+   * 
+   * NOTE: If there is not version in the crate, it does not comply with the
+   * specification.
+   * 
+   * @return the class representation indication the version of this crate, if
+   *         available.
+   */
+  public Optional<CrateVersion> getVersion();
+
+  /**
+   * Returns strings indicating the conformance of a crate with other
+   * specifications than the RO-Crate version.
+   * 
+   * If you need the crate version too, refer to {@link #getVersion()}.
+   * 
+   * This corresponds technically to all conformsTo values, excluding the RO crate
+   * version / specification.
+   * 
+   * @return a collection of the profiles or specifications this crate conforms
+   *         to.
+   */
+  public Collection<String> getProfiles();
+
   CratePreview getPreview();
 
   void setMetadataContext(CrateMetadataContext metadataContext);
