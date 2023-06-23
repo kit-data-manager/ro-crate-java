@@ -92,4 +92,20 @@ public enum CrateVersion {
         }
         return null;
     }
+
+    public boolean isGreaterThan(CrateVersion other) {
+        return this.compareTo(other) > 0;
+    }
+
+    public boolean isGreaterOrEqualThan(CrateVersion other) {
+        return this.compareTo(other) >= 0;
+    }
+
+    public boolean isLowerThan(CrateVersion other) {
+        return this.compareTo(other) < 0;
+    }
+
+    public boolean isLowerOrEqualThan(CrateVersion other) {
+        return this.compareTo(other) <= 0;
+    }
 }
