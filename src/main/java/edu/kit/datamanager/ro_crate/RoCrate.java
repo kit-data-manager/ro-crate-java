@@ -32,9 +32,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
 /**
  * The class that represents a single ROCrate.
+ * 
+ * To build or modify it, use a instance of {@link RoCrateBuilder}. In the case
+ * features of RO-Crate DRAFT specifications are needed, refer to
+ * {@link BuilderWithDraftFeatures} and its documentation.
  *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
@@ -351,6 +354,9 @@ public class RoCrate implements Crate {
       return this;
     }
 
+    /**
+     * @return a crate with the information from this builder.
+     */
     public RoCrate build() {
       return new RoCrate(this);
     }
@@ -374,7 +380,6 @@ public class RoCrate implements Crate {
     JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
 
     /**
-     * {@inheritDoc}
      * @see RoCrateBuilder#RoCrateBuilder()
      */
     public BuilderWithDraftFeatures() {
@@ -382,17 +387,14 @@ public class RoCrate implements Crate {
     }
 
     /**
-     * {@inheritDoc}
-     * @param name {@inheritDoc}
-     * @param description {@inheritDoc}
+     * @see RoCrateBuilder#RoCrateBuilder(String, String)
      */
     public BuilderWithDraftFeatures(String name, String description) {
       super();
     }
 
     /**
-     * {@inheritDoc}
-     * @param crate {@inheritDoc}
+     * @see RoCrateBuilder#RoCrateBuilder(RoCrate)
      */
     public BuilderWithDraftFeatures(RoCrate crate) {
       super(crate);
