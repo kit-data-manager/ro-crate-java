@@ -354,7 +354,7 @@ public class RoCrate implements Crate {
     }
 
     /**
-     * @return a crate with the information from this builder.
+     * Returns a crate with the information from this builder.
      */
     public RoCrate build() {
       return new RoCrate(this);
