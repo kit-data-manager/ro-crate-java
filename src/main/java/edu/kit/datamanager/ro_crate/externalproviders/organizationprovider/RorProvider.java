@@ -41,8 +41,8 @@ public class RorProvider {
       CloseableHttpClient httpClient = HttpClients.createDefault();
       CloseableHttpResponse response = httpClient.execute(request);
     ) {
-        boolean isOk = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
-        if (isOk) {
+        boolean isError = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+        if (isError) {
           String errorMessage = String.format("Identifier not found: %s", response.getStatusLine().toString());
           logger.error(errorMessage);
           return null;

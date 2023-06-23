@@ -48,10 +48,11 @@ public class OrcidProvider {
       CloseableHttpClient httpClient = HttpClients.createDefault();
       CloseableHttpResponse response = httpClient.execute(request);
     ) {
-      boolean isOk = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
-      boolean isJson = response.containsHeader(HttpHeaders.CONTENT_TYPE)
-        && response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue().equals(ContentType.TEXT_HTML.toString());
-      if (isOk && isJson) {
+      boolean isError = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+      String receivedMimeType = ContentType.parse(response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue()).getMimeType();
+      boolean isUnexpectedFormat = response.containsHeader(HttpHeaders.CONTENT_TYPE)
+        && !receivedMimeType.equals("application/ld+json");
+      if (isError || isUnexpectedFormat) {
         String errorMessage = String.format("Identifier not found: %s", response.getStatusLine().toString());
         logger.error(errorMessage);
         return null;
