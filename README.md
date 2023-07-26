@@ -8,8 +8,14 @@
 A Java library to create and modify RO-Crates.
 The aim of this implementation is to **not** require too deep knowledge of the specification,
 and avoiding crates which do not fully comply to the specification, at the same time.
-Read [Quick-start](#quick-start) for a short overview of the API
-or take a look at [how to adapt the examples from the official specification](#adapting-the-specification-examples).
+
+## Use it in your application
+
+- [Instructions for your build manager (e.g., Gradle, Maven, etc.)](https://central.sonatype.com/artifact/edu.kit.datamanager/ro-crate-java/1.1.0)
+- [Quick-Start](#quick-start)
+- [Adapting Specification Examples](#adapting-the-specification-examples)
+
+## Build the library / documentation
 
 Build and run tests: `./gradlew build`  
 Build documentation: `./gradlew javadoc`
