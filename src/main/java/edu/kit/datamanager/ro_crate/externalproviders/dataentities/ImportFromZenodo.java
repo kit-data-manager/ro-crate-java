@@ -32,10 +32,12 @@ public class ImportFromZenodo {
    * @param url the url of the zenodo resource.
    * @param name the name of the crate created.
    * @param description the description of the crate created.
+   * @param datePublished the published date of the crate.
+   * @param licenseId the license identifier of the crate.
    * @return the created crate.
    */
-  public static Crate createCrateWithItem(String url, String name, String description) {
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+  public static Crate createCrateWithItem(String url, String name, String description, String datePublished, String licenseId) {
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     addToCrateFromZotero(url, crate);
     return crate;
   }
