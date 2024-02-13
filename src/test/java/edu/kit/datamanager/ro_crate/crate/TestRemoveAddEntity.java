@@ -17,7 +17,7 @@ import java.io.IOException;
 public class TestRemoveAddEntity {
   @Test
   void testAddRemoveEntity() throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -59,7 +59,7 @@ public class TestRemoveAddEntity {
         .build();
 
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity")
+        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addContextualEntity(place)
         .addContextualEntity(person)
         .addDataEntity(file)
@@ -86,7 +86,7 @@ public class TestRemoveAddEntity {
     assertEquals(0, roCrate.getAllContextualEntities().size());
 
     RoCrate roCrate2 = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity").build();
+        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/").build();
     HelpFunctions.compareTwoCrateJson(roCrate, roCrate2);
   }
 
@@ -112,7 +112,7 @@ public class TestRemoveAddEntity {
         .build();
 
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity")
+        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addContextualEntity(place)
         .addContextualEntity(person)
         .addDataEntity(file)
@@ -132,7 +132,7 @@ public class TestRemoveAddEntity {
         .setId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
         .build();
-    RoCrate second2 = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
+    RoCrate second2 = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(file2)
         .build();
 

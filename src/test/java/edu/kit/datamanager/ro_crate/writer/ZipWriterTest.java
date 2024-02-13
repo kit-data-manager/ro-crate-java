@@ -57,7 +57,7 @@ public class ZipWriterTest {
 
     // create the RO_Crate including the files that should be present in it
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity")
+        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("cp7glop.ai")
@@ -131,7 +131,7 @@ public class ZipWriterTest {
     FileUtils.writeStringToFile(falseFile.toFile(), "this file contains something else", Charset.defaultCharset());
     // create the RO_Crate including the files that should be present in it
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity")
+        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("cp7glop.ai")
