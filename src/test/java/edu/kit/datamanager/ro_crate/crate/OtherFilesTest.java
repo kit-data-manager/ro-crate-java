@@ -18,15 +18,13 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Disabled;
 
-@Disabled("Disabled while issues are being fixed!")
 public class OtherFilesTest {
 
   /**
    * Test if adding untracked files to the crate a being included inside it
    */
-    @Test
+  @Test
   void testOtherFiles(@TempDir Path tempDir) throws IOException, URISyntaxException {
     Path crate = tempDir.resolve("crate");
     Path file1 = tempDir.resolve("file1.txt");

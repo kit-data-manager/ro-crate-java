@@ -18,7 +18,6 @@ import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
 import edu.kit.datamanager.ro_crate.preview.PreviewGenerator;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -90,7 +89,6 @@ public class FolderWriterTest {
     assertTrue(Files.isRegularFile(result.resolve(fileWithoutID.getFileName())));
   }
 
-  @Disabled("Disabled while issues are being fixed!")
   @Test
   void writeToFolderTest(@TempDir Path tempDir) throws IOException {
     RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
@@ -154,8 +152,7 @@ public class FolderWriterTest {
     // just so we know the metadata is still valid
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/fileAndDir.json");
   }
-  
-  @Disabled("Disabled while issues are being fixed!")
+
   @Test
   void writeToFolderWrongTest(@TempDir Path tempDir) throws IOException {
     RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
