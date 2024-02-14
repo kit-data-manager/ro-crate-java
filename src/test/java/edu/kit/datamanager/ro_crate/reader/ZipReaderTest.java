@@ -23,7 +23,7 @@ public class ZipReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .build();
 
     Path zipPath = temp.resolve("result.zip");
@@ -46,7 +46,7 @@ public class ZipReaderTest {
     Path cvs = temp.resolve("survey-responses-2019.csv");
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setSource(cvs.toFile())
@@ -75,7 +75,7 @@ public class ZipReaderTest {
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")
@@ -114,7 +114,7 @@ public class ZipReaderTest {
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("file.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("survey-responses-2019.csv")

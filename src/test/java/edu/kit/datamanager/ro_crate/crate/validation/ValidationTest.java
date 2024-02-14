@@ -25,7 +25,7 @@ public class ValidationTest {
 
   @Test
   void jsonSchemaValidationTest() throws IOException, URISyntaxException {
-    Crate crate = new RoCrate.RoCrateBuilder("workflowCrate", "this is a test", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    Crate crate = new RoCrate.RoCrateBuilder("workflowCrate", "this is a test")
         .addDataEntity(
             new WorkflowEntity.WorkflowEntityBuilder()
                 .setId("https://www.example.com/entity")

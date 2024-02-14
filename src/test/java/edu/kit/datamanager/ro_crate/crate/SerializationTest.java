@@ -25,14 +25,14 @@ public class SerializationTest {
 
   @Test
   void simpleROCrateSerialization() throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .build();
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
   }
 
   @Test
   void simpleTestWithBonusContextPair() throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addValuePairToContext("@test", "ww.test")
         .build();
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple2.json");
@@ -43,7 +43,7 @@ public class SerializationTest {
     Path cvs = temp.resolve("survey-responses-2019.csv");
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setSource(cvs.toFile())
@@ -63,7 +63,7 @@ public class SerializationTest {
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
 
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setSource(cvs.toFile())
@@ -110,7 +110,7 @@ public class SerializationTest {
 
 
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+        "The RO-Crate Root Data Entity")
         .addContextualEntity(place)
         .addContextualEntity(person)
         .addDataEntity(file)
@@ -135,7 +135,7 @@ public class SerializationTest {
     Path folder = temp.resolve("folder");
     FileUtils.forceMkdir(folder.toFile());
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
-        "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+        "The RO-Crate Root Data Entity")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
                 .setId("cp7glop.ai")
@@ -234,7 +234,7 @@ public class SerializationTest {
     FileUtils.writeStringToFile(pdf.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
 
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Air quality measurements in Karlsruhe",
-        "Air quality measurements conducted in different places across Karlsruhe", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+        "Air quality measurements conducted in different places across Karlsruhe")
         .setLicense(license)
         .addContextualEntity(license)
         .addContextualEntity(geo)

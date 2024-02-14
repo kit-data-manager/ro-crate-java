@@ -33,7 +33,7 @@ public class OtherFilesTest {
     FileUtils.touch(file2.toFile());
     FileUtils.writeStringToFile(file1.toFile(), "content of file 1", Charset.defaultCharset());
     FileUtils.writeStringToFile(file2.toFile(), "content of file 2", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
         .addUntrackedFile(file1.toFile())
         .addUntrackedFile(file2.toFile())
         .build();
