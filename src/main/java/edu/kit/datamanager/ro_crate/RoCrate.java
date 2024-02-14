@@ -390,7 +390,7 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * @see RoCrateBuilder#RoCrateBuilder(String, String)
+         * @see RoCrateBuilder#RoCrateBuilder(String, String, String, String)
          */
         public BuilderWithDraftFeatures(String name, String description) {
             super();
