@@ -10,12 +10,11 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.special.UriUtil;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -101,7 +100,7 @@ public class RoCrateReader {
   }
 
   private File checkFolderHasFile(String id, File file) {
-    Path path = file.toPath().resolve(URLDecoder.decode(id, StandardCharsets.UTF_8));
+    Path path = file.toPath().resolve(UriUtil.decode(id).get());
     if (path.toFile().exists()) {
       return path.toFile();
     }

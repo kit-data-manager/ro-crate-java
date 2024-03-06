@@ -4,19 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.decode;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.isUrl;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 
 /**
  * The base class of every data entity.
@@ -34,16 +32,15 @@ public class DataEntity extends AbstractEntity {
    *
    * @param entityBuilder the builder passed as argument.
    */
-  public DataEntity(AbstractDataEntityBuilder<?> entityBuilder) {
+  public DataEntity(AbstractDataEntityBuilder<?> entityBuilder){
     super(entityBuilder);
     if (!entityBuilder.authors.isEmpty()) {
       this.addIdListProperties("author", entityBuilder.authors);
     }
     this.source = entityBuilder.location;
-    if (this.getSource() == null) {
-      UrlValidator urlValidator = new UrlValidator();
-      if (!urlValidator.isValid(URLDecoder.decode(this.getId(), StandardCharsets.UTF_8))) {
-        System.out.println("This Data Entity remote ID does not resolve to a valid URL.");
+    if (this.getSource() == null) {  
+      if (!isUrl(decode(this.getId()).get())) {
+       throw new IllegalArgumentException("This Data Entity remote ID does not resolve to a valid URL.");
       }
     }
   }
@@ -101,7 +98,7 @@ public class DataEntity extends AbstractEntity {
     public T setSource(File file) {
       if (file != null) {
         if (this.getId() == null) {
-          this.setId(URLEncoder.encode(file.getName(), StandardCharsets.UTF_8));
+                this.setId(file.getName());
         }
         this.location = file;
       }
@@ -143,7 +140,7 @@ public class DataEntity extends AbstractEntity {
     }
 
     @Override
-    public DataEntity build() {
+    public DataEntity build(){
       return new DataEntity(this);
     }
   }
