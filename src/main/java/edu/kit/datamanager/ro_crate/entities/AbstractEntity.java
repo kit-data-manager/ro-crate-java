@@ -14,6 +14,7 @@ import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.Observer;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.isEncoded;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -315,8 +316,14 @@ public class AbstractEntity {
          * @return the generic builder.
          */
         public T setId(String id) {
+
+            // TODO document why this has been implemented this way.
             if (id != null) {
-                this.id = id;
+                if (isEncoded(id)) {
+                    this.id=id;
+                } else {
+                    throw new IllegalArgumentException("The ID is not correctly encoded.");
+                }
             }
             return self();
         }
@@ -353,7 +360,7 @@ public class AbstractEntity {
          * Adding a property to the builder.
          *
          * @param key the key of the property in a string.
-         * @param value the JsonNode value of the property.
+         * @param value the JsonNode value of te property.
          * @return the generic builder.
          */
         public T addProperty(String key, JsonNode value) {
@@ -401,6 +408,7 @@ public class AbstractEntity {
             return self();
         }
 
+
         public T addProperty(String key, double value) {
             this.properties.put(key, value);
             return self();
@@ -410,6 +418,7 @@ public class AbstractEntity {
             this.properties.put(key, value);
             return self();
         }
+      
         /**
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one. Instead of:
