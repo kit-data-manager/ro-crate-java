@@ -26,14 +26,14 @@ public class DataCiteImportTest {
     var crate = ImportFromDataCite
         .createCrateFromDataCiteResource(
             "https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669",
-            "importedCrate", "description");
+            "importedCrate", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/");
     Validator validator = new Validator(new JsonSchemaValidation());
     assertTrue(validator.validate(crate));
   }
 
   @Test
   void dataCiteImportToExistingCrate() {
-    var crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    var crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/").build();
     ImportFromDataCite.addDataCiteToCrate("https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669", crate);
     Validator validator = new Validator(new JsonSchemaValidation());
     assertTrue(validator.validate(crate));
@@ -51,7 +51,7 @@ public class DataCiteImportTest {
       jsonNode = objectMapper.readValue(response.getEntity().getContent(),
           JsonNode.class);
 
-      var crate = ImportFromDataCite.createCrateFromDataCiteJson(jsonNode, "name", "description");
+      var crate = ImportFromDataCite.createCrateFromDataCiteJson(jsonNode, "name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/");
       Validator validator = new Validator(new JsonSchemaValidation());
       assertTrue(validator.validate(crate));
 

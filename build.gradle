@@ -4,7 +4,7 @@ plugins {
 
     id 'jacoco'
     // Adds coveralls task for CI to send results to the coveralls service.
-    id "com.github.kt3k.coveralls" version "2.12.0"
+    id "com.github.kt3k.coveralls" version "2.12.2"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
@@ -12,7 +12,7 @@ plugins {
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
 }
 
 group 'edu.kit.datamanager'
@@ -26,30 +26,34 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    jacksonVersion  = '2.16.1'
+}
+
 dependencies {
     // JUnit setup for testing
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation('org.junit.jupiter:junit-jupiter')
-    testImplementation('org.junit.jupiter:junit-jupiter-params')
+    testImplementation(platform("org.junit:junit-bom:5.10.1"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // JSON object mapping / (de-)serialization
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     // http client
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
     // read from and write to zip files
-    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.2'
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:4.5'
+    implementation 'com.github.fslev:json-compare:6.13'
     // url validator
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.8.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.3'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.9'
     // JSON-LD, Zenodo mapping
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.1'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.3'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.73"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.1.0"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
 

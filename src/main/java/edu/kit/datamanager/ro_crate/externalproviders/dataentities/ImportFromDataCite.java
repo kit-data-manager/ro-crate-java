@@ -48,12 +48,14 @@ public class ImportFromDataCite {
   https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669
    * @param name        the name the crate should have.
    * @param description the description of the crate.
+   * @param datePublished the published date of the crate.
+   * @param licenseId the license identifier of the crate.
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteResource(
-      String url, String name, String description) {
+      String url, String name, String description, String datePublished, String licenseId) {
 
-    Crate crate = new RoCrate.RoCrateBuilder(name, description)
+    Crate crate = new RoCrate.RoCrateBuilder(name, description, datePublished, licenseId)
         .build();
     addDataCiteToCrate(url, crate);
     return crate;
@@ -78,11 +80,13 @@ public class ImportFromDataCite {
    * @param json the Json object of the DataCite resource.
    * @param name the name of the crate that will be created.
    * @param description the description of the crate that will be created.
+   * @param datePublished the published date of the crate.
+   * @param licenseId the license identifier of the crate.
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteJson(
-      JsonNode json, String name, String description) {
-    Crate crate = new RoCrate.RoCrateBuilder(name, description)
+      JsonNode json, String name, String description, String datePublished, String licenseId) {
+    Crate crate = new RoCrate.RoCrateBuilder(name, description, datePublished, licenseId)
         .build();
     addDataCiteToCrateFromJson(json, crate);
     return crate;

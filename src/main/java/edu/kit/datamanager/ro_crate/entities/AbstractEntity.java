@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Abstract Entity parent class of every singe item in the json metadata file.
@@ -92,7 +94,6 @@ public class AbstractEntity {
 
     /**
      * Returns the types of this entity.
-     *
      * @return a set of type strings.
      */
     public Set<String> getTypes() {
@@ -308,12 +309,14 @@ public class AbstractEntity {
         }
 
         /**
-         * Setting the id property of the entity.
+         * Setting the id property of the entity, if the given value is not
+         * null.
          *
          * @param id the String representing the id.
          * @return the generic builder.
          */
         public T setId(String id) {
+
             // TODO document why this has been implemented this way.
             if (id != null) {
                 if (isEncoded(id)) {
@@ -367,15 +370,44 @@ public class AbstractEntity {
             return self();
         }
 
+        /**
+         * Adding a property to the builder. If the key of the property is
+         * "datePublished", then the value must match the ISO 8601 date format.
+         *
+         * @param key the key of the property as a string.
+         * @param value the value of the property as a string.
+         * @return the generic builder.
+         */
         public T addProperty(String key, String value) {
-            this.properties.put(key, value);
+            if (key.equalsIgnoreCase("datePublished")) {
+                matchStringwithISODateFormat(value);
+                this.properties.put(key, value);
+            } else {
+                this.properties.put(key, value);
+            }
             return self();
+        }
+
+        /**
+         * checks if the date matches the ISO 8601 date format. If not, an
+         * exception is thrown.
+         *
+         * @param date the date as a string
+         */
+        private void matchStringwithISODateFormat(String date) {
+            String regex = "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(date);
+            if (!matcher.matches()) {
+                throw new RuntimeException("DatePublished MUST be a string in ISO 8601 format");
+            }
         }
 
         public T addProperty(String key, int value) {
             this.properties.put(key, value);
             return self();
         }
+
 
         public T addProperty(String key, double value) {
             this.properties.put(key, value);
@@ -386,7 +418,7 @@ public class AbstractEntity {
             this.properties.put(key, value);
             return self();
         }
-
+      
         /**
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one. Instead of:

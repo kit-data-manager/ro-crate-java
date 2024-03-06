@@ -6,13 +6,29 @@
 [![Publish to Maven Central / OSSRH](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/publishRelease.yml/badge.svg)](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/publishRelease.yml)
 
 A Java library to create and modify RO-Crates.
-Read [Quickstart](#quickstart) for a short overview of the API
-or take a look at [how to adapt the examples from the official specification](#adapting-the-specification-examples).
+The aim of this implementation is to **not** require too deep knowledge of the specification,
+and avoiding crates which do not fully comply to the specification, at the same time.
+
+## Use it in your application
+
+- [Instructions for your build manager (e.g., Gradle, Maven, etc.)](https://central.sonatype.com/artifact/edu.kit.datamanager/ro-crate-java/1.1.0)
+- [Quick-Start](#quick-start)
+- [Adapting Specification Examples](#adapting-the-specification-examples)
+- [Related Publications](https://publikationen.bibliothek.kit.edu/publikationslisten/get.php?referencing=all&external_publications=kit&lang=de&format=html&style=kit-3lines-title_b-authors-other&consider_suborganizations=true&order=desc%20year&contributors=%5B%5B%5B%5D%2C%5B%22p20751.105%22%5D%5D%5D&title_contains=crate)
+
+## Build the library / documentation
 
 Build and run tests: `./gradlew build`  
 Build documentation: `./gradlew javadoc`
 
 On Windows, replace `./gradlew` with `gradlew.bat`.
+
+## RO-Crate Specification Compatibility
+
+- ✅ Version 1.1
+- 🛠️ Version 1.2-DRAFT
+  - ✅ Reading and writing crates with additional profiles or specifications ([examples for reading](src/test/java/edu/kit/datamanager/ro_crate/reader/RoCrateReaderSpec12Test.java), [examples for writing](src/test/java/edu/kit/datamanager/ro_crate/writer/RoCrateWriterSpec12Test.java))
+  - ✅ Adding profiles or other specifications to a crate ([examples](src/test/java/edu/kit/datamanager/ro_crate/crate/BuilderSpec12Test.java))
 
 ## Quick-start
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
