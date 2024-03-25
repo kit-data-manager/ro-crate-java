@@ -28,7 +28,7 @@ public class JsonDescriptor extends ContextualEntity {
 
     protected static ContextualEntityBuilder staticPropertiesPrefilledBuilder() {
         return new ContextualEntity.ContextualEntityBuilder()
-                .setId(ID)
+                .addId(ID)
                 .addType("CreativeWork")
                 .addIdProperty("about", "./");
     }

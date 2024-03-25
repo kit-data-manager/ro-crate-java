@@ -11,12 +11,11 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.decode;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,13 +95,14 @@ public class RoCrateReader {
           File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
-          }
+            
           // data entity
           DataEntity dataEntity = new DataEntity.DataEntityBuilder()
               .setAll(node.deepCopy())
-              .setSource(loc)
+              .addContent(loc.toPath(), loc.getName())
               .build();
           crate.addDataEntity(dataEntity, false);
+          }
         } else {
           // contextual entity
           crate.addContextualEntity(
@@ -124,7 +124,7 @@ public class RoCrateReader {
   }
 
   protected File checkFolderHasFile(String id, File file) {
-    Path path = file.toPath().resolve(URLDecoder.decode(id, StandardCharsets.UTF_8));
+    Path path = file.toPath().resolve(decode(id).get());
     if (path.toFile().exists()) {
       return path.toFile();
     }

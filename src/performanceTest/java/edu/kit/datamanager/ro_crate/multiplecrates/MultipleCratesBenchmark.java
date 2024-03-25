@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import java.nio.file.Paths;
 
 /**
  * A benchmark for creating multiple crates with the same entities.
@@ -45,14 +46,14 @@ public class MultipleCratesBenchmark {
 
     Instant start = Instant.now();
     for (int i = 0; i < numCrates; i++) {
-      RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+      RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
       for (int j = 0; j < numEntitiesProCrate; j++) {
         PersonEntity person = new PersonEntity.PersonEntityBuilder()
-            .setId("#id" + i + j)
+            .addId("#id" + i + j)
             .addProperty("name", "Joe")
             .build();
         DataEntity file = new DataEntity.DataEntityBuilder()
-            .setSource(new File(baseLocation + "file" + j))
+            .addContent(Paths.get(baseLocation + "file" + j))
             .addType("File")
             .addIdProperty("author", person)
             .build();
