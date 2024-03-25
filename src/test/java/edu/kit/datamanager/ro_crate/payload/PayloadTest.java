@@ -41,7 +41,7 @@ public class PayloadTest {
   @Test
   void testAddDataEntity() {
     var dataEntity = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity")
+        .addId("https://www.example.com/entity")
         .addProperty("description", "yes")
         .build();
 
@@ -57,13 +57,13 @@ public class PayloadTest {
   @Test
   void addAnyEntity() {
     var dataEntity = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addType("CreativeWork")
         .addProperty("description", "yes")
         .build();
 
     var contextualEntity= new PersonEntity.PersonEntityBuilder()
-        .setId("https://www.example.com/entity2")
+        .addId("https://www.example.com/entity2")
         .addProperty("description", "yes")
         .build();
 
@@ -82,11 +82,11 @@ public class PayloadTest {
   void testAddEntitiesFromCollection() {
 
     var contextualEntity1= new PersonEntity.PersonEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addProperty("description", "yes")
         .build();
     var contextualEntity2= new PersonEntity.PersonEntityBuilder()
-        .setId("https://www.example.com/entity2")
+        .addId("https://www.example.com/entity2")
         .addProperty("description", "yes")
         .build();
 
@@ -103,12 +103,12 @@ public class PayloadTest {
   @Test
   void addSameIdTest() {
     var dataEntity1 = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addProperty("description", "yes")
         .build();
 
     var dataEntity2 = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addProperty("description", "different")
         .build();
 
@@ -122,12 +122,12 @@ public class PayloadTest {
   @Test
   void removeEntity() {
     var dataEntity1 = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addProperty("description", "yes")
         .build();
 
     var dataEntity2 = new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity2")
+        .addId("https://www.example.com/entity2")
         .addProperty("description", "yes")
         .build();
 
@@ -146,7 +146,7 @@ public class PayloadTest {
   @Test
   void testAssociatedItems() {
     var dataEntity1= new DataEntity.DataEntityBuilder()
-        .setId("https://www.example.com/entity1")
+        .addId("https://www.example.com/entity1")
         .addProperty("description", "yes")
         .build();
 
@@ -154,7 +154,7 @@ public class PayloadTest {
     assertEquals(0, dataEntity1.getLinkedTo().size() );
 
     var entity2 = new DataSetEntity.DataSetBuilder()
-        .setId("set")
+        .addId("set")
         .addToHasPart(dataEntity1)
         .addProperty("description", "yes")
         .build();

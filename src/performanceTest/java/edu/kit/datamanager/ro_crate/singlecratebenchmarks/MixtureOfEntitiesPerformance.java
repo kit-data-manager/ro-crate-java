@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import java.nio.file.Paths;
 
 /**
  * A benchmark for the creation of single crate with a mixture of entities.
@@ -39,14 +40,14 @@ public class MixtureOfEntitiesPerformance {
    */
   public static void mixEntitiesTest(int numEntities, String baseLocation) throws IOException {
     Instant start = Instant.now();
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       PersonEntity person = new PersonEntity.PersonEntityBuilder()
-          .setId("#id" + i)
+          .addId("#id" + i)
           .addProperty("name", "Joe")
           .build();
       DataEntity file = new DataEntity.DataEntityBuilder()
-          .setSource(new File(baseLocation + "file" + i))
+          .addContent(Paths.get(baseLocation + "file" + i))
           .addType("File")
           .addIdProperty("author", person)
           .build();

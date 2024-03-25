@@ -49,7 +49,7 @@ public class ZipReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .addContent(cvs, cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -78,11 +78,10 @@ public class ZipReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .addContent(file, "survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -117,11 +116,10 @@ public class ZipReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .addContent(file, "survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -145,9 +143,8 @@ public class ZipReaderTest {
     FileUtils.writeStringToFile(newFile.toFile(), "fkladjsl;fjasd;lfjda;lkf", Charset.defaultCharset());
 
     res.addDataEntity(new FileEntity.FileEntityBuilder()
-        .setId("new_file")
         .setEncodingFormat("setnew")
-        .setSource(newFile.toFile())
+        .addContent(newFile, "new_file")
         .build(), true);
 
     Path destinationDir = temp.resolve("result");

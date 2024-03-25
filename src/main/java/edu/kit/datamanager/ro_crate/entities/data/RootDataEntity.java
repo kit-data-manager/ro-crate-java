@@ -1,6 +1,6 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * The root DataEntity is basically a DataSet with a default id.
@@ -30,7 +30,7 @@ public class RootDataEntity extends DataSetEntity {
     @Override
     public RootDataEntity build() {
       // small hack not to get the command line message
-      this.setSource(new File("./"));
+      this.addContent(Paths.get("./"), "./");
       return new RootDataEntity(this);
     }
   }

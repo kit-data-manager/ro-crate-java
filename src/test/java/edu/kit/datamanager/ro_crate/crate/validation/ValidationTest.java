@@ -28,7 +28,7 @@ public class ValidationTest {
     Crate crate = new RoCrate.RoCrateBuilder("workflowCrate", "this is a test", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new WorkflowEntity.WorkflowEntityBuilder()
-                .setId("https://www.example.com/entity")
+                .addId("https://www.example.com/entity")
                 .build()
         )
         .build();

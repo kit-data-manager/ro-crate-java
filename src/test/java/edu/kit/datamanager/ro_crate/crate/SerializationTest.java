@@ -48,7 +48,7 @@ public class SerializationTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .addContent(cvs, cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -68,7 +68,7 @@ public class SerializationTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .addContent(cvs, cvs.toFile().getName())
                 .addProperty("name", "dadadada")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -76,7 +76,7 @@ public class SerializationTest {
         )
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .addContent(cvs,cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -90,12 +90,12 @@ public class SerializationTest {
   void twoFilesAndSomeContextualEntities(@TempDir Path temp) throws IOException {
 
     PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
-        .setId("http://sws.geonames.org/8152662/")
+        .addId("http://sws.geonames.org/8152662/")
         .addProperty("name", "Catalina Park")
         .build();
 
     PersonEntity person = new PersonEntity.PersonEntityBuilder()
-        .setId("#alice")
+        .addId("#alice")
         .addProperty("name", "Alice")
         .addProperty("description", "One of hopefully many Contextual Entities")
         .build();
@@ -104,7 +104,7 @@ public class SerializationTest {
     FileUtils.touch(txt.toFile());
     FileUtils.writeStringToFile(txt.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
     FileEntity file = new FileEntity.FileEntityBuilder()
-        .setSource(txt.toFile())
+        .addContent(txt, txt.toFile().getName())
         .addProperty("description", "One of hopefully many Data Entities")
         .setContentLocation(place.getId())
         .addAuthor(person.getId())
@@ -118,8 +118,7 @@ public class SerializationTest {
         .addDataEntity(file)
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("data2.txt")
-                .setSource(txt.toFile())
+                .addContent(txt, "data2.txt")
                 .build()
         )
         .build();
@@ -140,8 +139,7 @@ public class SerializationTest {
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("cp7glop.ai")
-                .setSource(ai.toFile())
+                .addContent(ai, "cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
@@ -150,8 +148,7 @@ public class SerializationTest {
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .setId("lots_of_little_files/")
-                .setSource(folder.toFile())
+                .addContent(folder, "lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
@@ -166,38 +163,38 @@ public class SerializationTest {
   void BiggerExample(@TempDir Path temp) throws IOException {
 
     ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
-        .setId("https://creativecommons.org/licenses/by/4.0/")
+        .addId("https://creativecommons.org/licenses/by/4.0/")
         .addType("CreativeWork")
         .addProperty("name", "CC BY 4.0")
         .addProperty("description", "Creative Commons Attribution 4.0 International License")
         .build();
 
     ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()
-        .setId("#4241434-33413")
+        .addId("#4241434-33413")
         .addType("GeoCoordinates")
         .addProperty("latitude", "49.00944")
         .addProperty("longitude", "8.41167")
         .build();
 
     PlaceEntity uni = new PlaceEntity.PlaceEntityBuilder()
-        .setId("kit_location")
+        .addId("kit_location")
         .setGeo(geo.getId())
         .build();
 
     OrganizationEntity organization = new OrganizationEntity.OrganizationEntityBuilder()
-        .setId("https://www.geonames.org/7288147")
+        .addId("https://www.geonames.org/7288147")
         .addProperty("name", "Karlsruher Institut fuer Technologie")
         .addProperty("url", "https://www.kit.edu/")
         .setLocationId(uni.getId())
         .build();
 
     PlaceEntity country = new PlaceEntity.PlaceEntityBuilder()
-        .setId("https://www.geonames.org/2921044")
+        .addId("https://www.geonames.org/2921044")
         .addProperty("description", "Big country in central Europe.")
         .build();
 
     PersonEntity author = new PersonEntity.PersonEntityBuilder()
-        .setId("creator")
+        .addId("creator")
         .setEmail("uuuuu@student.kit.edu")
         .setFamilyName("Tzotchev")
         .setGivenName("Nikola")
@@ -206,7 +203,7 @@ public class SerializationTest {
         .build();
 
     ContextualEntity instrument = new ContextualEntity.ContextualEntityBuilder()
-        .setId("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
+        .addId("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
         .addType("IndividualProduct")
         .addProperty("description",
             "The Outdoor Air Quality Test Kit (Starter) is for users who want an affordable set of tools to measure the common pollutants in ambient outdoor air.")
@@ -215,8 +212,7 @@ public class SerializationTest {
     Path folder = temp.resolve("folder");
     FileUtils.forceMkdir(folder.toFile());
     DataSetEntity measure = new DataSetEntity.DataSetBuilder()
-        .setId("measurements/")
-        .setSource(folder.toFile())
+        .addContent(folder, "measurements/")
         .addProperty("name", "Measurement data.")
         .addProperty("description", "This folder contains all relative to the measurements files.")
         .addAuthor(author.getId())
@@ -224,7 +220,7 @@ public class SerializationTest {
         .build();
 
     ContextualEntity createAction = new ContextualEntity.ContextualEntityBuilder()
-        .setId("#MeasurementCapture_23231")
+        .addId("#MeasurementCapture_23231")
         .addType("CreateAction")
         .addIdProperty("agent", author.getId())
         .addIdProperty("instrument", instrument.getId())
@@ -246,8 +242,7 @@ public class SerializationTest {
         .addContextualEntity(author)
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("map.pdf")
-                .setSource(pdf.toFile())
+                .addContent(pdf,"map.pdf")
                 .addProperty("name", "Map of measurements")
                 .addProperty("description",
                     "A map of all the location where the tests have been conducted")

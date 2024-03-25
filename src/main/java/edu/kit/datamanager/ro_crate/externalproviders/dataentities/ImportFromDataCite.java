@@ -307,7 +307,7 @@ public class ImportFromDataCite {
         String relationTypeString = element.get("relationType").asText();
         DataEntity relatedItem = new DataEntity.DataEntityBuilder()
             .addType("CreativeWork")
-            .setId(relatedId)
+            .addId(relatedId)
             .addProperty("description", relatedIdType)
             .addProperty("keywords", relationTypeString)
             .build();
@@ -430,7 +430,7 @@ public class ImportFromDataCite {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
             .addType("CreativeWork")
             .addProperty("name", licenseName)
-            .setId(rightsUri)
+            .addId(rightsUri)
             .addProperty("identifier", rightsIdentifier)
             .build();
 
@@ -453,7 +453,7 @@ public class ImportFromDataCite {
         } else {
           funder = new PersonEntity.PersonEntityBuilder()
               .addProperty("name", el.get("funderName"))
-              .setId(el.get("funderIdentifier") == null
+              .addId(el.get("funderIdentifier") == null
                   ? null : el.get("funderIdentifier").asText())
               .build();
         }
@@ -467,7 +467,7 @@ public class ImportFromDataCite {
         if (awardNumber != null || awardTitle != null || awardUri != null) {
           ContextualEntity grant = new ContextualEntity.ContextualEntityBuilder()
               .addType("Grant")
-              .setId(awardUri == null ? null : awardUri.asText())
+              .addId(awardUri == null ? null : awardUri.asText())
               .addProperty("name", awardTitle)
               .addProperty("identifier", awardNumber)
               .addIdProperty("funder", funder)
@@ -489,7 +489,7 @@ public class ImportFromDataCite {
       }
     }
     DataEntity dataEntity = new DataEntity.DataEntityBuilder()
-        .setId(id)
+        .addId(id)
         .addType(type)
         .addProperty("title", title)
         .addProperty("publicationYear", publicationYear)
@@ -528,7 +528,7 @@ public class ImportFromDataCite {
     String relationTypeString = relatedItem.get("relationType").asText();
     return new DataEntity.DataEntityBuilder()
         .addType("CreativeWork")
-        .setId(relatedId == null ? null : relatedId.asText())
+        .addId(relatedId == null ? null : relatedId.asText())
         .addProperty("description", relatedIdType)
         .addProperty("keywords", relationTypeString)
         .build();
@@ -574,7 +574,7 @@ public class ImportFromDataCite {
           organization = RorProvider.getOrganization(affiliationId.asText());
         } else {
           organization = new OrganizationEntity.OrganizationEntityBuilder()
-              .setId(affiliationId.asText())
+              .addId(affiliationId.asText())
               .addProperty("name", affiliationName)
               .build();
         }

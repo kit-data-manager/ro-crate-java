@@ -3,18 +3,17 @@ package edu.kit.datamanager.ro_crate.entities.data;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity.DataEntityBuilder;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.net.MalformedURLException;
+import java.net.URI;
 
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class DataEntityTest {
 
         DataEntity file = new DataEntityBuilder()
                 .addType("File")
-                .setId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
+                .addId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
                 .addProperty("name", "RO-Crate specification")
                 .addProperty("encodingFormat", "application/pdf")
                 .addProperty("url", "https://zenodo.org/record/3541888")
@@ -66,7 +65,6 @@ public class DataEntityTest {
         json.put("@id", "https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf");
         json.put("@type", "File");
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             DataEntity data = new DataEntity.DataEntityBuilder().build();
             data.setProperties(json);
             HelpFunctions.compareEntityWithFile(data, "/json/entities/data/fileEntity.json");
@@ -81,43 +79,49 @@ public class DataEntityTest {
             data.setProperties(json);
             assertNotEquals("", data.getId());
             HelpFunctions.compareEntityWithFile(data, "/json/entities/data/fileEntity.json");
+    }
 
+    @Test
+    void testUriCheck() {
+        //this entity id is a valid URL so there should not be any console information
+        DataEntity dataEntity = new DataEntity.DataEntityBuilder()
+                .addType("File")
+                .addContent(URI.create("https://www.example.com/19"))
+                .build();
+
+        assertNotNull(dataEntity);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new DataEntity.DataEntityBuilder()
+                    .addType("File")
+                    .addContent(URI.create("zzz://wrong/url"))
+                    .build();
         });
+
         assertEquals("This Data Entity remote ID does not resolve to a valid URL.", exception.getMessage());
+
+        assertNotNull(dataEntity);
 
     }
 
     @Test
-    void testUrlCheck() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            // create data entity with random ID that is not a remote URI
-        // this should create a warning in the console
-        new DataEntity.DataEntityBuilder()
-                .addType("File")
-                .setId("dfkjdfkj")
+    void testPathCheck() throws IOException {
+        FileEntity dataEntity = new FileEntity.FileEntityBuilder()
+                .addContent(Paths.get("example.json"), "example.json")
+                .addProperty("name", "RO-Crate specification")
+                .setEncodingFormat("application/json")
                 .build();
+        assertEquals(dataEntity.getId(), "example.json");
+        HelpFunctions.compareEntityWithFile(dataEntity, "/json/entities/data/localFile.json");
 
-        });
-
-        assertEquals("This Data Entity remote ID does not resolve to a valid URL.", exception.getMessage());
-
-        //this entity id is a valid URL so there should not be any console information
-        DataEntity dataEntity = new DataEntity.DataEntityBuilder()
-                .addType("File")
-                .setId("https://www.example.com/19")
+        dataEntity = new FileEntity.FileEntityBuilder()
+                .addContent(Paths.get("cp7glop.ai"), "cp7glop.ai")
+                .addProperty("name", "Diagram showing trend to increase")
+                .setEncodingFormat("application/pdf")
                 .build();
-
-        assertNotNull(dataEntity);
-        
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-        new DataEntity.DataEntityBuilder()
-                    .addType("File")
-                    .setSource(new File("/json/crate/results and diagrams.json"))
-                    .build();
-
-        });
-
-        assertEquals("The ID is not correctly encoded.", exception.getMessage());
+        assertEquals(dataEntity.getId(), "cp7glop.ai");
+        assertEquals(dataEntity.getContent(), Paths.get("cp7glop.ai"));
+        assertEquals(dataEntity.getProperty("encodingFormat").asText(), "application/pdf");
     }
 
     @Test
@@ -125,7 +129,7 @@ public class DataEntityTest {
         //this entity id is a valid URL so there should not be any console information
         DataEntity dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .setId("https://github.com/kit-data-manager/ro-crate-java/issues/5")
+                .addContent(URI.create("https://github.com/kit-data-manager/ro-crate-java/issues/5"))
                 .build();
 
         assertEquals("https://github.com/kit-data-manager/ro-crate-java/issues/5", dataEntity.getId());
@@ -133,39 +137,27 @@ public class DataEntityTest {
         URL url
                 = HelpFunctions.class.getResource("/json/crate/simple2.json");
         assert url != null;
-        // this data entity is not a remote one, so there should not be any messages
         dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .setSource(new File(url.getFile()))
+                .addContent(Paths.get(url.getFile()), "simple2.json")
                 .build();
 
         assertNotNull(dataEntity);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new DataEntity.DataEntityBuilder()
+           dataEntity= new DataEntity.DataEntityBuilder()
                     .addType("File")
-                    .setId("/json/crate/Results%20and%20Diagrams/almost-50%25.json")
+                    .addContent(Paths.get("/json/crate/Results%20and%20Diagrams/almost-50%25.json"), "almost-50%25.json")
                     .build();
-
-        });
-
-        assertEquals("This Data Entity remote ID does not resolve to a valid URL.", exception.getMessage());
-
-        dataEntity = new DataEntity.DataEntityBuilder()
-                .addType("File")
-                .setSource(new File("/json/crate/Results%20and%20Diagrams/almost-50%25.json"))
-                .build();
 
         assertTrue(dataEntity.getTypes().contains("File"));
+        assertEquals(dataEntity.getId(), "almost-50%25.json");
 
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            new DataEntity.DataEntityBuilder()
-                    .addType("File")
-                    .setSource(new File("/json/crate/Results and Diagrams/almost-50%.json"))
-                    .build();
+        // even if the Path is not correctly encoded, the data entity will be added with an encoded Path.
+        dataEntity = new DataEntity.DataEntityBuilder()
+                .addType("File")
+                .addContent(Paths.get("/json/crate/Results and Diagrams/almost-50%.json"),"almost-50%.json" )
+                .build();
+        assertEquals(dataEntity.getId(), "almost-50%25.json");
 
-        });
-
-        assertEquals("The ID is not correctly encoded.", exception.getMessage());
     }
 }

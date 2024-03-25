@@ -14,6 +14,7 @@ import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.Observer;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.encode;
 import static edu.kit.datamanager.ro_crate.special.UriUtil.isEncoded;
 
 import java.util.ArrayList;
@@ -310,19 +311,17 @@ public class AbstractEntity {
 
         /**
          * Setting the id property of the entity, if the given value is not
-         * null.
+         * null. If the id is not encoded, the encoding will be done.
          *
          * @param id the String representing the id.
          * @return the generic builder.
          */
-        public T setId(String id) {
-
-            // TODO document why this has been implemented this way.
+        public T addId(String id) {
             if (id != null) {
                 if (isEncoded(id)) {
                     this.id=id;
                 } else {
-                    throw new IllegalArgumentException("The ID is not correctly encoded.");
+                    this.id=encode(id).get();
                 }
             }
             return self();

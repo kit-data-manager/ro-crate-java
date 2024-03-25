@@ -14,6 +14,7 @@ import edu.kit.datamanager.ro_crate.reader.FolderReader;
 import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
+import java.nio.file.Paths;
 
 /**
  * Benchmark for creating multiple crates then writing
@@ -53,14 +54,14 @@ public class MultipleCratesWriteAndRead {
     }
     Instant start = Instant.now();
     for (int i = 0; i < numCrates; i++) {
-      RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+      RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
       for (int j = 0; j < numEntitiesProCrate; j++) {
         PersonEntity person = new PersonEntity.PersonEntityBuilder()
-            .setId("#id" + i + j)
+            .addId("#id" + i + j)
             .addProperty("name", "Joe")
             .build();
         DataEntity file = new DataEntity.DataEntityBuilder()
-            .setSource(new File(baseLocation + "file" + j))
+            .addContent(Paths.get(baseLocation + "file" + j))
             .addType("File")
             .addIdProperty("author", person)
             .build();

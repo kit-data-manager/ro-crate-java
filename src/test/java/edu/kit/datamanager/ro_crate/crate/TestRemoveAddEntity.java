@@ -22,7 +22,7 @@ public class TestRemoveAddEntity {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
+                .addId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -43,18 +43,18 @@ public class TestRemoveAddEntity {
   @Test
   void withTwoFiles() throws IOException {
     PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
-        .setId("http://sws.geonames.org/8152662/")
+        .addId("http://sws.geonames.org/8152662/")
         .addProperty("name", "Catalina Park")
         .build();
 
     PersonEntity person = new PersonEntity.PersonEntityBuilder()
-        .setId("#alice")
+        .addId("#alice")
         .addProperty("name", "Alice")
         .addProperty("description", "One of hopefully many Contextual Entities")
         .build();
 
     FileEntity file = new FileEntity.FileEntityBuilder()
-        .setId("data1.txt")
+        .addId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
         .setContentLocation(place.getId())
         .addAuthor(person.getId())
@@ -66,7 +66,7 @@ public class TestRemoveAddEntity {
         .addContextualEntity(person)
         .addDataEntity(file)
         .addDataEntity(
-            new FileEntity.FileEntityBuilder().setId("data2.txt").build()
+            new FileEntity.FileEntityBuilder().addId("data2.txt").build()
         )
         .build();
 
@@ -95,18 +95,18 @@ public class TestRemoveAddEntity {
   @Test
   void removeOtherOccur() throws JsonProcessingException {
     PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
-        .setId("http://sws.geonames.org/8152662/")
+        .addId("http://sws.geonames.org/8152662/")
         .addProperty("name", "Catalina Park")
         .build();
 
     PersonEntity person = new PersonEntity.PersonEntityBuilder()
-        .setId("#alice")
+        .addId("#alice")
         .addProperty("name", "Alice")
         .addProperty("description", "One of hopefully many Contextual Entities")
         .build();
 
     FileEntity file = new FileEntity.FileEntityBuilder()
-        .setId("data1.txt")
+        .addId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
         .setContentLocation(place.getId())
         .addAuthor(person.getId())
@@ -131,7 +131,7 @@ public class TestRemoveAddEntity {
     assertEquals(1, roCrate.getAllDataEntities().size());
 
     FileEntity file2 = new FileEntity.FileEntityBuilder()
-        .setId("data1.txt")
+        .addId("data1.txt")
         .addProperty("description", "One of hopefully many Data Entities")
         .build();
     RoCrate second2 = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")

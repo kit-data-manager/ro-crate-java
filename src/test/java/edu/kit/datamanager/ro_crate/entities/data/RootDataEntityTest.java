@@ -1,16 +1,13 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.RoCrate;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.Disabled;
+import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,16 +21,14 @@ public class RootDataEntityTest {
     void testSerialization() throws IOException {
         String id1 = "file1_id";
         FileEntity file1 = new FileEntity.FileEntityBuilder()
-                .setId(id1)
-                .setSource(new File("does_not_matter"))
+                .addContent(Paths.get("does_not_matter"), id1)
                 .build();
 
         String id2 = "file2_id";
         FileEntity file2 = new FileEntity.FileEntityBuilder()
-                .setId(id2)
                 .addIdProperty("name", "dsklfajs")
                 .addIdProperty("name", "11111111")
-                .setSource(new File("does_not_matter"))
+                .addContent(Paths.get("does_not_matter"), id2)
                 .build();
 
         RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
@@ -54,13 +49,14 @@ public class RootDataEntityTest {
         HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/root.json");
     }
 
-    @Disabled("Disabled while issues are being fixed!")
     @Test
     void testSerializationMinimalExample() throws IOException {
+        ObjectMapper objectMapper = MyObjectMapper.getMapper();
         RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                 .addProperty("name", "Data files")
                 .addProperty("description", "Palliative care planning...")
                 .addProperty("datePublished", "2024-02-09T08:21:41Z")
+                .addProperty("license", objectMapper.createObjectNode().put("@id", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"))
                 .build();
         HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/rootMinimalExample.json");
 

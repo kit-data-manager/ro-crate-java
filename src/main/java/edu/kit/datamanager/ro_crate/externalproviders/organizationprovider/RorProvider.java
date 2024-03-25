@@ -50,7 +50,7 @@ public class RorProvider {
         ObjectNode jsonNode = MyObjectMapper.getMapper().readValue(response.getEntity().getContent(),
             ObjectNode.class);
         return new OrganizationEntity.OrganizationEntityBuilder()
-            .setId(jsonNode.get("id").asText())
+            .addId(jsonNode.get("id").asText())
             .addProperty("name", jsonNode.get("name"))
             .addProperty("email", jsonNode.get("email_address"))
             .addProperty("url", jsonNode.get("links"))

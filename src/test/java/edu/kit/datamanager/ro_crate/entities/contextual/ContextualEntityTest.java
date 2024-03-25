@@ -23,7 +23,7 @@ public class ContextualEntityTest {
   void testSerialization() throws IOException {
     // this does not make any difference for our testcase it just shows how the GeoCoordinates entity will look
     ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()
-        .setId("#b4168a98-8534-4c6d-a568-64a55157b656")
+        .addId("#b4168a98-8534-4c6d-a568-64a55157b656")
         .addType("GeoCoordinates")
         .addProperty("latitude", "-33.7152")
         .addProperty("longitude", "150.30119")
@@ -32,7 +32,7 @@ public class ContextualEntityTest {
 
     ContextualEntity place = new ContextualEntity.ContextualEntityBuilder()
         .addType("Place")
-        .setId("https://sws.geonames.org/8152662/")
+        .addId("https://sws.geonames.org/8152662/")
         .addProperty("description",
             "Catalina Park is a disused motor racing venue, located at Katoomba ...")
         .addProperty("identifier", "https://sws.geonames.org/8152662/")

@@ -16,7 +16,7 @@ public class BuilderTest {
     void testReadBuilder() throws JsonProcessingException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
                 .addType("CreativeWork")
-                .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                .addId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("description",
                         "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
@@ -35,7 +35,7 @@ public class BuilderTest {
     void testAddCrateWithOnlyRootDataEntity() throws IOException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
                 .addType("CreativeWork")
-                .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                .addId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("description",
                         "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")

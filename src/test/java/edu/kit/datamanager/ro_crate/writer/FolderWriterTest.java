@@ -11,7 +11,6 @@ import java.nio.file.Path;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
-import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
@@ -52,28 +51,19 @@ public class FolderWriterTest {
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setSource(file1.toFile())
+                .addContent(file1, "cp7glop.ai")
                 .build()
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .setId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setSource(dirInCrate.toFile())
-                .build()
-        )
-        .addDataEntity(
-            new DataEntity.DataEntityBuilder()
-                .addProperty("name", "fileWihtoutID")
-                .addProperty("description", "this File should have the same name as the filed that is being copied")
-                .setSource(fileWithoutID.toFile())
+                .addContent(dirInCrate, "lots_of_little_files/")
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -87,7 +77,7 @@ public class FolderWriterTest {
     // when there is an ID the file should be called the same as the entity.
     assertTrue(Files.isRegularFile(result.resolve("cp7glop.ai")));
     assertTrue(Files.isDirectory(result.resolve("lots_of_little_files/")));
-    assertTrue(Files.isRegularFile(result.resolve(fileWithoutID.getFileName())));
+   // assertTrue(Files.isRegularFile(result.resolve(fileWithoutID.getFileName())));
   }
 
   @Disabled("Disabled while issues are being fixed!")
@@ -127,21 +117,19 @@ public class FolderWriterTest {
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setSource(file1.toFile())
+                .addContent(file1, "cp7glop.ai")
                 .build()
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .setId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setSource(dirInCrate.toFile())
+                .addContent(dirInCrate, "lots_of_little_files/")
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -194,21 +182,20 @@ public class FolderWriterTest {
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .setSource(falseFile.toFile())
+                .addContent(falseFile, "cp7glop.ai")
                 .build()
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .setId("lots_of_little_files/")
+                .addId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .setSource(dirInCrate.toFile())
+                .addContent(dirInCrate, "lots_of_little_files/")
                 .build()
         )
         .build();

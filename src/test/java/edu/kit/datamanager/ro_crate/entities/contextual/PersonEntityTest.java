@@ -18,7 +18,7 @@ public class PersonEntityTest {
     void personSerialization() throws IOException {
         String id = "https://orcid.org/0000-0001-6121-5409";
         PersonEntity person = new PersonEntity.PersonEntityBuilder()
-                .setId(id)
+                .addId(id)
                 .setContactPoint("mailto:tim.luckett@uts.edu.au")
                 .setAffiliation("https://ror.org/03f0f6041")
                 .setFamilyName("Luckett")
