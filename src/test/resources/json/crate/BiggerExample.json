@@ -6,6 +6,7 @@
       "@type": "Dataset",
       "name": "Air quality measurements in Karlsruhe",
       "description": "Air quality measurements conducted in different places across Karlsruhe",
+       "datePublished": "2024",
       "hasPart": [
         {
           "@id": "map.pdf"

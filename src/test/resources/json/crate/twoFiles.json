@@ -5,6 +5,8 @@
       "@type": "Dataset",
       "name": "Example RO-Crate",
       "description": "The RO-Crate Root Data Entity",
+      "datePublished": "2024",
+       "license": {"@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"},
       "hasPart": [
         {"@id": "data1.txt"},
         {"@id": "data2.txt"}

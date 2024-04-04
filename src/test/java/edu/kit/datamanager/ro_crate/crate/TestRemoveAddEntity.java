@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import org.junit.jupiter.api.Disabled;
 
-@Disabled("Disabled while issues are being fixed!")
 public class TestRemoveAddEntity {
   @Test
   void testAddRemoveEntity() throws IOException {

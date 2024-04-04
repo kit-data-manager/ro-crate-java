@@ -8,11 +8,9 @@ import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Disabled;
 
 public class ZenodoImportTest {
 
-  @Disabled("Disabled while issues are being fixed!")
   @Test
   void testImportingNewCrate() {
     String url = "https://zenodo.org/api/records/6411574";

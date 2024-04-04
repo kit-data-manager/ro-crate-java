@@ -45,7 +45,7 @@ public class LocalDataEntitiesPerformance {
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       DataEntity person = new DataEntity.DataEntityBuilder()
-          .addContent(Paths.get(baseLocation + "file" + i))
+          .addContent(Paths.get(baseLocation + "file" + i), baseLocation + "file" + i)
           .addType("File")
           .build();
       crate.addDataEntity(person, true);

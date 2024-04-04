@@ -14,14 +14,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Disabled;
 
 public class PreviewCrateTest {
     
-  @Disabled("Disabled while issues are being fixed!")  
   @Test
   void testAutomaticPreview(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate1");
@@ -30,10 +29,10 @@ public class PreviewCrateTest {
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().getAbsolutePath());
+    
     assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
 
-  @Disabled("Disabled while issues are being fixed!")
   @Test
   void testAutomaticPreviewAddingLater(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate2");

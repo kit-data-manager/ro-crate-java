@@ -47,7 +47,7 @@ public class MixtureOfEntitiesPerformance {
           .addProperty("name", "Joe")
           .build();
       DataEntity file = new DataEntity.DataEntityBuilder()
-          .addContent(Paths.get(baseLocation + "file" + i))
+          .addContent(Paths.get(baseLocation + "file" + i), baseLocation + "file" + i)
           .addType("File")
           .addIdProperty("author", person)
           .build();

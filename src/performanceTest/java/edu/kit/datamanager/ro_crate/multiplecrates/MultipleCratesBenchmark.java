@@ -53,7 +53,7 @@ public class MultipleCratesBenchmark {
             .addProperty("name", "Joe")
             .build();
         DataEntity file = new DataEntity.DataEntityBuilder()
-            .addContent(Paths.get(baseLocation + "file" + j))
+            .addContent(Paths.get(baseLocation + "file" + j),baseLocation + "file" + j )
             .addType("File")
             .addIdProperty("author", person)
             .build();

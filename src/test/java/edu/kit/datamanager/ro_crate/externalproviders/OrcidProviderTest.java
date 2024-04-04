@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Disabled;
 
 /**
  * @author Nikola Tzotchev on 10.2.2022 г.
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Disabled;
  */
 public class OrcidProviderTest {
     
-  @Disabled("Disabled while issues are being fixed!")
   @Test
   void testAddingPersonEntity() throws IOException {
     PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");

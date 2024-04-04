@@ -37,7 +37,7 @@ public class ImportFromZenodo {
    * @return the created crate.
    */
   public static Crate createCrateWithItem(String url, String name, String description, String datePublished, String licenseId) {
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder(name, description, datePublished, licenseId).build();
     addToCrateFromZotero(url, crate);
     return crate;
   }
