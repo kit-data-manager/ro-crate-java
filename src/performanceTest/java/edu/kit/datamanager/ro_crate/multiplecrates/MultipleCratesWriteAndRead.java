@@ -57,7 +57,7 @@ public class MultipleCratesWriteAndRead {
       RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
       for (int j = 0; j < numEntitiesProCrate; j++) {
         PersonEntity person = new PersonEntity.PersonEntityBuilder()
-            .addId("#id" + i + j)
+            .setId("#id" + i + j)
             .addProperty("name", "Joe")
             .build();
         DataEntity file = new DataEntity.DataEntityBuilder()

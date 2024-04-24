@@ -41,7 +41,7 @@ public class ContextTest {
     // this entity is not correct
     // there is no type blabla in schema.org
     var contextualEntity = new ContextualEntity.ContextualEntityBuilder()
-        .addId("dkfaj")
+        .setId("dkfaj")
         .addType("blabla")
         .build();
 
@@ -50,7 +50,7 @@ public class ContextTest {
     // this entity is correct the type Accommodation exists in schema.org,
     // so it should be valid
     var contextualEntityCorrect = new ContextualEntity.ContextualEntityBuilder()
-        .addId("dkfaj")
+        .setId("dkfaj")
         .addType("Accommodation")
         .addProperty("name", "ffjkjk")
         .build();
@@ -59,7 +59,7 @@ public class ContextTest {
 
     // this entity has correct types but wrong field
     var contextualEntityWrongField = new ContextualEntity.ContextualEntityBuilder()
-        .addId("dkfaj")
+        .setId("dkfaj")
         .addType("Accommodation")
         .addProperty("notExisting", "kfdjfk")
         .build();
@@ -73,7 +73,7 @@ public class ContextTest {
         List.of("www.example.com", "www.example.com/context"));
 
     var contextualEntityWrongField = new ContextualEntity.ContextualEntityBuilder()
-        .addId("dkfaj")
+        .setId("dkfaj")
         .addType("Accommodation")
         .build();
     // this will be false since here there is no default context, and the example
@@ -185,7 +185,7 @@ public class ContextTest {
 
     var data = new DataEntity.DataEntityBuilder()
         .addType("house")
-        .addId("https://www.example.com/entity")
+        .setId("https://www.example.com/entity")
         .build();
     // house is in the context
     assertTrue(newContext.checkEntity(data));

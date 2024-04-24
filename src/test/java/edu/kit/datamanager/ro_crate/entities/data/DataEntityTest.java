@@ -44,7 +44,7 @@ public class DataEntityTest {
 
         DataEntity file = new DataEntityBuilder()
                 .addType("File")
-                .addId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
+                .setId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
                 .addProperty("name", "RO-Crate specification")
                 .addProperty("encodingFormat", "application/pdf")
                 .addProperty("url", "https://zenodo.org/record/3541888")

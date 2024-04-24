@@ -43,7 +43,7 @@ public class MixtureOfEntitiesPerformance {
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       PersonEntity person = new PersonEntity.PersonEntityBuilder()
-          .addId("#id" + i)
+          .setId("#id" + i)
           .addProperty("name", "Joe")
           .build();
       DataEntity file = new DataEntity.DataEntityBuilder()

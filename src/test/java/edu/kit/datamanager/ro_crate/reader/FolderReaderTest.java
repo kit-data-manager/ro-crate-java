@@ -54,7 +54,7 @@ public class FolderReaderTest {
   void testMultipleReads(@TempDir Path temp1, @TempDir Path temp2) throws IOException {
     String id = "https://orcid.org/0000-0001-6121-5409";
     PersonEntity person = new PersonEntity.PersonEntityBuilder()
-        .addId(id)
+        .setId(id)
         .setContactPoint("mailto:tim.luckett@uts.edu.au")
         .setAffiliation("https://ror.org/03f0f6041")
         .setFamilyName("Luckett")

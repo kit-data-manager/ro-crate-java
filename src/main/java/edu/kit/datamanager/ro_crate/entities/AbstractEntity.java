@@ -316,7 +316,7 @@ public class AbstractEntity {
          * @param id the String representing the id.
          * @return the generic builder.
          */
-        public T addId(String id) {
+        public T setId(String id) {
             if (id != null) {
                 if (isEncoded(id)) {
                     this.id=id;

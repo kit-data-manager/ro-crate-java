@@ -18,7 +18,7 @@ public class OrganizationEntityTest {
   void testSerialization() throws IOException {
     String id = "https://ror.org/03f0f6041";
     OrganizationEntity organization = new OrganizationEntity.OrganizationEntityBuilder()
-        .addId(id)
+        .setId(id)
         .setAddress("set")
         .setEmail("Sydney@sy.kit")
         .setTelephone("0665445")

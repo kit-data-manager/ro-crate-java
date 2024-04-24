@@ -37,7 +37,7 @@ public class RemoteDataEntitiesPerformance {
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       DataEntity person = new DataEntity.DataEntityBuilder()
-          .addId(baseId + i)
+          .setId(baseId + i)
           .addType("File")
           .build();
       crate.addDataEntity(person, true);

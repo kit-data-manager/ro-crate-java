@@ -42,7 +42,7 @@ public class ContextualEntitiesPerformance {
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       PersonEntity person = new PersonEntity.PersonEntityBuilder()
-          .addId(baseId + i)
+          .setId(baseId + i)
           .addProperty("name", "Joe Bloggs")
           .build();
       crate.addContextualEntity(person);

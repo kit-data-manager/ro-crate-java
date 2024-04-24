@@ -188,7 +188,7 @@ public class FolderWriterTest {
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .addId("lots_of_little_files/")
+                .setId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")

@@ -59,7 +59,7 @@ public class FileEntityTest {
   @Test
   void testSerializationWithLicense() throws IOException {
     ContextualEntity entity = new ContextualEntity.ContextualEntityBuilder()
-        .addId("https://creativecommons.org/licenses/by/4.0/")
+        .setId("https://creativecommons.org/licenses/by/4.0/")
         .addType("CreativeWork")
         .build();
 

@@ -88,12 +88,12 @@ public class SerializationTest {
   void twoFilesAndSomeContextualEntities(@TempDir Path temp) throws IOException {
 
     PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
-        .addId("http://sws.geonames.org/8152662/")
+        .setId("http://sws.geonames.org/8152662/")
         .addProperty("name", "Catalina Park")
         .build();
 
     PersonEntity person = new PersonEntity.PersonEntityBuilder()
-        .addId("#alice")
+        .setId("#alice")
         .addProperty("name", "Alice")
         .addProperty("description", "One of hopefully many Contextual Entities")
         .build();
@@ -161,38 +161,38 @@ public class SerializationTest {
   void BiggerExample(@TempDir Path temp) throws IOException {
 
     ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
-        .addId("https://creativecommons.org/licenses/by/4.0/")
+        .setId("https://creativecommons.org/licenses/by/4.0/")
         .addType("CreativeWork")
         .addProperty("name", "CC BY 4.0")
         .addProperty("description", "Creative Commons Attribution 4.0 International License")
         .build();
 
     ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()
-        .addId("#4241434-33413")
+        .setId("#4241434-33413")
         .addType("GeoCoordinates")
         .addProperty("latitude", "49.00944")
         .addProperty("longitude", "8.41167")
         .build();
 
     PlaceEntity uni = new PlaceEntity.PlaceEntityBuilder()
-        .addId("kit_location")
+        .setId("kit_location")
         .setGeo(geo.getId())
         .build();
 
     OrganizationEntity organization = new OrganizationEntity.OrganizationEntityBuilder()
-        .addId("https://www.geonames.org/7288147")
+        .setId("https://www.geonames.org/7288147")
         .addProperty("name", "Karlsruher Institut fuer Technologie")
         .addProperty("url", "https://www.kit.edu/")
         .setLocationId(uni.getId())
         .build();
 
     PlaceEntity country = new PlaceEntity.PlaceEntityBuilder()
-        .addId("https://www.geonames.org/2921044")
+        .setId("https://www.geonames.org/2921044")
         .addProperty("description", "Big country in central Europe.")
         .build();
 
     PersonEntity author = new PersonEntity.PersonEntityBuilder()
-        .addId("creator")
+        .setId("creator")
         .setEmail("uuuuu@student.kit.edu")
         .setFamilyName("Tzotchev")
         .setGivenName("Nikola")
@@ -201,7 +201,7 @@ public class SerializationTest {
         .build();
 
     ContextualEntity instrument = new ContextualEntity.ContextualEntityBuilder()
-        .addId("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
+        .setId("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
         .addType("IndividualProduct")
         .addProperty("description",
             "The Outdoor Air Quality Test Kit (Starter) is for users who want an affordable set of tools to measure the common pollutants in ambient outdoor air.")
@@ -218,7 +218,7 @@ public class SerializationTest {
         .build();
 
     ContextualEntity createAction = new ContextualEntity.ContextualEntityBuilder()
-        .addId("#MeasurementCapture_23231")
+        .setId("#MeasurementCapture_23231")
         .addType("CreateAction")
         .addIdProperty("agent", author.getId())
         .addIdProperty("instrument", instrument.getId())

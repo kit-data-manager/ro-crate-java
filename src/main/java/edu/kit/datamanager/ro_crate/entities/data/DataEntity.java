@@ -100,7 +100,7 @@ public class DataEntity extends AbstractEntity {
          */
         public T addContent(Path path, String id) {
             if (path != null && id != null) {
-                this.addId(id);
+                this.setId(id);
                 this.location = path;
             } else {
                 throw new IllegalArgumentException("The given path and Identifier should not be null.");
@@ -117,7 +117,7 @@ public class DataEntity extends AbstractEntity {
          */
         public T addContent(URI uri) {
             if (isUrl(uri.toString())) {
-                this.addId(uri.toString());
+                this.setId(uri.toString());
             }
             return self();
         }

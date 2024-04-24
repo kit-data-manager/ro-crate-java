@@ -19,7 +19,7 @@ public class PlaceEntityTest {
     // this does not make any difference for our testcase it just shows how the GeoCoordinates entity will look
     String id = "#b4168a98-8534-4c6d-a568-64a55157b656";
     ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()
-        .addId(id)
+        .setId(id)
         .addType("GeoCoordinates")
         .addProperty("latitude", "-33.7152")
         .addProperty("longitude", "150.30119")
@@ -27,7 +27,7 @@ public class PlaceEntityTest {
         .build();
 
     PlaceEntity place = new PlaceEntity.PlaceEntityBuilder()
-        .addId("https://sws.geonames.org/8152662/")
+        .setId("https://sws.geonames.org/8152662/")
         .addProperty("description",
             "Catalina Park is a disused motor racing venue, located at Katoomba ...")
         .addProperty("identifier", "https://sws.geonames.org/8152662/")

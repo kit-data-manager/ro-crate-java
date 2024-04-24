@@ -16,7 +16,7 @@ public class BuilderTest {
     void testReadBuilder() throws JsonProcessingException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
                 .addType("CreativeWork")
-                .addId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("description",
                         "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
@@ -35,7 +35,7 @@ public class BuilderTest {
     void testAddCrateWithOnlyRootDataEntity() throws IOException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
                 .addType("CreativeWork")
-                .addId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("description",
                         "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
@@ -44,7 +44,6 @@ public class BuilderTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("Data files", "Palliative care planning...", "2024-02-09T08:21:41Z", license.getId()).addContextualEntity(license).build();
 
         HelpFunctions.compareEntityWithFile(crate.getRootDataEntity(), "/json/entities/data/rootMinimalExample.json");
-        System.out.println("Sab "+crate.getRootDataEntity());
         HelpFunctions.compareEntityWithFile(crate.getContextualEntityById("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"), "/json/entities/data/license.json");
     }
     
