@@ -12,7 +12,8 @@ plugins {
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
-    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+    id "io.freefair.maven-publish-java" version "8.6"
 }
 
 group 'edu.kit.datamanager'
@@ -57,6 +58,11 @@ dependencies {
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.1.0"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+
+def signingTasks = tasks.withType(Sign)
+tasks.withType(AbstractPublishToMaven).configureEach{
+    mustRunAfter(signingTasks)
+ }
 
 sourceSets {
     main {
