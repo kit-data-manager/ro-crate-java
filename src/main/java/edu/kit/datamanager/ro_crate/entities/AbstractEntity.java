@@ -287,6 +287,37 @@ public class AbstractEntity {
     }
 
     /**
+     * checks if the date matches the ISO 8601 date format. If not, an exception
+     * is thrown.
+     *
+     * @param date the date as a string
+     */
+    public static void matchStringwithISODateFormat(String date) {
+        String regex = "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(date);
+        if (!matcher.matches()) {
+            throw new RuntimeException("Date MUST be a string in ISO 8601 format");
+        }
+
+    }
+
+    /**
+     * adding a date time Property. The property should match the ISO 8601 date
+     * format.
+     *
+     * @param key key of the property
+     * @param value value of the property
+     */
+    public void addDateTimeProperty(String key, String value) {
+        if (value != null) {
+            matchStringwithISODateFormat(value);
+            this.properties.put(key, value);
+            this.notifyObservers();
+        }
+    }
+
+    /**
      * This a builder inner class that should allow for an easier creating of
      * entities.
      *
@@ -319,9 +350,9 @@ public class AbstractEntity {
         public T setId(String id) {
             if (id != null) {
                 if (isEncoded(id)) {
-                    this.id=id;
+                    this.id = id;
                 } else {
-                    this.id=encode(id).get();
+                    this.id = encode(id).get();
                 }
             }
             return self();
@@ -356,6 +387,22 @@ public class AbstractEntity {
         }
 
         /**
+         * adding a date time Property. The property should match the ISO 8601
+         * date format.
+         *
+         * @param key key of the property
+         * @param value value of the property
+         * @return the generic builder.
+         */
+        public T addDateTimeProperty(String key, String value) {
+            if (value != null) {
+                matchStringwithISODateFormat(value);
+                this.properties.put(key, value);
+            }
+            return self();
+        }
+
+        /**
          * Adding a property to the builder.
          *
          * @param key the key of the property in a string.
@@ -378,35 +425,14 @@ public class AbstractEntity {
          * @return the generic builder.
          */
         public T addProperty(String key, String value) {
-            if (key.equalsIgnoreCase("datePublished")) {
-                matchStringwithISODateFormat(value);
-                this.properties.put(key, value);
-            } else {
-                this.properties.put(key, value);
-            }
+            this.properties.put(key, value);
             return self();
-        }
-
-        /**
-         * checks if the date matches the ISO 8601 date format. If not, an
-         * exception is thrown.
-         *
-         * @param date the date as a string
-         */
-        private void matchStringwithISODateFormat(String date) {
-            String regex = "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(date);
-            if (!matcher.matches()) {
-                throw new RuntimeException("DatePublished MUST be a string in ISO 8601 format");
-            }
         }
 
         public T addProperty(String key, int value) {
             this.properties.put(key, value);
             return self();
         }
-
 
         public T addProperty(String key, double value) {
             this.properties.put(key, value);
@@ -417,7 +443,7 @@ public class AbstractEntity {
             this.properties.put(key, value);
             return self();
         }
-      
+
         /**
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one. Instead of:

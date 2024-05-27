@@ -211,7 +211,7 @@ public class SerializationTest {
     FileUtils.forceMkdir(folder.toFile());
     DataSetEntity measure = new DataSetEntity.DataSetBuilder()
         .addContent(folder, "measurements/")
-        .addProperty("name", "Measurement data.")
+        .addProperty("name", "Measurement Data")
         .addProperty("description", "This folder contains all relative to the measurements files.")
         .addAuthor(author.getId())
         .addIdProperty("license", license.getId())
