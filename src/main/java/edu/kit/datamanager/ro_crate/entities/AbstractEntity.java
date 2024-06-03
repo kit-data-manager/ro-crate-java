@@ -95,6 +95,7 @@ public class AbstractEntity {
 
     /**
      * Returns the types of this entity.
+     *
      * @return a set of type strings.
      */
     public Set<String> getTypes() {
@@ -141,6 +142,26 @@ public class AbstractEntity {
 
     protected void setId(String id) {
         this.properties.put("@id", id);
+    }
+
+    /**
+     * removes one property from an entity.
+     *
+     * @param key the key of the entity, which will be removed.
+     */
+    public void removeProperty(String key) {
+        this.getProperties().remove(key);
+        this.notifyObservers();
+    }
+
+    /**
+     * removes a list of properties from an entity.
+     *
+     * @param keyList list of keys, which will be removed.
+     */
+    public void removeProperties(List<String> keyList) {
+        this.getProperties().remove(keyList);
+        this.notifyObservers();
     }
 
     /**
