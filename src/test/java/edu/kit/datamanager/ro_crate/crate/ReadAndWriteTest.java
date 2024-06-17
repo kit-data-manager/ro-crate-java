@@ -30,7 +30,7 @@ public class ReadAndWriteTest {
     Path fileInDir = htmlDir.resolve("file.html");
     FileUtils.writeStringToFile(fileInDir.toFile(), "fileN2", Charset.defaultCharset());
 
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .setPreview(new CustomPreview(htmlFile.toFile(), htmlDir.toFile()))
         .build();
 

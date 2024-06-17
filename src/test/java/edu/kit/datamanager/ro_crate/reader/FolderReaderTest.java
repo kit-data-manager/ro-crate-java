@@ -36,7 +36,7 @@ public class FolderReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .build();
     Path f = writeMetadataToFile(temp, roCrate);
     // Read from written file
@@ -61,8 +61,8 @@ public class FolderReaderTest {
         .setGivenName("Tim")
         .addProperty("name", "Tim Luckett")
         .build();
-    RoCrate c1 = new RoCrate.RoCrateBuilder("mini", "test").build();
-    RoCrate c2 = new RoCrate.RoCrateBuilder("other", "with file")
+    RoCrate c1 = new RoCrate.RoCrateBuilder("mini", "test", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/").build();
+    RoCrate c2 = new RoCrate.RoCrateBuilder("other", "with file", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addContextualEntity(person)
         .build();
     writeMetadataToFile(temp1, c1);
@@ -89,10 +89,10 @@ public class FolderReaderTest {
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
 
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .addContent(cvs, cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -121,10 +121,10 @@ public class FolderReaderTest {
     FileUtils.touch(csv.toFile());
     FileUtils.writeStringToFile(csv.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
 
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
             .addDataEntity(
                     new FileEntity.FileEntityBuilder()
-                            .setSource(csv.toFile())
+                            .addContent(csv, csv.toFile().getName())
                             .addProperty("name", "Survey responses")
                             .addProperty("contentSize", "26452")
                             .addProperty("encodingFormat", "text/csv")
@@ -147,14 +147,13 @@ public class FolderReaderTest {
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .addContent(file, "survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -185,14 +184,13 @@ public class FolderReaderTest {
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("file.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .addContent(file, "survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -211,9 +209,8 @@ public class FolderReaderTest {
 
     Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
     res.addDataEntity(new FileEntity.FileEntityBuilder()
-        .setId("new_file")
         .setEncodingFormat("setnew")
-        .setSource(newFile.toFile())
+        .addContent(newFile, "new_file")
         .build(), true);
 
     Path destinationDir = temp.resolve("result");

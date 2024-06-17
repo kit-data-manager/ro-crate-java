@@ -1,12 +1,14 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity.FileEntityBuilder;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,7 @@ public class FileEntityTest {
   void testSerialization() throws IOException {
     String name = "RO-Crate specification";
     FileEntity file = new FileEntityBuilder()
-        .setId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
+        .addContent(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
         .addProperty("name", name)
         .setEncodingFormat("application/pdf")
         .addProperty("url", "https://zenodo.org/record/3541888")
@@ -41,33 +43,22 @@ public class FileEntityTest {
   }
 
   @Test
-  void testSerializationWithPhysicalFile() throws IOException {
+  void testSerializationWithPhysicalFile() throws IOException, URISyntaxException {
 
     // add a random json file
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
     FileEntity file = new FileEntityBuilder()
-        .setId("example.json")
-        .setSource(new File(url.getFile()))
+        .addContent(Paths.get(url.toURI()), "example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .build();
     HelpFunctions.compareEntityWithFile(file, "/json/entities/data/localFile.json");
-
-    // if the entity does not include and id but includes a physical file
-    // use the name of the file as id
-    FileEntity fileWithoutId = new FileEntityBuilder()
-        .setSource(new File(url.getFile()))
-        .addProperty("name", "RO-Crate specification")
-        .setEncodingFormat("application/json")
-        .build();
-
-    assertEquals(fileWithoutId.getId(), new File(url.getFile()).getName());
   }
 
   @Test
-  void testSerializationWithLicense() throws IOException {
+  void testSerializationWithLicense() throws IOException, URISyntaxException {
     ContextualEntity entity = new ContextualEntity.ContextualEntityBuilder()
         .setId("https://creativecommons.org/licenses/by/4.0/")
         .addType("CreativeWork")
@@ -77,8 +68,7 @@ public class FileEntityTest {
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assertNotNull(url);
     FileEntity file = new FileEntityBuilder()
-        .setId("example.json")
-        .setSource(new File(url.getFile()))
+        .addContent(Paths.get(url.toURI()), "example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .setLicense(entity)

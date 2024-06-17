@@ -34,7 +34,7 @@ public class RemoteDataEntitiesPerformance {
   private static void remoteDataEntitiesTest(int numEntities, String baseId) throws IOException {
 
     Instant start = Instant.now();
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       DataEntity person = new DataEntity.DataEntityBuilder()
           .setId(baseId + i)

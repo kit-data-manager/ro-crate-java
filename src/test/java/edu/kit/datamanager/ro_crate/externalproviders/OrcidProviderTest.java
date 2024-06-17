@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version 1
  */
 public class OrcidProviderTest {
-
+    
   @Test
   void testAddingPersonEntity() throws IOException {
     PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
