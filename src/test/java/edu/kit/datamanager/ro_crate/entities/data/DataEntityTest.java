@@ -141,7 +141,7 @@ public class DataEntityTest {
         assert url != null;
         dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(Paths.get(url.getFile()), "simple2.json")
+                .addContent(Paths.get(url.toURI()), "simple2.json")
                 .build();
 
         assertNotNull(dataEntity);

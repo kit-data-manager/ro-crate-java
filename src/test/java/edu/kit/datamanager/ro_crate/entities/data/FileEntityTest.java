@@ -7,6 +7,7 @@ import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity.FileEntityBuilder;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
@@ -42,14 +43,14 @@ public class FileEntityTest {
   }
 
   @Test
-  void testSerializationWithPhysicalFile() throws IOException {
+  void testSerializationWithPhysicalFile() throws IOException, URISyntaxException {
 
     // add a random json file
     URL url =
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
     FileEntity file = new FileEntityBuilder()
-        .addContent(Paths.get(url.getFile()), "example.json")
+        .addContent(Paths.get(url.toURI()), "example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .build();
@@ -57,7 +58,7 @@ public class FileEntityTest {
   }
 
   @Test
-  void testSerializationWithLicense() throws IOException {
+  void testSerializationWithLicense() throws IOException, URISyntaxException {
     ContextualEntity entity = new ContextualEntity.ContextualEntityBuilder()
         .setId("https://creativecommons.org/licenses/by/4.0/")
         .addType("CreativeWork")
@@ -67,7 +68,7 @@ public class FileEntityTest {
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assertNotNull(url);
     FileEntity file = new FileEntityBuilder()
-        .addContent(Paths.get(url.getFile()), "example.json")
+        .addContent(Paths.get(url.toURI()), "example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .setLicense(entity)
