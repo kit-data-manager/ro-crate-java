@@ -12,6 +12,8 @@ import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import static edu.kit.datamanager.ro_crate.special.UriUtil.decode;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.isUrl;
+
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
@@ -92,17 +94,18 @@ public class RoCrateReader {
         // if the id is in the root hasPart list, we know this entity is a data entity
         RootDataEntity root = crate.getRootDataEntity();
         if (root != null && root.hasInHasPart(node.get(PROP_ID).asText())) {
+          // data entity
+          DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
+                  .setAll(node.deepCopy());
+
+          // Handle data entities with corresponding file
           File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
-            
-          // data entity
-          DataEntity dataEntity = new DataEntity.DataEntityBuilder()
-              .setAll(node.deepCopy())
-              .addContent(loc.toPath(), loc.getName())
-              .build();
-          crate.addDataEntity(dataEntity, false);
+            dataEntity.addContent(loc.toPath(), loc.getName());
           }
+
+          crate.addDataEntity(dataEntity.build(), false);
         } else {
           // contextual entity
           crate.addContextualEntity(
