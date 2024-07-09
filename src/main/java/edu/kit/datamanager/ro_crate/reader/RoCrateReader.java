@@ -127,6 +127,7 @@ public class RoCrateReader {
   }
 
   protected File checkFolderHasFile(String id, File file) {
+    if (isUrl(id)) return null;
     Path path = file.toPath().resolve(decode(id).get());
     if (path.toFile().exists()) {
       return path.toFile();
