@@ -56,7 +56,11 @@ public class UriUtil {
      * @return true if it is a url, false otherwise.
      */
     public static boolean isUrl(String uri) {
-        return asUrl(uri).isPresent();
+        try {
+            return asUrl(uri).isPresent();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
