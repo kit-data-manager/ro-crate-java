@@ -118,7 +118,7 @@ public class DataEntity extends AbstractEntity {
         public T addContent(URI uri) {
             if (isUrl(uri.toString())) {
                 this.setId(uri.toString());
-            }
+            } else throw new IllegalArgumentException("This Data Entity remote ID does not resolve to a valid URL.");
             return self();
         }
 
