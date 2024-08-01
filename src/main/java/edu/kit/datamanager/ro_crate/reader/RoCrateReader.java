@@ -11,12 +11,13 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.decode;
+import static edu.kit.datamanager.ro_crate.special.UriUtil.isUrl;
+
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -93,16 +94,18 @@ public class RoCrateReader {
         // if the id is in the root hasPart list, we know this entity is a data entity
         RootDataEntity root = crate.getRootDataEntity();
         if (root != null && root.hasInHasPart(node.get(PROP_ID).asText())) {
+          // data entity
+          DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
+                  .setAll(node.deepCopy());
+
+          // Handle data entities with corresponding file
           File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
+            dataEntity.addContent(loc.toPath(), loc.getName());
           }
-          // data entity
-          DataEntity dataEntity = new DataEntity.DataEntityBuilder()
-              .setAll(node.deepCopy())
-              .setSource(loc)
-              .build();
-          crate.addDataEntity(dataEntity, false);
+
+          crate.addDataEntity(dataEntity.build(), false);
         } else {
           // contextual entity
           crate.addContextualEntity(
@@ -124,7 +127,8 @@ public class RoCrateReader {
   }
 
   protected File checkFolderHasFile(String id, File file) {
-    Path path = file.toPath().resolve(URLDecoder.decode(id, StandardCharsets.UTF_8));
+    if (isUrl(id)) return null;
+    Path path = file.toPath().resolve(decode(id).get());
     if (path.toFile().exists()) {
       return path.toFile();
     }

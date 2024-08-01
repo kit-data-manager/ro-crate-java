@@ -4,9 +4,7 @@
       "@id": "./",
       "@type": "Dataset",
       "name" : "minimal",
-      "description" : "minimal RO_crate",
-       "datePublished": "2024",
-       "license": {"@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"}
+      "description" : "minimal RO_crate"
     },
     {
       "@type": "CreativeWork",

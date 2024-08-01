@@ -12,7 +12,8 @@ plugins {
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
-    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+    id "io.freefair.maven-publish-java" version "8.6"
 }
 
 group 'edu.kit.datamanager'
@@ -27,12 +28,13 @@ repositories {
 }
 
 ext {
-    jacksonVersion  = '2.16.0'
+    jacksonVersion  = '2.17.2'
 }
 
 dependencies {
     // JUnit setup for testing
-    testImplementation(platform("org.junit:junit-bom:5.10.1"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.0.0-M4'
+    testImplementation(platform("org.junit:junit-bom:5.10.3"))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // JSON object mapping / (de-)serialization
@@ -41,21 +43,26 @@ dependencies {
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:6.12'
+    implementation 'com.github.fslev:json-compare:6.13'
     // url validator
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.8.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.9'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
     // JSON-LD, Zenodo mapping
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.3'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.4.1'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.87"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.1"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+
+def signingTasks = tasks.withType(Sign)
+tasks.withType(AbstractPublishToMaven).configureEach{
+    mustRunAfter(signingTasks)
+ }
 
 sourceSets {
     main {
@@ -140,7 +147,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.11"
 }
 
 // maxParallelForks(2)

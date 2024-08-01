@@ -19,22 +19,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PreviewCrateTest {
-
+    
   @Test
   void testAutomaticPreview(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate1");
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .setPreview(new AutomaticPreview())
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().getAbsolutePath());
+    
     assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
 
   @Test
   void testAutomaticPreviewAddingLater(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate2");
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/").build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
     assertFalse(location.resolve("ro-crate-preview.html").toFile().exists());
@@ -48,7 +49,7 @@ public class PreviewCrateTest {
     Path location = temp.resolve("ro_crate3");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .setPreview(new CustomPreview(previewFile.toFile()))
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
@@ -64,7 +65,7 @@ public class PreviewCrateTest {
     Path dirHtml = temp.resolve("html_dir");
     Path css_file = dirHtml.resolve("test.css");
     FileUtils.writeStringToFile(css_file.toFile(), "random css it is not important that it is valid for know", Charset.defaultCharset());
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .setPreview(new CustomPreview(previewFile.toFile(), dirHtml.toFile()))
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
