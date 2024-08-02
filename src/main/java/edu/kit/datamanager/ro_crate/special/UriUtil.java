@@ -170,10 +170,14 @@ public class UriUtil {
 
     /**
      * Returns true, if the URLs domain exists.
+     * 
+     * @deprecated The current plementation will only check if this is a valid url.
+     *             Functionality will be removed.
      *
      * @param url the given URL
      * @return true if domain exists.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean hasValidDomain(String url) {
         if (!isValidUri(url)) {
             String encoded = encode(url).get();
