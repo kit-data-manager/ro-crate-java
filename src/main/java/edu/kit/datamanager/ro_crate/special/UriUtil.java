@@ -42,6 +42,12 @@ public class UriUtil {
     /**
      * Returns true, if the given String is encoded and can be used as an
      * identifier in RO-Crate.
+     * 
+     * Possible identifiers include:
+     * - a uri
+     * - a url
+     * - a valid LD identifier (including blank node identifiers)
+     * - relative identifiers
      *
      * @param uri the given URI. Usually a URL or relative file path.
      * @return trie if the url is encoded, false if it is not.
