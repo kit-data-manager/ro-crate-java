@@ -172,4 +172,20 @@ public class UriUtil {
         }
         return asUrl(url) != null;
     }
+
+    /**
+     * checks if the given string is correctly encoded.
+     *
+     * @param uri the given string
+     * @return true if the given string is correctly encoded.
+     */
+    public static boolean isEncoded(String uri) {
+        String decoded = decode(uri).get();
+        Optional<String> encoded = encode(decoded);
+        String result = null;
+        if (encoded.isPresent()) {
+            result = encoded.get();
+        }
+        return uri.equals(result);
+    }
 }
