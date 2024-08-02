@@ -57,7 +57,7 @@ public class UriUtil {
      */
     public static boolean isUrl(String uri) {
         try {
-            return asUrl(uri).isPresent();
+            return asUrl(encode(uri).get()).isPresent();
         } catch (Exception e) {
             return false;
         }
