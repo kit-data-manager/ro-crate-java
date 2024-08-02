@@ -82,7 +82,7 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given string is a path.
+     * Returns true, if the given string is a file path.
      *
      * @param uri the given string
      * @return true if it is a path, false otherwise.
@@ -92,7 +92,7 @@ public class UriUtil {
     }
 
     /**
-     * Tests if the given String is a path, and if so, returns it.
+     * Tests if the given String is a file path, and if so, returns it.
      *
      * @param uri the given String which will be tested.
      * @return the path, if it is one.
