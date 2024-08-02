@@ -53,7 +53,7 @@ public class UriUtil {
      * - relative identifiers
      *
      * @param uri the given URI. Usually a URL or relative file path.
-     * @return trie if the url is encoded, false if it is not.
+     * @return true if the url is encoded, false if it is not.
      */
     public static boolean isValidUri(String uri) {
         return UriUtils.isURI(uri) || isLdBlankNode(uri);
