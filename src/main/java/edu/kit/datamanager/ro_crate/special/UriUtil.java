@@ -144,7 +144,7 @@ public class UriUtil {
      * @return true if the string is a blank node. False if not.
      */
     private static boolean isLdBlankNode(String uri) {
-        return uri.startsWith("_:");
+        return uri.startsWith("_:") && !uri.contains(" ");
     }
 
     /**
