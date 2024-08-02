@@ -20,12 +20,12 @@ import java.net.URISyntaxException;
  * The purpose is to have a simple abstraction where the way e.g. a URL is
  * checked can be changed and tested easily for the whole library.
  */
-public class UriUtil {
+public class IdentifierUtils {
 
     /**
      * Hidden constructor, as this class only has static methods.
      */
-    private UriUtil() {
+    private IdentifierUtils() {
     }
 
     /**
