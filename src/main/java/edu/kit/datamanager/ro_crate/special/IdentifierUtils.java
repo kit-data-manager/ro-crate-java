@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.special;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -19,21 +20,24 @@ import java.net.URISyntaxException;
  * The purpose is to have a simple abstraction where the way e.g. a URL is
  * checked can be changed and tested easily for the whole library.
  */
-public class UriUtil {
+public class IdentifierUtils {
 
     /**
      * Hidden constructor, as this class only has static methods.
      */
-    private UriUtil() {
+    private IdentifierUtils() {
     }
 
     /**
      * Returns true, if the given String can not be used as an identifier in
      * RO-Crate.
+     * 
+     * @deprecated Prefer using !isValidUri instead.
      *
      * @param uri the given URI. Usually a URL or relative file path.
      * @return true if url is decoded, false if it is not.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean isNotValidUri(String uri) {
         return !isValidUri(uri);
     }
@@ -41,9 +45,15 @@ public class UriUtil {
     /**
      * Returns true, if the given String is encoded and can be used as an
      * identifier in RO-Crate.
+     * 
+     * Possible identifiers include:
+     * - a uri
+     * - a url
+     * - a valid LD identifier (including blank node identifiers)
+     * - relative identifiers
      *
      * @param uri the given URI. Usually a URL or relative file path.
-     * @return trie if the url is encoded, false if it is not.
+     * @return true if the url is encoded, false if it is not.
      */
     public static boolean isValidUri(String uri) {
         return UriUtils.isURI(uri) || isLdBlankNode(uri);
@@ -57,7 +67,7 @@ public class UriUtil {
      */
     public static boolean isUrl(String uri) {
         try {
-            return asUrl(uri).isPresent();
+            return asUrl(encode(uri).get()).isPresent();
         } catch (Exception e) {
             return false;
         }
@@ -82,7 +92,7 @@ public class UriUtil {
     }
 
     /**
-     * Returns true, if the given string is a path.
+     * Returns true, if the given string is a file path.
      *
      * @param uri the given string
      * @return true if it is a path, false otherwise.
@@ -92,7 +102,7 @@ public class UriUtil {
     }
 
     /**
-     * Tests if the given String is a path, and if so, returns it.
+     * Tests if the given String is a file path, and if so, returns it.
      *
      * @param uri the given String which will be tested.
      * @return the path, if it is one.
@@ -126,11 +136,22 @@ public class UriUtil {
         result = result.replace("\\", "/");
         result = result.replace("%", "%25");
         result = result.replace(" ", "%20");
-        return Optional.of(result);
+        if (isValidUri(result)) {
+            return Optional.of(result);
+        }
+        // from here on, our soft-encoding failed and we will fully encode the url or
+        // path.
+        result = URLEncoder.encode(result, StandardCharsets.UTF_8);
+
+        if (isValidUri(result)) {
+            return Optional.of(result);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public static Optional<String> decode(String uri) {
-        if (isNotValidUri(uri) || isLdBlankNode(uri)) {
+        if (!isValidUri(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
         return Optional.of(URLDecoder.decode(uri, StandardCharsets.UTF_8));
@@ -144,17 +165,21 @@ public class UriUtil {
      * @return true if the string is a blank node. False if not.
      */
     private static boolean isLdBlankNode(String uri) {
-        return uri.startsWith("_:");
+        return uri.startsWith("_:") && !uri.contains(" ");
     }
 
     /**
      * Returns true, if the URLs domain exists.
+     * 
+     * @deprecated The current plementation will only check if this is a valid url.
+     *             Functionality will be removed.
      *
      * @param url the given URL
      * @return true if domain exists.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean hasValidDomain(String url) {
-        if (isNotValidUri(url)) {
+        if (!isValidUri(url)) {
             String encoded = encode(url).get();
             return asUrl(encoded) != null;
         }
@@ -167,6 +192,7 @@ public class UriUtil {
      * @param uri the given string
      * @return true if the given string is correctly encoded.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean isEncoded(String uri) {
         String decoded = decode(uri).get();
         Optional<String> encoded = encode(decoded);
