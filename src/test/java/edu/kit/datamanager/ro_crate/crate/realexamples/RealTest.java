@@ -106,17 +106,11 @@ public class RealTest {
                 .setGeo("#4241434-33413")
                 .build();
 
-        List<String> instrument = new ArrayList<>();
-        instrument.add("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit");
-        List<String> result = new ArrayList<>();
-        result.add("measurements/");
-
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder()
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
                 .setId("#MeasurementCapture_23231")
-                .addType(ActionTypeEnum.CREATE)
-                .addAgent("creator")
-                .addInstrument(instrument)
-                .addResult(result)
+                .setAgent("creator")
+                .addInstrument("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
+                .addResult("measurements/")
                 .build();
 
         ContextualEntity geo = new ContextualEntity.ContextualEntityBuilder()

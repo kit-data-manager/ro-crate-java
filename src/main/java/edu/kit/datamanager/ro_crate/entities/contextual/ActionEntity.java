@@ -19,67 +19,80 @@ public class ActionEntity extends ContextualEntity {
         this.addDateTimeProperty("endTime", entityBuilder.endTime);
 
         this.addIdProperty("agent", entityBuilder.agent);
-        this.addIdListProperties("instrument", entityBuilder.instrument);
-        this.addIdListProperties("result", entityBuilder.result);
-        this.addIdListProperties("object", entityBuilder.object);
+        this.addIdListProperties("instrument", entityBuilder.instruments);
+        this.addIdListProperties("result", entityBuilder.results);
+        this.addIdListProperties("object", entityBuilder.objects);
     }
 
     abstract static class AbstractActionEntityBuilder<T extends AbstractActionEntityBuilder<T>>
             extends AbstractContextualEntityBuilder<T> {
 
-        ActionTypeEnum type;
-        String description;
-        String name;
-        String startTime;
-        String endTime;
-        String agent;
+        private ActionTypeEnum type;
+        private String description;
+        private String name;
+        private String startTime;
+        private String endTime;
+        private String agent;
 
-        List<String> object = new ArrayList<>();
-        List<String> result = new ArrayList<>();
-        List<String> instrument = new ArrayList<>();
+        List<String> objects = new ArrayList<>();
+        List<String> results = new ArrayList<>();
+        List<String> instruments = new ArrayList<>();
 
-        public T addType(ActionTypeEnum type) {
+        protected AbstractActionEntityBuilder(ActionTypeEnum type) {
             this.type = type;
-            return self();
         }
 
-        public T addDescription(String description) {
+        public T setDescription(String description) {
             this.description = description;
             return self();
         }
 
-        public T addName(String name) {
+        public T setName(String name) {
             this.name = name;
             return self();
         }
 
-        public T addStartTime(String startTime) {
+        public T setStartTime(String startTime) {
             this.startTime = startTime;
             return self();
         }
 
-        public T addEndTime(String endTime) {
+        public T setEndTime(String endTime) {
             this.endTime = endTime;
             return self();
         }
 
-        public T addAgent(String agent) {
+        public T setAgent(String agent) {
             this.agent = agent;
             return self();
         }
 
-        public T addObject(List<String> object) {
-            this.object = object;
+        public T addObjects(List<String> objects) {
+            this.objects.addAll(objects);
             return self();
         }
 
-        public T addResult(List<String> result) {
-            this.result = result;
+        public T addObject(String object) {
+            this.objects.add(object);
             return self();
         }
 
-        public T addInstrument(List<String> instrument) {
-            this.instrument = instrument;
+        public T addResults(List<String> results) {
+            this.results.addAll(results);
+            return self();
+        }
+        public T addResult(String result) {
+            this.results.add(result);
+            return self();
+        }
+
+        public T addInstruments(List<String> instruments) {
+            this.instruments.addAll(instruments);
+            return self();
+        }
+
+        public T addInstrument(String instrument) {
+            this.instruments.add(instrument);
             return self();
         }
 
@@ -89,6 +102,10 @@ public class ActionEntity extends ContextualEntity {
 
     public static final class ActionEntityBuilder
             extends AbstractActionEntityBuilder<ActionEntityBuilder> {
+
+        public ActionEntityBuilder(ActionTypeEnum type) {
+            super(type);
+        }
 
         @Override
         public ActionEntityBuilder self() {
