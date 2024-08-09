@@ -1,51 +1,46 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author sabrinechelbi
  */
-public class ActionEntityTest {
+class ActionEntityTest {
 
     @Test
     void testAddCreateActionMinimalExample() throws IOException {
         
-        String idEquipment = "https://confluence.csiro.au/display/ASL/Hovermap";
         ContextualEntity equipment = new ContextualEntity.ContextualEntityBuilder()
-                .setId(idEquipment)
+                .setId("https://confluence.csiro.au/display/ASL/Hovermap")
                 .addType("IndividualProduct")
                 .addProperty("description", "The CSIRO bentwing is an unmanned aerial vehicle (UAV, commonly known as a drone) with a LIDAR ... ")
                 .addProperty("name", "Bentwing")
                 .addIdProperty("manufacturer", "https://www.atlassian.com/software/confluence")
                 .addProperty("serialNumber", "1111122233321231")
                 .build();
-        HelpFunctions.compareEntityWithFile(equipment, "/json/entities/contextual/equipment.json");
         
+        assertNotNull(equipment);
+        HelpFunctions.compareEntityWithFile(equipment, "/json/entities/contextual/equipment.json");
 
-        String idAction = "#DataCapture_wcc02";
-        List<String> instrument = new ArrayList<>();
-        instrument.add("https://confluence.csiro.au/display/ASL/Hovermap");
-        List<String> object = new ArrayList<>();
-        object.add("#victoria_arch");
-        List<String> result = new ArrayList<>();
-        result.add("wcc02_arch.laz");
-        result.add("wcc02_arch_traj.txt");
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder()
-                .setId(idAction)
-                .addType(ActionTypeEnum.CREATE)
-                .addAgent("https://orcid.org/0000-0002-1672-552X")
-                .addInstrument(instrument)
-                .addObject(object)
-                .addResult(result)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
+                .setId("#DataCapture_wcc02")
+                .setAgent("https://orcid.org/0000-0002-1672-552X")
+                .addInstrument("https://confluence.csiro.au/display/ASL/Hovermap")
+                .addObject("#victoria_arch")
+                // note how we can add multiple items by simply repeating them.
+                .addResult("wcc02_arch.laz")
+                .addResult("wcc02_arch_traj.txt")
                 .addDateTimeProperty("startTime","2017-06-10T12:56:14+10:00")
                 .addDateTimeProperty("endTime","2017-06-11T12:56:14+10:00")
                 .build();
-                
+        
+        assertNotNull(createAction);
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/createActionExample.json");
     }
     
@@ -62,40 +57,27 @@ public class ActionEntityTest {
                 .build();
         HelpFunctions.compareEntityWithFile(software, "/json/entities/contextual/software.json");
 
-        String id = "#Photo_Capture_1";
-        List<String> instrument = new ArrayList<>();
-        instrument.add("#EPL1");
-        instrument.add("#Panny20mm");
-        List<String> result = new ArrayList<>();
-        result.add("pics/2017-06-11%2012.56.14.jpg");
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder()
-                .setId(id)
-                .addType(ActionTypeEnum.CREATE)
-                .addAgent("https://orcid.org/0000-0002-3545-944X")
-                .addDescription("Photo snapped on a photo walk on a misty day")
-                .addEndTime("2017-06-11T12:56:14+10:00")
-                .addInstrument(instrument)
-                .addResult(result)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
+                .setId("#Photo_Capture_1")
+                .setAgent("https://orcid.org/0000-0002-3545-944X")
+                .setDescription("Photo snapped on a photo walk on a misty day")
+                .setEndTime("2017-06-11T12:56:14+10:00")
+                .addInstrument("#EPL1")
+                .addInstrument("#Panny20mm")
+                .addResult("pics/2017-06-11%2012.56.14.jpg")
                 .build();
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/createActionExampleSoftware.json");
     }
     
     @Test
     void testAddUpdateAction() throws IOException {
-
-        String id = "#history-02";
-        List<String> instrument = new ArrayList<>();
-        instrument.add("https://stash.research.uts.edu.au");
-         List<String> object = new ArrayList<>();
-        object.add("https://doi.org/10.5281/zenodo.1009240");
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder()
-                .setId(id)
-                .addType(ActionTypeEnum.UPDATE)
-                .addObject(object)
-                .addName("RO-Crate published")
-                .addAgent("https://orcid.org/0000-0001-5152-5307")
-                .addEndTime("2018-09-10")
-                .addInstrument(instrument)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.UPDATE)
+                .setId("#history-02")
+                .setName("RO-Crate published")
+                .addObject("https://doi.org/10.5281/zenodo.1009240")
+                .setAgent("https://orcid.org/0000-0001-5152-5307")
+                .setEndTime("2018-09-10")
+                .addInstrument("https://stash.research.uts.edu.au")
                 .addIdProperty("actionStatus", "http://schema.org/CompletedActionStatus")
                 .build();
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/updateAction.json");
