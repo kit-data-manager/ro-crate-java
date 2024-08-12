@@ -5,6 +5,8 @@ import edu.kit.datamanager.ro_crate.HelpFunctions;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +33,53 @@ class ActionEntityTest {
         ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.CREATE)
                 .setId("#DataCapture_wcc02")
                 .setAgent("https://orcid.org/0000-0002-1672-552X")
+
                 .addInstrument("https://confluence.csiro.au/display/ASL/Hovermap")
+                // or (duplications will be ignored):
+                .addInstruments(Arrays.asList("https://confluence.csiro.au/display/ASL/Hovermap"))
+                
                 .addObject("#victoria_arch")
+                // or (duplications will be ignored):
+                .addObjects(Arrays.asList("#victoria_arch"))
+
                 // note how we can add multiple items by simply repeating them.
                 .addResult("wcc02_arch.laz")
                 .addResult("wcc02_arch_traj.txt")
+                // adding the same items will not duplicate them:
+                .addResults(Arrays.asList("wcc02_arch.laz", "wcc02_arch_traj.txt"))
                 .setStartTime("2017-06-10T12:56:14+10:00")
                 .setEndTime("2017-06-11T12:56:14+10:00")
+                .build();
+        
+        assertNotNull(createAction);
+        HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/createActionExample.json");
+    }
+
+    @Test
+    void testCreateActionGeneric() throws IOException {
+        
+        ContextualEntity equipment = new ContextualEntity.ContextualEntityBuilder()
+                .setId("https://confluence.csiro.au/display/ASL/Hovermap")
+                .addType("IndividualProduct")
+                .addProperty("description", "The CSIRO bentwing is an unmanned aerial vehicle (UAV, commonly known as a drone) with a LIDAR ... ")
+                .addProperty("name", "Bentwing")
+                .addIdProperty("manufacturer", "https://www.atlassian.com/software/confluence")
+                .addProperty("serialNumber", "1111122233321231")
+                .build();
+        
+        assertNotNull(equipment);
+        HelpFunctions.compareEntityWithFile(equipment, "/json/entities/contextual/equipment.json");
+
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.CREATE)
+                .setId("#DataCapture_wcc02")
+                .setAgent("https://orcid.org/0000-0002-1672-552X")
+
+                .addInstrument("https://confluence.csiro.au/display/ASL/Hovermap")
+                .addObject("#victoria_arch")
+                .addResult("wcc02_arch.laz")
+                .addResult("wcc02_arch_traj.txt")
+                .addDateTimeProperty("startTime","2017-06-10T12:56:14+10:00")
+                .addDateTimeProperty("endTime","2017-06-11T12:56:14+10:00")
                 .build();
         
         assertNotNull(createAction);
