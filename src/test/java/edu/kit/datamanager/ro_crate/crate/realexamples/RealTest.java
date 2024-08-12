@@ -22,12 +22,11 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RealTest {
+class RealTest {
 
+    @SuppressWarnings("java:S2699") // disable warning about missing assertions
     @Test
     void testWithIDRCProject(@TempDir Path temp) throws IOException {
 
@@ -59,11 +58,10 @@ public class RealTest {
         crate.deleteEntityById("new_file.txt");
 
         HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
-        //  uncomment if want to see crate in local folder structure
     }
 
     @Test
-    void testRealExampleWithActions(@TempDir Path temp) throws IOException {
+    void testRealExampleWithActions() throws IOException {
         DataSetEntity dataSet = new DataSetEntity.DataSetBuilder()
                 .setId("measurements/")
                 .addProperty("name", "Measurement Data")
@@ -140,8 +138,8 @@ public class RealTest {
                 .build();
 
         HelpFunctions.compareCrateJsonToFileInResources(crate, "/json/crate/BiggerExample.json");
-        assertEquals(crate.getAllContextualEntities().size(), 7);
-        assertEquals(crate.getAllDataEntities().size(), 2);
+        assertEquals(7, crate.getAllContextualEntities().size());
+        assertEquals(2, crate.getAllDataEntities().size());
 
     }
 }

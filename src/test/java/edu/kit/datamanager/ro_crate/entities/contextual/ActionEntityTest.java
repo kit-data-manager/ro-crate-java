@@ -46,15 +46,14 @@ class ActionEntityTest {
     
     @Test
     void testAddCreateActionUsingSoftware() throws IOException {
-        
-         String idSoftware = "https://www.imagemagick.org/";
         ContextualEntity software = new ContextualEntity.ContextualEntityBuilder()
-                .setId(idSoftware)
+                .setId("https://www.imagemagick.org/")
                 .addType("SoftwareApplication")
                 .addProperty("url", "https://www.imagemagick.org/")
                 .addProperty("name", "ImageMagick")
                 .addProperty("version", "ImageMagick 6.9.7-4 Q16 x86_64 20170114 http://www.imagemagick.org")
                 .build();
+        assertNotNull(software);
         HelpFunctions.compareEntityWithFile(software, "/json/entities/contextual/software.json");
 
         ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
@@ -66,6 +65,7 @@ class ActionEntityTest {
                 .addInstrument("#Panny20mm")
                 .addResult("pics/2017-06-11%2012.56.14.jpg")
                 .build();
+        assertNotNull(createAction);
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/createActionExampleSoftware.json");
     }
     
@@ -80,6 +80,7 @@ class ActionEntityTest {
                 .addInstrument("https://stash.research.uts.edu.au")
                 .addIdProperty("actionStatus", "http://schema.org/CompletedActionStatus")
                 .build();
+        assertNotNull(createAction);
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/updateAction.json");
     }
 }
