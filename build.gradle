@@ -33,7 +33,7 @@ ext {
 
 dependencies {
     // JUnit setup for testing
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0-RC1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testImplementation(platform("org.junit:junit-bom:5.10.3"))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
