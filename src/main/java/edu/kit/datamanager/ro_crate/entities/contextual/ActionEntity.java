@@ -4,7 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * This class helps to generate a detailing provenance of entities.
+ * This class represents a detailing provenance of entities.
+ * 
+ * Relevant specification link: <a href=
+ * "https://www.researchobject.org/ro-crate/specification/1.1/provenance.html">Provenance
+ * of entities</a>
  * 
  * @author sabrinechelbi
  */
@@ -69,9 +73,14 @@ public class ActionEntity extends ContextualEntity {
         }
 
         /**
-         * Same as calling {@link #addObject(String)} with each element of the collection.
+         * Same as calling {@link #addObject(String)} with each element of the
+         * collection.
          * 
-         * @param objects the objects to add to this ActionEntity
+         * From the specification: "A curation Action MUST have at least one object
+         * which associates it with either the root data entity Dataset or one of its
+         * components."
+         * 
+         * @param objects see {@link #addObject(String)}
          * @return this builder
          */
         public T addObjects(Collection<String> objects) {
@@ -82,8 +91,16 @@ public class ActionEntity extends ContextualEntity {
         /**
          * Adds a object to the collection of objects of this ActionEntity.
          * 
+         * From the specification: "A curation Action MUST have at least one object
+         * which associates it with either the root data entity Dataset or one of its
+         * components."
+         * 
          * @param object the object to add to this ActionEntity. Duplicates will be
-         *               ignored/removed.
+         *               ignored/removed. "The object upon which the action is carried
+         *               out, whose state is kept intact or changed. Also known as the
+         *               semantic roles patient, affected or undergoer (which change
+         *               their state) or theme (which doesn't). E.g. John read a book."
+         *               (Schema.org definition)
          * @return this builder
          */
         public T addObject(String object) {
@@ -92,9 +109,10 @@ public class ActionEntity extends ContextualEntity {
         }
 
         /**
-         * Same as calling {@link #addResult(String)} with each element of the collection.
+         * Same as calling {@link #addResult(String)} with each element of the
+         * collection.
          * 
-         * @param results the results to add to this ActionEntity
+         * @param results see {@link #addResult(String)}
          * @return this builder
          */
         public T addResults(Collection<String> results) {
@@ -105,7 +123,9 @@ public class ActionEntity extends ContextualEntity {
         /**
          * Adds a result to the collection of results of this ActionEntity.
          * 
-         * @param result the result to add to this ActionEntity. Duplicates will be ignored/removed.
+         * @param result the result to add to this ActionEntity. Duplicates will be
+         *               ignored/removed. "The result produced in the action. E.g. John
+         *               wrote a book." (Schema.org definition)
          * @return this builder
          */
         public T addResult(String result) {
@@ -114,9 +134,10 @@ public class ActionEntity extends ContextualEntity {
         }
 
         /**
-         * Same as calling {@link #addInstrument(String)} with each element of the collection.
+         * Same as calling {@link #addInstrument(String)} with each element of the
+         * collection.
          * 
-         * @param results the results to add to this ActionEntity
+         * @param see {@link #addInstrument(String)}
          * @return this builder
          */
         public T addInstruments(Collection<String> instruments) {
@@ -127,7 +148,10 @@ public class ActionEntity extends ContextualEntity {
         /**
          * Adds a instrument to the collection of instruments of this ActionEntity.
          * 
-         * @param instrument the instrument to add to this ActionEntity. Duplicates will be ignored/removed.
+         * @param instrument the instrument to add to this ActionEntity. Duplicates will
+         *                   be ignored/removed. "The object that helped the agent
+         *                   perform the action. E.g. John wrote a book with a pen."
+         *                   (Schema.org definition)
          * @return this builder
          */
         public T addInstrument(String instrument) {
