@@ -1,7 +1,7 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * This class helps to generate a detailing provenance of entities.
@@ -34,9 +34,9 @@ public class ActionEntity extends ContextualEntity {
         private String endTime;
         private String agent;
 
-        List<String> objects = new ArrayList<>();
-        List<String> results = new ArrayList<>();
-        List<String> instruments = new ArrayList<>();
+        Collection<String> objects = new HashSet<>();
+        Collection<String> results = new HashSet<>();
+        Collection<String> instruments = new HashSet<>();
 
         protected AbstractActionEntityBuilder(ActionTypeEnum type) {
             this.type = type;
@@ -67,7 +67,7 @@ public class ActionEntity extends ContextualEntity {
             return self();
         }
 
-        public T addObjects(List<String> objects) {
+        public T addObjects(Collection<String> objects) {
             this.objects.addAll(objects);
             return self();
         }
@@ -77,7 +77,7 @@ public class ActionEntity extends ContextualEntity {
             return self();
         }
 
-        public T addResults(List<String> results) {
+        public T addResults(Collection<String> results) {
             this.results.addAll(results);
             return self();
         }
@@ -86,7 +86,7 @@ public class ActionEntity extends ContextualEntity {
             return self();
         }
 
-        public T addInstruments(List<String> instruments) {
+        public T addInstruments(Collection<String> instruments) {
             this.instruments.addAll(instruments);
             return self();
         }
