@@ -145,7 +145,7 @@ public class ActionEntity extends ContextualEntity {
          * Same as calling {@link #addInstrument(String)} with each element of the
          * collection.
          * 
-         * @param see {@link #addInstrument(String)}
+         * @param instruments see {@link #addInstrument(String)}
          * @return this builder
          */
         public T addInstruments(Collection<String> instruments) {
