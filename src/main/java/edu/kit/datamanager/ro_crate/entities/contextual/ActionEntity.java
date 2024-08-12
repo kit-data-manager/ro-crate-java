@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 /**
  * This class helps to generate a detailing provenance of entities.
+ * 
  * @author sabrinechelbi
  */
 public class ActionEntity extends ContextualEntity {
@@ -27,16 +28,16 @@ public class ActionEntity extends ContextualEntity {
     abstract static class AbstractActionEntityBuilder<T extends AbstractActionEntityBuilder<T>>
             extends AbstractContextualEntityBuilder<T> {
 
-        private ActionTypeEnum type;
-        private String description;
-        private String name;
-        private String startTime;
-        private String endTime;
-        private String agent;
+        protected ActionTypeEnum type;
+        protected String description;
+        protected String name;
+        protected String startTime;
+        protected String endTime;
+        protected String agent;
 
-        Collection<String> objects = new HashSet<>();
-        Collection<String> results = new HashSet<>();
-        Collection<String> instruments = new HashSet<>();
+        protected Collection<String> objects = new HashSet<>();
+        protected Collection<String> results = new HashSet<>();
+        protected Collection<String> instruments = new HashSet<>();
 
         protected AbstractActionEntityBuilder(ActionTypeEnum type) {
             this.type = type;
@@ -67,30 +68,68 @@ public class ActionEntity extends ContextualEntity {
             return self();
         }
 
+        /**
+         * Same as calling {@link #addObject(String)} with each element of the collection.
+         * 
+         * @param objects the objects to add to this ActionEntity
+         * @return this builder
+         */
         public T addObjects(Collection<String> objects) {
             this.objects.addAll(objects);
             return self();
         }
 
+        /**
+         * Adds a object to the collection of objects of this ActionEntity.
+         * 
+         * @param object the object to add to this ActionEntity. Duplicates will be
+         *               ignored/removed.
+         * @return this builder
+         */
         public T addObject(String object) {
             this.objects.add(object);
             return self();
         }
 
+        /**
+         * Same as calling {@link #addResult(String)} with each element of the collection.
+         * 
+         * @param results the results to add to this ActionEntity
+         * @return this builder
+         */
         public T addResults(Collection<String> results) {
             this.results.addAll(results);
             return self();
         }
+
+        /**
+         * Adds a result to the collection of results of this ActionEntity.
+         * 
+         * @param result the result to add to this ActionEntity. Duplicates will be ignored/removed.
+         * @return this builder
+         */
         public T addResult(String result) {
             this.results.add(result);
             return self();
         }
 
+        /**
+         * Same as calling {@link #addInstrument(String)} with each element of the collection.
+         * 
+         * @param results the results to add to this ActionEntity
+         * @return this builder
+         */
         public T addInstruments(Collection<String> instruments) {
             this.instruments.addAll(instruments);
             return self();
         }
 
+        /**
+         * Adds a instrument to the collection of instruments of this ActionEntity.
+         * 
+         * @param instrument the instrument to add to this ActionEntity. Duplicates will be ignored/removed.
+         * @return this builder
+         */
         public T addInstrument(String instrument) {
             this.instruments.add(instrument);
             return self();
