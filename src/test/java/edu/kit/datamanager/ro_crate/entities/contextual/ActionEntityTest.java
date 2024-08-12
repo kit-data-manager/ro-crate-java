@@ -36,8 +36,8 @@ class ActionEntityTest {
                 // note how we can add multiple items by simply repeating them.
                 .addResult("wcc02_arch.laz")
                 .addResult("wcc02_arch_traj.txt")
-                .addDateTimeProperty("startTime","2017-06-10T12:56:14+10:00")
-                .addDateTimeProperty("endTime","2017-06-11T12:56:14+10:00")
+                .setStartTime("2017-06-10T12:56:14+10:00")
+                .setEndTime("2017-06-11T12:56:14+10:00")
                 .build();
         
         assertNotNull(createAction);
