@@ -271,7 +271,7 @@ public class AbstractEntity {
      * @param name the key of the property.
      * @param stringList List containing all the id as String.
      */
-    public void addIdListProperties(String name, List<String> stringList) {
+    public void addIdListProperties(String name, Collection<String> stringList) {
         ObjectMapper objectMapper = MyObjectMapper.getMapper();
         ArrayNode node = objectMapper.createArrayNode();
         if (this.properties.get(name) == null) {
