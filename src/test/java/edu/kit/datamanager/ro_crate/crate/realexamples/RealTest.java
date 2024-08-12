@@ -4,7 +4,7 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ActionEntity;
-import edu.kit.datamanager.ro_crate.entities.contextual.ActionTypeEnum;
+import edu.kit.datamanager.ro_crate.entities.contextual.ActionType;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
@@ -104,7 +104,7 @@ class RealTest {
                 .setGeo("#4241434-33413")
                 .build();
 
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.CREATE)
                 .setId("#MeasurementCapture_23231")
                 .setAgent("creator")
                 .addInstrument("https://www.aeroqual.com/product/outdoor-portable-monitor-starter-kit")
