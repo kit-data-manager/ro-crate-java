@@ -28,7 +28,7 @@ class ActionEntityTest {
         assertNotNull(equipment);
         HelpFunctions.compareEntityWithFile(equipment, "/json/entities/contextual/equipment.json");
 
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.CREATE)
                 .setId("#DataCapture_wcc02")
                 .setAgent("https://orcid.org/0000-0002-1672-552X")
                 .addInstrument("https://confluence.csiro.au/display/ASL/Hovermap")
@@ -56,7 +56,7 @@ class ActionEntityTest {
         assertNotNull(software);
         HelpFunctions.compareEntityWithFile(software, "/json/entities/contextual/software.json");
 
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.CREATE)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.CREATE)
                 .setId("#Photo_Capture_1")
                 .setAgent("https://orcid.org/0000-0002-3545-944X")
                 .setDescription("Photo snapped on a photo walk on a misty day")
@@ -71,14 +71,14 @@ class ActionEntityTest {
     
     @Test
     void testAddUpdateAction() throws IOException {
-        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionTypeEnum.UPDATE)
+        ActionEntity createAction = new ActionEntity.ActionEntityBuilder(ActionType.UPDATE)
                 .setId("#history-02")
                 .setName("RO-Crate published")
                 .addObject("https://doi.org/10.5281/zenodo.1009240")
                 .setAgent("https://orcid.org/0000-0001-5152-5307")
                 .setEndTime("2018-09-10")
                 .addInstrument("https://stash.research.uts.edu.au")
-                .addIdProperty("actionStatus", "http://schema.org/CompletedActionStatus")
+                .setStatus(ActionStatus.COMPLETED_ACTION_STATUS)
                 .build();
         assertNotNull(createAction);
         HelpFunctions.compareEntityWithFile(createAction, "/json/entities/contextual/updateAction.json");

@@ -2,6 +2,7 @@ package edu.kit.datamanager.ro_crate.entities.contextual;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 /**
  * This class represents a detailing provenance of entities.
@@ -23,6 +24,7 @@ public class ActionEntity extends ContextualEntity {
         this.addDateTimeProperty("startTime", entityBuilder.startTime);
         this.addDateTimeProperty("endTime", entityBuilder.endTime);
 
+        entityBuilder.status.ifPresent(status -> this.addIdProperty("actionStatus", status.getId()));
         this.addIdProperty("agent", entityBuilder.agent);
         this.addIdListProperties("instrument", entityBuilder.instruments);
         this.addIdListProperties("result", entityBuilder.results);
@@ -32,18 +34,19 @@ public class ActionEntity extends ContextualEntity {
     abstract static class AbstractActionEntityBuilder<T extends AbstractActionEntityBuilder<T>>
             extends AbstractContextualEntityBuilder<T> {
 
-        protected ActionTypeEnum type;
+        protected ActionType type;
         protected String description;
         protected String name;
         protected String startTime;
         protected String endTime;
         protected String agent;
+        protected Optional<ActionStatus> status = Optional.empty();
 
         protected Collection<String> objects = new HashSet<>();
         protected Collection<String> results = new HashSet<>();
         protected Collection<String> instruments = new HashSet<>();
 
-        protected AbstractActionEntityBuilder(ActionTypeEnum type) {
+        protected AbstractActionEntityBuilder(ActionType type) {
             this.type = type;
         }
 
@@ -69,6 +72,11 @@ public class ActionEntity extends ContextualEntity {
 
         public T setAgent(String agent) {
             this.agent = agent;
+            return self();
+        }
+
+        public T setStatus(ActionStatus status) {
+            this.status = Optional.ofNullable(status);
             return self();
         }
 
@@ -166,7 +174,7 @@ public class ActionEntity extends ContextualEntity {
     public static final class ActionEntityBuilder
             extends AbstractActionEntityBuilder<ActionEntityBuilder> {
 
-        public ActionEntityBuilder(ActionTypeEnum type) {
+        public ActionEntityBuilder(ActionType type) {
             super(type);
         }
 
