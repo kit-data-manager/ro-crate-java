@@ -71,6 +71,7 @@ public class MultipleCratesWriteAndRead {
       RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
       writer.save(crate, "crate" + i);
       RoCrateReader reader = new RoCrateReader(new FolderReader());
+      @SuppressWarnings("unused")
       RoCrate copy = (RoCrate) reader.readCrate("crate" + i);
     }
     Instant end = Instant.now();
