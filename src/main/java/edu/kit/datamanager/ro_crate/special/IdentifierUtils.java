@@ -21,27 +21,6 @@ import java.net.URISyntaxException;
  * checked can be changed and tested easily for the whole library.
  */
 public class IdentifierUtils {
-
-    /**
-     * Hidden constructor, as this class only has static methods.
-     */
-    private IdentifierUtils() {
-    }
-
-    /**
-     * Returns true, if the given String can not be used as an identifier in
-     * RO-Crate.
-     * 
-     * @deprecated Prefer using !isValidUri instead.
-     *
-     * @param uri the given URI. Usually a URL or relative file path.
-     * @return true if url is decoded, false if it is not.
-     */
-    @Deprecated(forRemoval = true, since = "2024-08-02")
-    public static boolean isNotValidUri(String uri) {
-        return !isValidUri(uri);
-    }
-
     /**
      * Returns true, if the given String is encoded and can be used as an
      * identifier in RO-Crate.
@@ -166,40 +145,5 @@ public class IdentifierUtils {
      */
     private static boolean isLdBlankNode(String uri) {
         return uri.startsWith("_:") && !uri.contains(" ");
-    }
-
-    /**
-     * Returns true, if the URLs domain exists.
-     * 
-     * @deprecated The current plementation will only check if this is a valid url.
-     *             Functionality will be removed.
-     *
-     * @param url the given URL
-     * @return true if domain exists.
-     */
-    @Deprecated(forRemoval = true, since = "2024-08-02")
-    public static boolean hasValidDomain(String url) {
-        if (!isValidUri(url)) {
-            String encoded = encode(url).get();
-            return asUrl(encoded) != null;
-        }
-        return asUrl(url) != null;
-    }
-
-    /**
-     * checks if the given string is correctly encoded.
-     *
-     * @param uri the given string
-     * @return true if the given string is correctly encoded.
-     */
-    @Deprecated(forRemoval = true, since = "2024-08-02")
-    public static boolean isEncoded(String uri) {
-        String decoded = decode(uri).get();
-        Optional<String> encoded = encode(decoded);
-        String result = null;
-        if (encoded.isPresent()) {
-            result = encoded.get();
-        }
-        return uri.equals(result);
     }
 }

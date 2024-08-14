@@ -103,18 +103,6 @@ public class IdentifierUtilsTest {
     }
 
     /**
-     * inverse of "testIsValidUriWithRoCrateSpecExamples"
-     */
-    @Test
-    @Deprecated(forRemoval = true)
-    void testIsDecodedWithRoCrateSpecExamples() {
-        assertFalse(IdentifierUtils.isNotValidUri(file_chinese));
-        assertFalse(IdentifierUtils.isNotValidUri(file_chinese_encoded));
-        assertTrue(IdentifierUtils.isNotValidUri(file_path_spaces));
-        assertFalse(IdentifierUtils.isNotValidUri(file_path_spaces_encoded));
-    }
-
-    /**
      * The examples contains a list of encoded identifiers we should test.
      * 
      * @param example_unencoded is maybe not encoded, but maybe it already is.
