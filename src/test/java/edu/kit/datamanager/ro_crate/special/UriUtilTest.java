@@ -139,6 +139,9 @@ public class UriUtilTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {
+            // unencoded:
+            url_with_spaces,
+            // encoded:
             url_simple_valid,
             url_orcid_valid,
             url_with_spaces_encoded,
@@ -155,7 +158,12 @@ public class UriUtilTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {
+            // unencoded:
+            file_path_spaces_UNIX,
+            file_path_spaces_WINDOWS,
+            // encoded:
             file_chinese,
+            file_path_spaces_encoded,
             file_chinese_encoded,
             file_path_spaces_encoded,
             "./file.html",
