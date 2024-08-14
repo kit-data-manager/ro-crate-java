@@ -121,6 +121,9 @@ public class IdentifierUtils {
         // from here on, our soft-encoding failed and we will fully encode the url or
         // path.
         result = URLEncoder.encode(uri, StandardCharsets.UTF_8);
+        result = result.replace("+", "%20");  // UrlEncoder encodes spaces with "+"
+        result = result.replace("%3A", ":");  // Convert colons back
+        result = result.replace("%2F", "/");  // Convert slashes back
 
         if (isValidUri(result)) {
             return Optional.of(result);
