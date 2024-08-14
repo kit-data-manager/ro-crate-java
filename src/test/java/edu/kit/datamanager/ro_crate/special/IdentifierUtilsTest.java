@@ -35,6 +35,8 @@ public class IdentifierUtilsTest {
     // Other tests
     static final String URL_WITH_SPACES = "https://example.com/file with spaces";
     static final String URL_WITH_SPACES_ENCODED = "https://example.com/file%20with%20spaces";
+    static final String URL_WITH_SPECIAL_CHARS = "https://example.com/break§ stuff + code<>/";
+    static final String URL_WITH_SPECIAL_CHARS_ENCODED = "https://example.com/break%C2%A7%20stuff%20%2B%20code%3C%3E/";
 
     public static Stream<Arguments> encodingExamplesProvider() {
         return Stream.of(
@@ -42,6 +44,7 @@ public class IdentifierUtilsTest {
                 Arguments.of(FILE_PATH_SPACES_UNIX, FILE_PATH_SPACES_ENCODED),
                 Arguments.of(FILE_PATH_SPACES_WINDOWS, FILE_PATH_SPACES_ENCODED),
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
+                Arguments.of(URL_WITH_SPECIAL_CHARS, URL_WITH_SPECIAL_CHARS_ENCODED),
                 // some things should stay as they are according to the specification
                 Arguments.of(FILE_CHINESE, FILE_CHINESE),
                 Arguments.of(URL_SIMPLE_VALID, URL_SIMPLE_VALID),
@@ -58,10 +61,12 @@ public class IdentifierUtilsTest {
                 // after decoding , before decoding
                 // Strings which will be decoded (encoded strings)
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
+                Arguments.of(URL_WITH_SPECIAL_CHARS, URL_WITH_SPECIAL_CHARS_ENCODED),
                 // Strings which are already decoded
                 Arguments.of(FILE_PATH_SPACES_UNIX, FILE_PATH_SPACES_UNIX),
                 Arguments.of(FILE_PATH_SPACES_WINDOWS, FILE_PATH_SPACES_WINDOWS),
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES),
+                Arguments.of(URL_WITH_SPECIAL_CHARS, URL_WITH_SPECIAL_CHARS),
                 // some things should stay as they are according to the specification
                 Arguments.of(FILE_CHINESE, FILE_CHINESE),
                 Arguments.of(URL_SIMPLE_VALID, URL_SIMPLE_VALID),
