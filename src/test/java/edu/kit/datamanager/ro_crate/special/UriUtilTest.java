@@ -106,6 +106,7 @@ public class UriUtilTest {
      * inverse of "testIsValidUriWithRoCrateSpecExamples"
      */
     @Test
+    @Deprecated(forRemoval = true)
     void testIsDecodedWithRoCrateSpecExamples() {
         assertFalse(UriUtil.isNotValidUri(file_chinese));
         assertFalse(UriUtil.isNotValidUri(file_chinese_encoded));

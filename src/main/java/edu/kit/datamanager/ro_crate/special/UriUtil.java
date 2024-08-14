@@ -31,10 +31,13 @@ public class UriUtil {
     /**
      * Returns true, if the given String can not be used as an identifier in
      * RO-Crate.
+     * 
+     * @deprecated Prefer using !isValidUri instead.
      *
      * @param uri the given URI. Usually a URL or relative file path.
      * @return true if url is decoded, false if it is not.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean isNotValidUri(String uri) {
         return !isValidUri(uri);
     }
@@ -148,7 +151,7 @@ public class UriUtil {
     }
 
     public static Optional<String> decode(String uri) {
-        if (isNotValidUri(uri) || isLdBlankNode(uri)) {
+        if (!isValidUri(uri) || isLdBlankNode(uri)) {
             return Optional.of(uri);
         }
         return Optional.of(URLDecoder.decode(uri, StandardCharsets.UTF_8));
@@ -172,7 +175,7 @@ public class UriUtil {
      * @return true if domain exists.
      */
     public static boolean hasValidDomain(String url) {
-        if (isNotValidUri(url)) {
+        if (!isValidUri(url)) {
             String encoded = encode(url).get();
             return asUrl(encoded) != null;
         }
@@ -185,6 +188,7 @@ public class UriUtil {
      * @param uri the given string
      * @return true if the given string is correctly encoded.
      */
+    @Deprecated(forRemoval = true, since = "2024-08-02")
     public static boolean isEncoded(String uri) {
         String decoded = decode(uri).get();
         Optional<String> encoded = encode(decoded);
