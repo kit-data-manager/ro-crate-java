@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
-import static edu.kit.datamanager.ro_crate.special.UriUtil.isUrl;
+import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import java.io.File;
 import java.io.IOException;

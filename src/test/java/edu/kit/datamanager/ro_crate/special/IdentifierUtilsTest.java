@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class UriUtilTest {
+public class IdentifierUtilsTest {
 
     // Strings taken from
     // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
@@ -91,15 +91,15 @@ public class UriUtilTest {
     @Test
     void testIsValidUriWithRoCrateSpecExamples() {
         // Chinese characters are preferred (readability),
-        assertTrue(UriUtil.isValidUri(file_chinese));
+        assertTrue(IdentifierUtils.isValidUri(file_chinese));
         // But the encoded version is also fine.
-        assertTrue(UriUtil.isValidUri(file_chinese_encoded));
+        assertTrue(IdentifierUtils.isValidUri(file_chinese_encoded));
         // Spaces are not considered valid,
-        assertFalse(UriUtil.isValidUri(file_path_spaces));
-        assertFalse(UriUtil.isValidUri(url_with_spaces));
+        assertFalse(IdentifierUtils.isValidUri(file_path_spaces));
+        assertFalse(IdentifierUtils.isValidUri(url_with_spaces));
         // so we need to encode them.
-        assertTrue(UriUtil.isValidUri(file_path_spaces_encoded));
-        assertTrue(UriUtil.isValidUri(url_with_spaces_encoded));
+        assertTrue(IdentifierUtils.isValidUri(file_path_spaces_encoded));
+        assertTrue(IdentifierUtils.isValidUri(url_with_spaces_encoded));
     }
 
     /**
@@ -108,10 +108,10 @@ public class UriUtilTest {
     @Test
     @Deprecated(forRemoval = true)
     void testIsDecodedWithRoCrateSpecExamples() {
-        assertFalse(UriUtil.isNotValidUri(file_chinese));
-        assertFalse(UriUtil.isNotValidUri(file_chinese_encoded));
-        assertTrue(UriUtil.isNotValidUri(file_path_spaces));
-        assertFalse(UriUtil.isNotValidUri(file_path_spaces_encoded));
+        assertFalse(IdentifierUtils.isNotValidUri(file_chinese));
+        assertFalse(IdentifierUtils.isNotValidUri(file_chinese_encoded));
+        assertTrue(IdentifierUtils.isNotValidUri(file_path_spaces));
+        assertFalse(IdentifierUtils.isNotValidUri(file_path_spaces_encoded));
     }
 
     /**
@@ -121,13 +121,13 @@ public class UriUtilTest {
      * @param example_encoded is guaranteed to be encoded
      */
     @ParameterizedTest(name = "testIsValidUriWithEncodingExamples {0} and {1}")
-    @MethodSource("edu.kit.datamanager.ro_crate.special.UriUtilTest#encodingExamplesProvider")
+    @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#encodingExamplesProvider")
     void testIsValidUriWithEncodingExamples(String example_unencoded, String example_encoded) {
-        assertTrue(UriUtil.isValidUri(example_encoded));
+        assertTrue(IdentifierUtils.isValidUri(example_encoded));
         if (example_unencoded != example_encoded) {
             // If we have examples where the encoding is different than the original,
             // this means the uri was not valid before.
-            assertFalse(UriUtil.isValidUri(example_unencoded));
+            assertFalse(IdentifierUtils.isValidUri(example_unencoded));
         }
     }
 
@@ -136,9 +136,9 @@ public class UriUtilTest {
      */
     @Test
     void testIsUrlWithRoCrateSpecExamples() {
-        assertFalse(UriUtil.isUrl(file_chinese));
-        assertFalse(UriUtil.isUrl(file_chinese_encoded));
-        assertFalse(UriUtil.isUrl(file_path_spaces_encoded));
+        assertFalse(IdentifierUtils.isUrl(file_chinese));
+        assertFalse(IdentifierUtils.isUrl(file_chinese_encoded));
+        assertFalse(IdentifierUtils.isUrl(file_path_spaces_encoded));
     }
 
     /**
@@ -146,9 +146,9 @@ public class UriUtilTest {
      */
     @Test
     void testIsPathWithRoCrateSpecExamples() {
-        assertTrue(UriUtil.isPath(file_chinese));
-        assertTrue(UriUtil.isPath(file_chinese_encoded));
-        assertTrue(UriUtil.isPath(file_path_spaces_encoded));
+        assertTrue(IdentifierUtils.isPath(file_chinese));
+        assertTrue(IdentifierUtils.isPath(file_chinese_encoded));
+        assertTrue(IdentifierUtils.isPath(file_path_spaces_encoded));
 
     }
 
@@ -167,8 +167,8 @@ public class UriUtilTest {
             "http://example-doesnotexist.com",
     })
     void testIsPathAndisUrlWithUrls(String url) {
-        assertFalse(UriUtil.isPath(url));
-        assertTrue(UriUtil.isUrl(url));
+        assertFalse(IdentifierUtils.isPath(url));
+        assertTrue(IdentifierUtils.isUrl(url));
     }
 
     /**
@@ -188,8 +188,8 @@ public class UriUtilTest {
             "file.html",
     })
     void testIsPathAndisUrlWithPaths(String path) {
-        assertTrue(UriUtil.isPath(path));
-        assertFalse(UriUtil.isUrl(path));
+        assertTrue(IdentifierUtils.isPath(path));
+        assertFalse(IdentifierUtils.isUrl(path));
     }
 
     /**
@@ -201,11 +201,11 @@ public class UriUtilTest {
      * handled correctly.
      */
     @ParameterizedTest(name = "testEncodeWith {0} and {1}")
-    @MethodSource("edu.kit.datamanager.ro_crate.special.UriUtilTest#encodingExamplesProvider")
+    @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#encodingExamplesProvider")
     void testEncode(String example_unencoded, String example_encoded) {
-        Optional<String> encoded = UriUtil.encode(example_unencoded);
+        Optional<String> encoded = IdentifierUtils.encode(example_unencoded);
         assertEquals(example_encoded, encoded.get());
-        assertTrue(UriUtil.isValidUri(encoded.get()));
+        assertTrue(IdentifierUtils.isValidUri(encoded.get()));
     }
 
     /**
@@ -214,9 +214,9 @@ public class UriUtilTest {
      * Uses the same input examples, but in the reverse direction.
      */
     @ParameterizedTest(name = "testDecodeWith {0} and {1}")
-    @MethodSource("edu.kit.datamanager.ro_crate.special.UriUtilTest#decodingExamplesProvider")
+    @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#decodingExamplesProvider")
     void testDecode(String example_unencoded, String example_encoded) {
-        Optional<String> decoded = UriUtil.decode(example_encoded);
+        Optional<String> decoded = IdentifierUtils.decode(example_encoded);
         assertEquals(example_unencoded, decoded.get());
     }
 }

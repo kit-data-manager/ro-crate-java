@@ -14,7 +14,7 @@ import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.Observer;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
-import edu.kit.datamanager.ro_crate.special.UriUtil;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -369,10 +369,10 @@ public class AbstractEntity {
          */
         public T setId(String id) {
             if (id != null) {
-                if (UriUtil.isValidUri(id)) {
+                if (IdentifierUtils.isValidUri(id)) {
                     this.id = id;
                 } else {
-                    this.id = UriUtil.encode(id).get();
+                    this.id = IdentifierUtils.encode(id).get();
                 }
             }
             return self();
