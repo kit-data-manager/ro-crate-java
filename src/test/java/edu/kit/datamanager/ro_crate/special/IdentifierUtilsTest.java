@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +19,6 @@ public class IdentifierUtilsTest {
     // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
     static final String FILE_CHINESE = "面试.mp4";
     static final String FILE_CHINESE_ENCODED = "%E9%9D%A2%E8%AF%95.mp4";
-    static String filePathSpaces = "Results and Diagrams\\almost-50%.png";
     static final String FILE_PATH_SPACES_WINDOWS = "Results and Diagrams\\almost-50%.png";
     static final String FILE_PATH_SPACES_UNIX = "Results and Diagrams/almost-50%.png";
     // note: "\" becomes "/" (unix style):
@@ -37,23 +35,12 @@ public class IdentifierUtilsTest {
     // Other tests
     static final String URL_WITH_SPACES = "https://example.com/file with spaces";
     static final String URL_WITH_SPACES_ENCODED = "https://example.com/file%20with%20spaces";
-    
-    @BeforeAll
-    public static void setupOS() {
-         String osName = System.getProperty("os.name").toLowerCase();
-            if(osName.contains("win")){
-                filePathSpaces = FILE_PATH_SPACES_WINDOWS;
-            }else if(osName.contains("mac")){
-                filePathSpaces = FILE_PATH_SPACES_UNIX;
-            }else{
-                System.out.println("setup OS failed");
-            }
-    }
 
     public static Stream<Arguments> encodingExamplesProvider() {
         return Stream.of(
                 // before encoding , after encoding
-                Arguments.of(filePathSpaces, FILE_PATH_SPACES_ENCODED),
+                Arguments.of(FILE_PATH_SPACES_UNIX, FILE_PATH_SPACES_ENCODED),
+                Arguments.of(FILE_PATH_SPACES_WINDOWS, FILE_PATH_SPACES_ENCODED),
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
                 // some things should stay as they are according to the specification
                 Arguments.of(FILE_CHINESE, FILE_CHINESE),
@@ -72,7 +59,8 @@ public class IdentifierUtilsTest {
                 // Strings which will be decoded (encoded strings)
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
                 // Strings which are already decoded
-                Arguments.of(filePathSpaces, filePathSpaces),
+                Arguments.of(FILE_PATH_SPACES_UNIX, FILE_PATH_SPACES_UNIX),
+                Arguments.of(FILE_PATH_SPACES_WINDOWS, FILE_PATH_SPACES_WINDOWS),
                 Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES),
                 // some things should stay as they are according to the specification
                 Arguments.of(FILE_CHINESE, FILE_CHINESE),
@@ -95,7 +83,8 @@ public class IdentifierUtilsTest {
         // But the encoded version is also fine.
         assertTrue(IdentifierUtils.isValidUri(FILE_CHINESE_ENCODED));
         // Spaces are not considered valid,
-        assertFalse(IdentifierUtils.isValidUri(filePathSpaces));
+        assertFalse(IdentifierUtils.isValidUri(FILE_PATH_SPACES_UNIX));
+        assertFalse(IdentifierUtils.isValidUri(FILE_PATH_SPACES_WINDOWS));
         assertFalse(IdentifierUtils.isValidUri(URL_WITH_SPACES));
         // so we need to encode them.
         assertTrue(IdentifierUtils.isValidUri(FILE_PATH_SPACES_ENCODED));
