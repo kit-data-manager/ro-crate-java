@@ -133,9 +133,9 @@ public class IdentifierUtils {
         // characters. So we try a "soft"-encoding first, and if this is not yet valid,
         // we really fully encode it.
 
-        result = result.replace("\\", "/");
-        result = result.replace("%", "%25");
-        result = result.replace(" ", "%20");
+        result = result.replace("\\", "/");  // "...express any relative paths using / separator..."
+        result = result.replace("%", "%25"); // "...escape special characters like space (%25)..."
+        result = result.replace(" ", "%20"); // "...and percent (%25)..."
         if (isValidUri(result)) {
             return Optional.of(result);
         }
