@@ -141,7 +141,7 @@ public class IdentifierUtils {
         }
         // from here on, our soft-encoding failed and we will fully encode the url or
         // path.
-        result = URLEncoder.encode(result, StandardCharsets.UTF_8);
+        result = URLEncoder.encode(uri, StandardCharsets.UTF_8);
 
         if (isValidUri(result)) {
             return Optional.of(result);
