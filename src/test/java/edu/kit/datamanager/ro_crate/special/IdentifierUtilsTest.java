@@ -18,33 +18,33 @@ public class IdentifierUtilsTest {
 
     // Strings taken from
     // https://www.researchobject.org/ro-crate/1.1/data-entities.html#encoding-file-paths
-    static final String file_chinese = "面试.mp4";
-    static final String file_chinese_encoded = "%E9%9D%A2%E8%AF%95.mp4";
-    static  String file_path_spaces = "Results and Diagrams\\almost-50%.png";
-    static final String file_path_spaces_WINDOWS = "Results and Diagrams\\almost-50%.png";
-    static final String file_path_spaces_UNIX = "Results and Diagrams/almost-50%.png";
+    static final String FILE_CHINESE = "面试.mp4";
+    static final String FILE_CHINESE_ENCODED = "%E9%9D%A2%E8%AF%95.mp4";
+    static String filePathSpaces = "Results and Diagrams\\almost-50%.png";
+    static final String FILE_PATH_SPACES_WINDOWS = "Results and Diagrams\\almost-50%.png";
+    static final String FILE_PATH_SPACES_UNIX = "Results and Diagrams/almost-50%.png";
     // note: "\" becomes "/" (unix style):
-    static final String file_path_spaces_encoded = "Results%20and%20Diagrams/almost-50%25.png";
+    static final String FILE_PATH_SPACES_ENCODED = "Results%20and%20Diagrams/almost-50%25.png";
 
     // taken from
     // https://www.researchobject.org/ro-crate/1.1/appendix/jsonld.html#describing-entities-in-json-ld
-    static final String url_simple_valid = "http://example.com/";
-    static final String url_orcid_valid = "https://orcid.org/0000-0002-1825-0097";
-    static final String entity_reference_simple = "#alice";
-    static final String entity_reference_generated = "#ac0bd781-7d91-4cdf-b2ad-7305921c7650";
-    static final String entity_blank_node_id = "_:alice";
+    static final String URL_SIMPLE_VALID = "http://example.com/";
+    static final String URL_ORCID_VALID = "https://orcid.org/0000-0002-1825-0097";
+    static final String ENTITY_REFERENCE_SIMPLE = "#alice";
+    static final String ENTITY_REFERENCE_GENERATED = "#ac0bd781-7d91-4cdf-b2ad-7305921c7650";
+    static final String ENTITY_BLANK_NODE_ID = "_:alice";
 
     // Other tests
-    static final String url_with_spaces = "https://example.com/file with spaces";
-    static final String url_with_spaces_encoded = "https://example.com/file%20with%20spaces";
+    static final String URL_WITH_SPACES = "https://example.com/file with spaces";
+    static final String URL_WITH_SPACES_ENCODED = "https://example.com/file%20with%20spaces";
     
     @BeforeAll
     public static void setupOS() {
-         String OS = System.getProperty("os.name").toLowerCase();
-            if(OS.contains("win")){
-                file_path_spaces = file_path_spaces_WINDOWS;
-            }else if(OS.contains("mac")){
-                file_path_spaces = file_path_spaces_UNIX;
+         String osName = System.getProperty("os.name").toLowerCase();
+            if(osName.contains("win")){
+                filePathSpaces = FILE_PATH_SPACES_WINDOWS;
+            }else if(osName.contains("mac")){
+                filePathSpaces = FILE_PATH_SPACES_UNIX;
             }else{
                 System.out.println("setup OS failed");
             }
@@ -53,15 +53,15 @@ public class IdentifierUtilsTest {
     public static Stream<Arguments> encodingExamplesProvider() {
         return Stream.of(
                 // before encoding , after encoding
-                Arguments.of(file_path_spaces, file_path_spaces_encoded),
-                Arguments.of(url_with_spaces, url_with_spaces_encoded),
+                Arguments.of(filePathSpaces, FILE_PATH_SPACES_ENCODED),
+                Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
                 // some things should stay as they are according to the specification
-                Arguments.of(file_chinese, file_chinese),
-                Arguments.of(url_simple_valid, url_simple_valid),
-                Arguments.of(url_orcid_valid, url_orcid_valid),
-                Arguments.of(entity_reference_simple, entity_reference_simple),
-                Arguments.of(entity_reference_generated, entity_reference_generated),
-                Arguments.of(entity_blank_node_id, entity_blank_node_id)
+                Arguments.of(FILE_CHINESE, FILE_CHINESE),
+                Arguments.of(URL_SIMPLE_VALID, URL_SIMPLE_VALID),
+                Arguments.of(URL_ORCID_VALID, URL_ORCID_VALID),
+                Arguments.of(ENTITY_REFERENCE_SIMPLE, ENTITY_REFERENCE_SIMPLE),
+                Arguments.of(ENTITY_REFERENCE_GENERATED, ENTITY_REFERENCE_GENERATED),
+                Arguments.of(ENTITY_BLANK_NODE_ID, ENTITY_BLANK_NODE_ID)
         );
     }
     
@@ -70,17 +70,17 @@ public class IdentifierUtilsTest {
         return Stream.of(
                 // after decoding , before decoding
                 // Strings which will be decoded (encoded strings)
-                Arguments.of(url_with_spaces, url_with_spaces_encoded),
+                Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES_ENCODED),
                 // Strings which are already decoded
-                Arguments.of(file_path_spaces, file_path_spaces),
-                Arguments.of(url_with_spaces, url_with_spaces),
+                Arguments.of(filePathSpaces, filePathSpaces),
+                Arguments.of(URL_WITH_SPACES, URL_WITH_SPACES),
                 // some things should stay as they are according to the specification
-                Arguments.of(file_chinese, file_chinese),
-                Arguments.of(url_simple_valid, url_simple_valid),
-                Arguments.of(url_orcid_valid, url_orcid_valid),
-                Arguments.of(entity_reference_simple, entity_reference_simple),
-                Arguments.of(entity_reference_generated, entity_reference_generated),
-                Arguments.of(entity_blank_node_id, entity_blank_node_id)
+                Arguments.of(FILE_CHINESE, FILE_CHINESE),
+                Arguments.of(URL_SIMPLE_VALID, URL_SIMPLE_VALID),
+                Arguments.of(URL_ORCID_VALID, URL_ORCID_VALID),
+                Arguments.of(ENTITY_REFERENCE_SIMPLE, ENTITY_REFERENCE_SIMPLE),
+                Arguments.of(ENTITY_REFERENCE_GENERATED, ENTITY_REFERENCE_GENERATED),
+                Arguments.of(ENTITY_BLANK_NODE_ID, ENTITY_BLANK_NODE_ID)
         );
     }
 
@@ -91,31 +91,31 @@ public class IdentifierUtilsTest {
     @Test
     void testIsValidUriWithRoCrateSpecExamples() {
         // Chinese characters are preferred (readability),
-        assertTrue(IdentifierUtils.isValidUri(file_chinese));
+        assertTrue(IdentifierUtils.isValidUri(FILE_CHINESE));
         // But the encoded version is also fine.
-        assertTrue(IdentifierUtils.isValidUri(file_chinese_encoded));
+        assertTrue(IdentifierUtils.isValidUri(FILE_CHINESE_ENCODED));
         // Spaces are not considered valid,
-        assertFalse(IdentifierUtils.isValidUri(file_path_spaces));
-        assertFalse(IdentifierUtils.isValidUri(url_with_spaces));
+        assertFalse(IdentifierUtils.isValidUri(filePathSpaces));
+        assertFalse(IdentifierUtils.isValidUri(URL_WITH_SPACES));
         // so we need to encode them.
-        assertTrue(IdentifierUtils.isValidUri(file_path_spaces_encoded));
-        assertTrue(IdentifierUtils.isValidUri(url_with_spaces_encoded));
+        assertTrue(IdentifierUtils.isValidUri(FILE_PATH_SPACES_ENCODED));
+        assertTrue(IdentifierUtils.isValidUri(URL_WITH_SPACES_ENCODED));
     }
 
     /**
      * The examples contains a list of encoded identifiers we should test.
      * 
-     * @param example_unencoded is maybe not encoded, but maybe it already is.
-     * @param example_encoded is guaranteed to be encoded
+     * @param exampleUnencoded is maybe not encoded, but maybe it already is.
+     * @param exampleEncoded is guaranteed to be encoded
      */
     @ParameterizedTest(name = "testIsValidUriWithEncodingExamples {0} and {1}")
     @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#encodingExamplesProvider")
-    void testIsValidUriWithEncodingExamples(String example_unencoded, String example_encoded) {
-        assertTrue(IdentifierUtils.isValidUri(example_encoded));
-        if (example_unencoded != example_encoded) {
+    void testIsValidUriWithEncodingExamples(String exampleUnencoded, String exampleEncoded) {
+        assertTrue(IdentifierUtils.isValidUri(exampleEncoded));
+        if (exampleUnencoded != exampleEncoded) {
             // If we have examples where the encoding is different than the original,
             // this means the uri was not valid before.
-            assertFalse(IdentifierUtils.isValidUri(example_unencoded));
+            assertFalse(IdentifierUtils.isValidUri(exampleUnencoded));
         }
     }
 
@@ -124,9 +124,9 @@ public class IdentifierUtilsTest {
      */
     @Test
     void testIsUrlWithRoCrateSpecExamples() {
-        assertFalse(IdentifierUtils.isUrl(file_chinese));
-        assertFalse(IdentifierUtils.isUrl(file_chinese_encoded));
-        assertFalse(IdentifierUtils.isUrl(file_path_spaces_encoded));
+        assertFalse(IdentifierUtils.isUrl(FILE_CHINESE));
+        assertFalse(IdentifierUtils.isUrl(FILE_CHINESE_ENCODED));
+        assertFalse(IdentifierUtils.isUrl(FILE_PATH_SPACES_ENCODED));
     }
 
     /**
@@ -134,9 +134,9 @@ public class IdentifierUtilsTest {
      */
     @Test
     void testIsPathWithRoCrateSpecExamples() {
-        assertTrue(IdentifierUtils.isPath(file_chinese));
-        assertTrue(IdentifierUtils.isPath(file_chinese_encoded));
-        assertTrue(IdentifierUtils.isPath(file_path_spaces_encoded));
+        assertTrue(IdentifierUtils.isPath(FILE_CHINESE));
+        assertTrue(IdentifierUtils.isPath(FILE_CHINESE_ENCODED));
+        assertTrue(IdentifierUtils.isPath(FILE_PATH_SPACES_ENCODED));
 
     }
 
@@ -146,11 +146,11 @@ public class IdentifierUtilsTest {
     @ParameterizedTest
     @ValueSource(strings = {
             // unencoded:
-            url_with_spaces,
+            URL_WITH_SPACES,
             // encoded:
-            url_simple_valid,
-            url_orcid_valid,
-            url_with_spaces_encoded,
+            URL_SIMPLE_VALID,
+            URL_ORCID_VALID,
+            URL_WITH_SPACES_ENCODED,
             "https://example.com/file.html",
             "http://example-doesnotexist.com",
     })
@@ -165,13 +165,13 @@ public class IdentifierUtilsTest {
     @ParameterizedTest
     @ValueSource(strings = {
             // unencoded:
-            file_path_spaces_UNIX,
-            file_path_spaces_WINDOWS,
+            FILE_PATH_SPACES_UNIX,
+            FILE_PATH_SPACES_WINDOWS,
             // encoded:
-            file_chinese,
-            file_path_spaces_encoded,
-            file_chinese_encoded,
-            file_path_spaces_encoded,
+            FILE_CHINESE,
+            FILE_PATH_SPACES_ENCODED,
+            FILE_CHINESE_ENCODED,
+            FILE_PATH_SPACES_ENCODED,
             "./file.html",
             "file.html",
     })
@@ -190,9 +190,9 @@ public class IdentifierUtilsTest {
      */
     @ParameterizedTest(name = "testEncodeWith {0} and {1}")
     @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#encodingExamplesProvider")
-    void testEncode(String example_unencoded, String example_encoded) {
-        Optional<String> encoded = IdentifierUtils.encode(example_unencoded);
-        assertEquals(example_encoded, encoded.get());
+    void testEncode(String exampleUnencoded, String exampleEncoded) {
+        Optional<String> encoded = IdentifierUtils.encode(exampleUnencoded);
+        assertEquals(exampleEncoded, encoded.get());
         assertTrue(IdentifierUtils.isValidUri(encoded.get()));
     }
 
@@ -203,8 +203,8 @@ public class IdentifierUtilsTest {
      */
     @ParameterizedTest(name = "testDecodeWith {0} and {1}")
     @MethodSource("edu.kit.datamanager.ro_crate.special.IdentifierUtilsTest#decodingExamplesProvider")
-    void testDecode(String example_unencoded, String example_encoded) {
-        Optional<String> decoded = IdentifierUtils.decode(example_encoded);
-        assertEquals(example_unencoded, decoded.get());
+    void testDecode(String exampleUnencoded, String exampleEncoded) {
+        Optional<String> decoded = IdentifierUtils.decode(exampleEncoded);
+        assertEquals(exampleUnencoded, decoded.get());
     }
 }
