@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.special;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -126,7 +127,18 @@ public class UriUtil {
         result = result.replace("\\", "/");
         result = result.replace("%", "%25");
         result = result.replace(" ", "%20");
-        return Optional.of(result);
+        if (isValidUri(result)) {
+            return Optional.of(result);
+        }
+        // from here on, our soft-encoding failed and we will fully encode the url or
+        // path.
+        result = URLEncoder.encode(result, StandardCharsets.UTF_8);
+
+        if (isValidUri(result)) {
+            return Optional.of(result);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public static Optional<String> decode(String uri) {
