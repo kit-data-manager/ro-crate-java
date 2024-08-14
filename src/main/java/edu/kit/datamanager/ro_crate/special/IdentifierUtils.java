@@ -21,6 +21,10 @@ import java.net.URISyntaxException;
  * checked can be changed and tested easily for the whole library.
  */
 public class IdentifierUtils {
+
+    /** Static class */
+    private IdentifierUtils() {}
+
     /**
      * Returns true, if the given String is encoded and can be used as an
      * identifier in RO-Crate.
