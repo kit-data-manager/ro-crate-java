@@ -85,18 +85,25 @@ public class UriUtilTest {
     }
 
     /**
-     * Encoding works with the examples from the specification.
+     * Test if isValidUri differentiates identifiers between
+     * "allowed to use" and "not allowed to use" in a crate.
      */
     @Test
-    void testIsEncodedWithRoCrateSpecExamples() {
+    void testIsValidUriWithRoCrateSpecExamples() {
+        // Chinese characters are preferred (readability),
         assertTrue(UriUtil.isValidUri(file_chinese));
+        // But the encoded version is also fine.
         assertTrue(UriUtil.isValidUri(file_chinese_encoded));
+        // Spaces are not considered valid,
         assertFalse(UriUtil.isValidUri(file_path_spaces));
+        assertFalse(UriUtil.isValidUri(url_with_spaces));
+        // so we need to encode them.
         assertTrue(UriUtil.isValidUri(file_path_spaces_encoded));
+        assertTrue(UriUtil.isValidUri(url_with_spaces_encoded));
     }
 
     /**
-     * Decoding works with the examples from the specification.
+     * inverse of "testIsValidUriWithRoCrateSpecExamples"
      */
     @Test
     void testIsDecodedWithRoCrateSpecExamples() {
