@@ -114,6 +114,23 @@ public class UriUtilTest {
     }
 
     /**
+     * The examples contains a list of encoded identifiers we should test.
+     * 
+     * @param example_unencoded is maybe not encoded, but maybe it already is.
+     * @param example_encoded is guaranteed to be encoded
+     */
+    @ParameterizedTest(name = "testIsValidUriWithEncodingExamples {0} and {1}")
+    @MethodSource("edu.kit.datamanager.ro_crate.special.UriUtilTest#encodingExamplesProvider")
+    void testIsValidUriWithEncodingExamples(String example_unencoded, String example_encoded) {
+        assertTrue(UriUtil.isValidUri(example_encoded));
+        if (example_unencoded != example_encoded) {
+            // If we have examples where the encoding is different than the original,
+            // this means the uri was not valid before.
+            assertFalse(UriUtil.isValidUri(example_unencoded));
+        }
+    }
+
+    /**
      * Detecting URLs works with the examples from the specification.
      */
     @Test
