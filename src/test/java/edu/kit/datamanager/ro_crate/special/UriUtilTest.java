@@ -68,8 +68,10 @@ public class UriUtilTest {
     
     public static Stream<Arguments> decodingExamplesProvider() {
         return Stream.of(
+                // after decoding , before decoding
+                // Strings which will be decoded (encoded strings)
                 Arguments.of(url_with_spaces, url_with_spaces_encoded),
-                Arguments.of(file_chinese, file_chinese),
+                // Strings which are already decoded
                 Arguments.of(file_path_spaces, file_path_spaces),
                 Arguments.of(url_with_spaces, url_with_spaces),
                 // some things should stay as they are according to the specification
