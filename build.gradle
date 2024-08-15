@@ -23,6 +23,12 @@ println "Running gradle version: $gradle.gradleVersion"
 println "Building ${name} version: ${version}"
 println "JDK version: ${JavaVersion.current()}"
 
+if (JavaVersion.current() == JavaVersion.VERSION_17) {
+    println "Setting encoding to UTF-8 manually"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+}
+
 repositories {
     mavenCentral()
 }
@@ -153,7 +159,7 @@ jacoco {
 // maxParallelForks(2)
 // failFast = true
 
-if (project.hasProperty('release')) {
+if (project.hasProperty('releaseBuildConfig')) {
     println 'Using release profile for building ' + project.getName()
     apply from: 'gradle/profile-release.gradle'
 }
