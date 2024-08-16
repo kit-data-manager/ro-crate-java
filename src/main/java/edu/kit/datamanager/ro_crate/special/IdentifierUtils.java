@@ -68,8 +68,8 @@ public class IdentifierUtils {
             if (uri.isAbsolute()) {
                 return Optional.of(uri.toURL());
             }
-        } catch (URISyntaxException | MalformedURLException ex) {
-            throw new IllegalArgumentException("This Data Entity remote ID does not resolve to a valid URL.");
+        } catch (URISyntaxException | MalformedURLException | NullPointerException ex) {
+            return Optional.empty();
         }
         return Optional.empty();
     }
