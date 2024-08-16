@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderReaderTest {
+class FolderReaderTest {
 
   private Path writeMetadataToFile(Path temp, RoCrate c1) throws IOException {
     // Write metadata to file
@@ -92,7 +92,8 @@ public class FolderReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(cvs, cvs.toFile().getName())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -124,7 +125,8 @@ public class FolderReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
             .addDataEntity(
                     new FileEntity.FileEntityBuilder()
-                            .addContent(csv, csv.toFile().getName())
+                            .setLocationWithExceptions(csv)
+                            .setId(csv.toFile().getName())
                             .addProperty("name", "Survey responses")
                             .addProperty("contentSize", "26452")
                             .addProperty("encodingFormat", "text/csv")
@@ -153,7 +155,8 @@ public class FolderReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .addContent(file, "survey-responses-2019.csv")
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -190,7 +193,8 @@ public class FolderReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .addContent(file, "survey-responses-2019.csv")
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -210,7 +214,8 @@ public class FolderReaderTest {
     Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
     res.addDataEntity(new FileEntity.FileEntityBuilder()
         .setEncodingFormat("setnew")
-        .addContent(newFile, "new_file")
+        .setLocationWithExceptions(newFile)
+        .setId("new_file")
         .build(), true);
 
     Path destinationDir = temp.resolve("result");

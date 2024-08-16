@@ -32,7 +32,7 @@ public class FileEntityTest {
   void testSerialization() throws IOException {
     String name = "RO-Crate specification";
     FileEntity file = new FileEntityBuilder()
-        .addContent(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
+        .setLocation(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
         .addProperty("name", name)
         .setEncodingFormat("application/pdf")
         .addProperty("url", "https://zenodo.org/record/3541888")
@@ -50,7 +50,8 @@ public class FileEntityTest {
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assert url != null;
     FileEntity file = new FileEntityBuilder()
-        .addContent(Paths.get(url.toURI()), "example.json")
+        .setLocationWithExceptions(Paths.get(url.toURI()))
+        .setId("example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .build();
@@ -68,7 +69,8 @@ public class FileEntityTest {
         HelpFunctions.class.getResource("/json/crate/simple2.json");
     assertNotNull(url);
     FileEntity file = new FileEntityBuilder()
-        .addContent(Paths.get(url.toURI()), "example.json")
+        .setLocationWithExceptions(Paths.get(url.toURI()))
+        .setId("example.json")
         .addProperty("name", "RO-Crate specification")
         .setEncodingFormat("application/json")
         .setLicense(entity)

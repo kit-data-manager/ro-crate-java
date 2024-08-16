@@ -21,14 +21,16 @@ public class RootDataEntityTest {
     void testSerialization() throws IOException {
         String id1 = "file1_id";
         FileEntity file1 = new FileEntity.FileEntityBuilder()
-                .addContent(Paths.get("does_not_matter"), id1)
+                .setLocationWithExceptions(Paths.get("does_not_matter"))
+                .setId(id1)
                 .build();
 
         String id2 = "file2_id";
         FileEntity file2 = new FileEntity.FileEntityBuilder()
                 .addIdProperty("name", "dsklfajs")
                 .addIdProperty("name", "11111111")
-                .addContent(Paths.get("does_not_matter"), id2)
+                .setLocationWithExceptions(Paths.get("does_not_matter"))
+                .setId(id2)
                 .build();
 
         RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()

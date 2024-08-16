@@ -19,7 +19,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ZipReaderTest {
+class ZipReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
@@ -49,7 +49,8 @@ public class ZipReaderTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(cvs, cvs.toFile().getName())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -81,7 +82,8 @@ public class ZipReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .addContent(file, "survey-responses-2019.csv")
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -119,7 +121,8 @@ public class ZipReaderTest {
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .addContent(file, "survey-responses-2019.csv")
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -144,7 +147,8 @@ public class ZipReaderTest {
 
     res.addDataEntity(new FileEntity.FileEntityBuilder()
         .setEncodingFormat("setnew")
-        .addContent(newFile, "new_file")
+        .setLocationWithExceptions(newFile)
+        .setId("new_file")
         .build(), true);
 
     Path destinationDir = temp.resolve("result");

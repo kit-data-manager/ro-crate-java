@@ -102,7 +102,8 @@ public class RoCrateReader {
           File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
-            dataEntity.addContent(loc.toPath(), loc.getName());
+            dataEntity.setLocationWithExceptions(loc.toPath())
+                .setId(loc.getName());
           }
 
           crate.addDataEntity(dataEntity.build(), false);

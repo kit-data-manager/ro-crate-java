@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Nikola Tzotchev on 4.2.2022 г.
  * @version 1
  */
-public class DataEntityTest {
+class DataEntityTest {
 
     @Test
     void testSerialization() throws IOException {
@@ -88,7 +88,7 @@ public class DataEntityTest {
         //this entity id is a valid URL so there should not be any console information
         DataEntity dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(URI.create("https://www.example.com/19"))
+                .setLocation(URI.create("https://www.example.com/19"))
                 .build();
 
         assertNotNull(dataEntity);
@@ -96,7 +96,7 @@ public class DataEntityTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new DataEntity.DataEntityBuilder()
                     .addType("File")
-                    .addContent(URI.create("zzz://wrong/url"))
+                    .setLocationWithExceptions(URI.create("zzz://wrong/url"))
                     .build();
         });
 
@@ -109,7 +109,8 @@ public class DataEntityTest {
     @Test
     void testPathCheck() throws IOException {
         FileEntity dataEntity = new FileEntity.FileEntityBuilder()
-                .addContent(Paths.get("example.json"), "example.json")
+                .setLocationWithExceptions(Paths.get("example.json"))
+                .setId("example.json")
                 .addProperty("name", "RO-Crate specification")
                 .setEncodingFormat("application/json")
                 .build();
@@ -117,12 +118,13 @@ public class DataEntityTest {
         HelpFunctions.compareEntityWithFile(dataEntity, "/json/entities/data/localFile.json");
 
         dataEntity = new FileEntity.FileEntityBuilder()
-                .addContent(Paths.get("cp7glop.ai"), "cp7glop.ai")
+                .setLocationWithExceptions(Paths.get("cp7glop.ai"))
+                .setId("cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .setEncodingFormat("application/pdf")
                 .build();
         assertEquals(dataEntity.getId(), "cp7glop.ai");
-        assertEquals(dataEntity.getContent(), Paths.get("cp7glop.ai"));
+        assertEquals(dataEntity.getPath(), Paths.get("cp7glop.ai"));
         assertEquals(dataEntity.getProperty("encodingFormat").asText(), "application/pdf");
     }
 
@@ -131,7 +133,7 @@ public class DataEntityTest {
         //this entity id is a valid URL so there should not be any console information
         DataEntity dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(URI.create("https://github.com/kit-data-manager/ro-crate-java/issues/5"))
+                .setLocation(URI.create("https://github.com/kit-data-manager/ro-crate-java/issues/5"))
                 .build();
 
         assertEquals("https://github.com/kit-data-manager/ro-crate-java/issues/5", dataEntity.getId());
@@ -141,14 +143,16 @@ public class DataEntityTest {
         assert url != null;
         dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(Paths.get(url.toURI()), "simple2.json")
+                .setLocationWithExceptions(Paths.get(url.toURI()))
+                .setId("simple2.json")
                 .build();
 
         assertNotNull(dataEntity);
 
         dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(Paths.get("/json/crate/Results%20and%20Diagrams/almost-50%25.json"), "almost-50%25.json")
+                .setLocationWithExceptions(Paths.get("/json/crate/Results%20and%20Diagrams/almost-50%25.json"))
+                .setId("almost-50%25.json")
                 .build();
 
         assertTrue(dataEntity.getTypes().contains("File"));
@@ -157,7 +161,8 @@ public class DataEntityTest {
         // even if the Path is not correctly encoded, the data entity will be added with an encoded Path.
         dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
-                .addContent(Paths.get("/json/crate/Results and Diagrams/almost-50%.json"), "almost-50%.json")
+                .setLocationWithExceptions(Paths.get("/json/crate/Results and Diagrams/almost-50%.json"))
+                .setId("almost-50%.json")
                 .build();
         assertEquals(dataEntity.getId(), "almost-50%25.json");
 

@@ -46,7 +46,8 @@ public class SerializationTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(cvs, cvs.toFile().getName())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -66,7 +67,8 @@ public class SerializationTest {
     RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(cvs, cvs.toFile().getName())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "dadadada")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -74,7 +76,8 @@ public class SerializationTest {
         )
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(cvs,cvs.toFile().getName())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -102,7 +105,8 @@ public class SerializationTest {
     FileUtils.touch(txt.toFile());
     FileUtils.writeStringToFile(txt.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
     FileEntity file = new FileEntity.FileEntityBuilder()
-        .addContent(txt, txt.toFile().getName())
+        .setLocationWithExceptions(txt)
+        .setId(txt.toFile().getName())
         .addProperty("description", "One of hopefully many Data Entities")
         .setContentLocation(place.getId())
         .addAuthor(person.getId())
@@ -116,7 +120,8 @@ public class SerializationTest {
         .addDataEntity(file)
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(txt, "data2.txt")
+                .setLocationWithExceptions(txt)
+                .setId("data2.txt")
                 .build()
         )
         .build();
@@ -137,7 +142,8 @@ public class SerializationTest {
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(ai, "cp7glop.ai")
+                .setLocationWithExceptions(ai)
+                .setId("cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
@@ -146,7 +152,8 @@ public class SerializationTest {
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .addContent(folder, "lots_of_little_files/")
+                .setLocationWithExceptions(folder)
+                .setId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
@@ -210,7 +217,8 @@ public class SerializationTest {
     Path folder = temp.resolve("folder");
     FileUtils.forceMkdir(folder.toFile());
     DataSetEntity measure = new DataSetEntity.DataSetBuilder()
-        .addContent(folder, "measurements/")
+        .setLocationWithExceptions(folder)
+        .setId("measurements/")
         .addProperty("name", "Measurement Data")
         .addProperty("description", "This folder contains all relative to the measurements files.")
         .addAuthor(author.getId())
@@ -238,7 +246,8 @@ public class SerializationTest {
         .addContextualEntity(author)
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .addContent(pdf,"map.pdf")
+                .setLocationWithExceptions(pdf)
+                .setId("map.pdf")
                 .addProperty("name", "Map of measurements")
                 .addProperty("description",
                     "A map of all the location where the tests have been conducted")

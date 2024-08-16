@@ -19,7 +19,8 @@ public class WorkflowEntityTest {
   void testSerialization() throws IOException {
     String id = "workflow/alignment.knime";
     WorkflowEntity entity = new WorkflowEntity.WorkflowEntityBuilder()
-        .addContent(Paths.get("src"), id)
+        .setLocationWithExceptions(Paths.get("src"))
+        .setId(id)
         .addIdProperty("conformsTo", "https://bioschemas.org/profiles/ComputationalWorkflow/0.5-DRAFT-2020_07_21/")
         .addProperty("name", "Sequence alignment workflow")
         .addIdProperty("programmingLanguage", "#knime")

@@ -265,7 +265,7 @@ public class RoCrate implements Crate {
          * @param datePublished the published date of the crate.
          * @param licenseId the license identifier of the crate.
          */
-        public RoCrateBuilder(String name, String description, String datePublished,String licenseId) {
+        public RoCrateBuilder(String name, String description, String datePublished, String licenseId) {
             this.payload = new RoCratePayload();
             this.untrackedFiles = new ArrayList<>();
             this.metadataContext = new RoCrateMetadataContext();

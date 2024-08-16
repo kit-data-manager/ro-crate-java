@@ -42,7 +42,14 @@ public class DataEntity extends AbstractEntity {
         this.path = entityBuilder.location;
     }
 
-    public void setAuthor(String id) {
+    /**
+     * Adds an author ID to the entity.
+     * 
+     * Calling this multiple times will add multiple author IDs.
+     * 
+     * @param id the identifier of the author.
+     */
+    public void addAuthorId(String id) {
         this.addIdProperty("author", id);
     }
 
@@ -70,58 +77,91 @@ public class DataEntity extends AbstractEntity {
      * @throws IOException if something goes wrong with the writing.
      */
     public void savetoFile(File file) throws IOException {
-        if (this.getContent() != null) {
-            if (this.getContent().toFile().isDirectory()) {
-                FileUtils.copyDirectory(this.getContent().toFile(), file.toPath().resolve(this.getId()).toFile());
+        if (this.getPath() != null) {
+            if (this.getPath().toFile().isDirectory()) {
+                FileUtils.copyDirectory(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
             } else {
-                FileUtils.copyFile(this.getContent().toFile(), file.toPath().resolve(this.getId()).toFile());
+                FileUtils.copyFile(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
             }
         }
     }
 
     @JsonIgnore
-    public Path getContent() {
+    public Path getPath() {
         return path;
     }
 
     abstract static class AbstractDataEntityBuilder<T extends AbstractDataEntityBuilder<T>> extends
             AbstractEntityBuilder<T> {
 
-        Path location;
-
-        List<String> authors = new ArrayList<>();
+        private Path location;
+        private List<String> authors = new ArrayList<>();
 
         /**
-         * adding a content to the data entity.
+         * Sets the location of the data entity.
+         * 
+         * If the ID has not been set manually in beforehand, it will be derived from
+         * the path. Use {@link #setId(String)} to override it or set it in beforehand.
+         * Note that another call of {@link #setLocation(Path)} will not override the ID
+         * as it has been set by the previous call!
          *
-         * @param path the path of the content
-         * @param id the identifier of the content
-         * @return
+         * @param path the location of the data. May be null, in which case nothing
+         *             happens.
+         * @return this builder
          */
-        public T addContent(Path path, String id) {
-            if (path != null && id != null) {
-                this.setId(id);
+        public T setLocation(Path path) {
+            if (path != null) {
+                if (this.getId() == null) {
+                    this.setId(path.getFileName().toString());
+                }
                 this.location = path;
-            } else {
-                throw new IllegalArgumentException("The given path and Identifier should not be null.");
             }
             return self();
         }
 
         /**
-         * adding a web content to the data entity. If the given uri is not a
-         * url, the content will not be added.
+         * A variant of {@link #setLocation(Path)} which may throw exceptions.
          *
-         * @param uri the given uri
-         * @return
+         * @param path the location of the data
+         * @return this builder
+         * @throws IllegalArgumentException if path is null
          */
-        public T addContent(URI uri) throws IllegalArgumentException {
-            if (isUrl(uri.toString())) {
+        public T setLocationWithExceptions(Path path) throws IllegalArgumentException {
+            if (path == null) {
+                throw new IllegalArgumentException("The given path should not be null.");
+            }
+            return setLocation(path);
+        }
+
+        /**
+         * Same as {@link #setLocation(Path)} but instead of associating this entity
+         * with a file, it will point to some place on the internet.
+         * 
+         * Via the specification, this means the uri will be set as the ID. This call is
+         * therefore equivalent to {@link #setId(String)}.
+         * 
+         * @param uri the URI, should point at the data reachable on the internet.
+         * @return this builder
+         */
+        public T setLocation(URI uri) {
+            if (uri != null && this.getId() == null) {
                 this.setId(uri.toString());
-            } else {
-                throw new IllegalArgumentException("This Data Entity remote ID does not resolve to a valid URL.");
             }
             return self();
+        }
+
+        /**
+         * A variant of {@link #setLocation(URI)} which may throw exceptions.
+         *
+         * @param uri the given uri
+         * @return this builder
+         * @throws IllegalArgumentException if uri is null or not a valid URL
+         */
+        public T setLocationWithExceptions(URI uri) throws IllegalArgumentException {
+            if (!isUrl(uri.toString())) {
+                throw new IllegalArgumentException("This Data Entity remote ID does not resolve to a valid URL.");
+            }
+            return setLocation(uri);
         }
 
         public T setLicense(String id) {
@@ -150,6 +190,10 @@ public class DataEntity extends AbstractEntity {
 
     /**
      * Data Entity builder class that allows for easier data entity creation.
+     * 
+     * If not explicitly mentioned, all methods avoid Exceptions and will silently
+     * ignore null-parameters, in which case nothing will happen. Use the available
+     * *WithExceptions-methods in case you need them.
      */
     public static final class DataEntityBuilder extends AbstractDataEntityBuilder<DataEntityBuilder> {
 

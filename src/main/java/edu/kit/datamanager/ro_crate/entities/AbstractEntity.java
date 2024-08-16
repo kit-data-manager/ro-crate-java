@@ -468,6 +468,8 @@ public class AbstractEntity {
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one. Instead of:
          * "name": "id" added is : "name" : {"@id": "id"}
+         * 
+         * Does nothing if name or id are null.
          *
          * @param name the name of the ID property.
          * @param id the ID.
