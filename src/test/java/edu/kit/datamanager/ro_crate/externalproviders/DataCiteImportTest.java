@@ -16,17 +16,21 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DataCiteImportTest {
+class DataCiteImportTest {
 
   @Test
   void dataCiteImportNewCrate() {
     var crate = ImportFromDataCite
         .createCrateFromDataCiteResource(
             "https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669",
-            "importedCrate", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/");
+            Optional.of("importedCrate"),
+            Optional.of("description"),
+            Optional.of("2024"),
+            Optional.of("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"));
     Validator validator = new Validator(new JsonSchemaValidation());
     assertTrue(validator.validate(crate));
   }
@@ -51,7 +55,12 @@ public class DataCiteImportTest {
       jsonNode = objectMapper.readValue(response.getEntity().getContent(),
           JsonNode.class);
 
-      var crate = ImportFromDataCite.createCrateFromDataCiteJson(jsonNode, "name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/");
+      var crate = ImportFromDataCite.createCrateFromDataCiteJson(
+        jsonNode,
+        Optional.of("importedCrate"),
+        Optional.of("description"),
+        Optional.of("2024"),
+        Optional.of("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"));
       Validator validator = new Validator(new JsonSchemaValidation());
       assertTrue(validator.validate(crate));
 

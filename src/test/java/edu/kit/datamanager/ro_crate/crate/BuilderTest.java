@@ -41,7 +41,12 @@ public class BuilderTest {
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("name", "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)")
                 .build();
-        RoCrate crate = new RoCrate.RoCrateBuilder("Data files", "Palliative care planning...", "2024-02-09T08:21:41Z", license.getId()).addContextualEntity(license).build();
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+            "Data files",
+            "Palliative care planning...",
+            "2024-02-09T08:21:41Z",
+            license
+        ).build();
 
         HelpFunctions.compareEntityWithFile(crate.getRootDataEntity(), "/json/entities/data/rootMinimalExample.json");
         HelpFunctions.compareEntityWithFile(crate.getContextualEntityById("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"), "/json/entities/data/license.json");

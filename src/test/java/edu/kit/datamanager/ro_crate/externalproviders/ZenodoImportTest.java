@@ -9,12 +9,19 @@ import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ZenodoImportTest {
+import java.util.Optional;
+
+class ZenodoImportTest {
 
   @Test
   void testImportingNewCrate() {
     String url = "https://zenodo.org/api/records/6411574";
-    var crate = ImportFromZenodo.createCrateWithItem(url, "name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/");
+    var crate = ImportFromZenodo.createCrateWithItem(
+        url,
+        Optional.of("name"),
+        Optional.of("description"),
+        Optional.of("2024"),
+        Optional.of("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"));
     Validator validator = new Validator(new JsonSchemaValidation());
     assertTrue(validator.validate(crate));
   }
