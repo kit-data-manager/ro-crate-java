@@ -284,7 +284,7 @@ public class RoCrate implements Crate {
          * @param name the name of the crate.
          * @param description the description of the crate.
          * @param datePublished the published date of the crate.
-         * @param licenseId the license identifier of the crate.
+         * @param license the license entity of the crate.
          */
         public RoCrateBuilder(String name, String description, String datePublished, ContextualEntity license) {
             this.payload = new RoCratePayload();
@@ -372,8 +372,8 @@ public class RoCrate implements Crate {
         /**
          * Setting the license of the crate using only a license identifier.
          *
-         * @param license the license is a contextual entity.
-         * @return the builder for further usage.
+         * @param licenseId the licenses identifier. Should be a resolveable URI.
+         * @return the builder
          */
         public RoCrateBuilder setLicense(String licenseId) {
             ContextualEntity licenseEntity = new ContextualEntity.ContextualEntityBuilder()
@@ -387,8 +387,7 @@ public class RoCrate implements Crate {
          * Adds a property with date time format. The property should match the ISO 8601
          * date format.
          * 
-         * @param key   key of the property (e.g. datePublished)
-         * @param value time string in ISO 8601 format
+         * @param dateValue time string in ISO 8601 format
          * @return this builder
          * @throws IllegalArgumentException if format is not ISO 8601
          */

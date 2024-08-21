@@ -329,7 +329,6 @@ public class AbstractEntity {
      *
      * @param key   key of the property (e.g. datePublished)
      * @param value time string in ISO 8601 format
-     * @return this builder
      * @throws IllegalArgumentException if format is not ISO 8601
      */
     public void addDateTimePropertyWithExceptions(String key, String value) throws IllegalArgumentException {
