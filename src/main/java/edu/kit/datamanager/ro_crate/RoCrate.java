@@ -454,8 +454,15 @@ public class RoCrate implements Crate {
         /**
          * @see RoCrateBuilder#RoCrateBuilder(String, String, String, String)
          */
-        public BuilderWithDraftFeatures(String name, String description) {
-            super();
+        public BuilderWithDraftFeatures(String name, String description, String datePublished, String licenseId) {
+            super(name, description, datePublished, licenseId);
+        }
+
+        /**
+         * @see RoCrateBuilder#RoCrateBuilder(String, String, String, ContextualEntity)
+         */
+        public BuilderWithDraftFeatures(String name, String description, String datePublished, ContextualEntity licenseId) {
+            super(name, description, datePublished, licenseId);
         }
 
         /**
