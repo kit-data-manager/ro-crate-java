@@ -307,31 +307,34 @@ public class AbstractEntity {
     }
 
     /**
-     * checks if the date matches the ISO 8601 date format. If not, an exception
-     * is thrown.
+     * Checks if the date matches the ISO 8601 date format.
      *
      * @param date the date as a string
+* @throws IllegalArgumentException if format does not match
      */
-    public static void matchStringwithISODateFormat(String date) {
+    private static void checkFormatISO8601(String date) throws IllegalArgumentException {
         String regex = "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(date);
         if (!matcher.matches()) {
-            throw new RuntimeException("Date MUST be a string in ISO 8601 format");
+            throw new IllegalArgumentException("Date MUST be a string in ISO 8601 format");
         }
-
     }
 
     /**
-     * adding a date time Property. The property should match the ISO 8601 date
-     * format.
+     * Adds a property with date time format. The property should match the ISO 8601
+     * date format.
      *
-     * @param key key of the property
-     * @param value value of the property
+     * Same as {@link #addProperty(String, String)} but with internal check.
+     *
+     * @param key   key of the property (e.g. datePublished)
+     * @param value time string in ISO 8601 format
+     * @return this builder
+     * @throws IllegalArgumentException if format is not ISO 8601
      */
-    public void addDateTimeProperty(String key, String value) {
+    public void addDateTimePropertyWithExceptions(String key, String value) throws IllegalArgumentException {
         if (value != null) {
-            matchStringwithISODateFormat(value);
+            checkFormatISO8601(value);
             this.properties.put(key, value);
             this.notifyObservers();
         }
@@ -407,16 +410,19 @@ public class AbstractEntity {
         }
 
         /**
-         * adding a date time Property. The property should match the ISO 8601
+         * Adds a property with date time format. The property should match the ISO 8601
          * date format.
          *
-         * @param key key of the property
-         * @param value value of the property
-         * @return the generic builder.
+         * Same as {@link #addProperty(String, String)} but with internal check.
+         *
+         * @param key   key of the property (e.g. datePublished)
+         * @param value time string in ISO 8601 format
+         * @return this builder
+         * @throws IllegalArgumentException if format is not ISO 8601
          */
-        public T addDateTimeProperty(String key, String value) {
+        public T addDateTimePropertyWithExceptions(String key, String value) throws IllegalArgumentException {
             if (value != null) {
-                matchStringwithISODateFormat(value);
+                checkFormatISO8601(value);
                 this.properties.put(key, value);
             }
             return self();

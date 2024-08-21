@@ -52,12 +52,12 @@ public class RootDataEntityTest {
     }
 
     @Test
-    void testSerializationMinimalExample() throws IOException {
+    void testSerializationMinimalExample() throws IOException, IllegalArgumentException {
         ObjectMapper objectMapper = MyObjectMapper.getMapper();
         RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                 .addProperty("name", "Data files")
                 .addProperty("description", "Palliative care planning...")
-                .addProperty("datePublished", "2024-02-09T08:21:41Z")
+                .addDateTimePropertyWithExceptions("datePublished", "2024-02-09T08:21:41Z")
                 .addProperty("license", objectMapper.createObjectNode().put("@id", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"))
                 .build();
         HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/rootMinimalExample.json");
