@@ -310,7 +310,7 @@ public class AbstractEntity {
      * Checks if the date matches the ISO 8601 date format.
      *
      * @param date the date as a string
-* @throws IllegalArgumentException if format does not match
+     * @throws IllegalArgumentException if format does not match
      */
     private static void checkFormatISO8601(String date) throws IllegalArgumentException {
         String regex = "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
@@ -324,7 +324,7 @@ public class AbstractEntity {
     /**
      * Adds a property with date time format. The property should match the ISO 8601
      * date format.
-     *
+     * 
      * Same as {@link #addProperty(String, String)} but with internal check.
      *
      * @param key   key of the property (e.g. datePublished)
@@ -412,7 +412,7 @@ public class AbstractEntity {
         /**
          * Adds a property with date time format. The property should match the ISO 8601
          * date format.
-         *
+         * 
          * Same as {@link #addProperty(String, String)} but with internal check.
          *
          * @param key   key of the property (e.g. datePublished)
@@ -443,8 +443,7 @@ public class AbstractEntity {
         }
 
         /**
-         * Adding a property to the builder. If the key of the property is
-         * "datePublished", then the value must match the ISO 8601 date format.
+         * Adding a property to the builder.
          *
          * @param key the key of the property as a string.
          * @param value the value of the property as a string.
@@ -472,8 +471,10 @@ public class AbstractEntity {
 
         /**
          * ID properties are often used when referencing other entities within
-         * the ROCrate. This method adds automatically such one. Instead of:
-         * "name": "id" added is : "name" : {"@id": "id"}
+         * the ROCrate. This method adds automatically such one.
+         * 
+         * Instead of {@code "name": "id" }
+         * this will add {@code "name" : {"@id": "id"} }
          * 
          * Does nothing if name or id are null.
          *

@@ -19,7 +19,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OtherFilesTest {
+class OtherFilesTest {
 
   /**
    * Test if adding untracked files to the crate a being included inside it
