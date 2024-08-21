@@ -61,7 +61,8 @@ public class MultipleCratesWriteAndRead {
             .addProperty("name", "Joe")
             .build();
         DataEntity file = new DataEntity.DataEntityBuilder()
-            .addContent(Paths.get(baseLocation + "file" + j),baseLocation + "file" + j )
+            .setLocationWithExceptions(Paths.get(baseLocation + "file" + j))
+            .setId(baseLocation + "file" + j)
             .addType("File")
             .addIdProperty("author", person)
             .build();

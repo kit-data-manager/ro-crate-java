@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.RoCrate;
+import edu.kit.datamanager.ro_crate.RoCrate.RoCrateBuilder;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
@@ -25,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -41,22 +43,41 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class ImportFromDataCite {
 
+  private static final String PROPTERY_DATE_PUBLISHED = "datePublished";
+
+  /**
+   * Class has only static methods, therefore forbid instance creation.
+   */
+  private ImportFromDataCite() {}
+
   /**
    * This will take a DataCite entry and create a crate from it.
+   * 
+   * Except of the url, all parameters are optional. If present, they will be
+   * added to the crate.
    *
-   * @param url         the url of the dataCite entry. ex:
-  https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669
-   * @param name        the name the crate should have.
-   * @param description the description of the crate.
+   * @param url           the url of the dataCite entry. ex:
+   *                      https://api.datacite.org/application/vnd.datacite.datacite+json/10.1594/pangaea.149669
+   * @param name          the name the crate should have.
+   * @param description   the description of the crate.
    * @param datePublished the published date of the crate.
-   * @param licenseId the license identifier of the crate.
+   * @param licenseId     the license identifier of the crate.
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteResource(
-      String url, String name, String description, String datePublished, String licenseId) {
+      String url,
+      Optional<String> name,
+      Optional<String> description,
+      Optional<String> datePublished,
+      Optional<String> licenseId) {
 
-    Crate crate = new RoCrate.RoCrateBuilder(name, description, datePublished, licenseId)
-        .build();
+    RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
+    name.ifPresent(builder::addName);
+    description.ifPresent(builder::addDescription);
+    datePublished.ifPresent(builder::addDatePublishedWithExceptions);
+    licenseId.ifPresent(builder::setLicense);
+
+    Crate crate = builder.build();
     addDataCiteToCrate(url, crate);
     return crate;
   }
@@ -85,9 +106,19 @@ public class ImportFromDataCite {
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteJson(
-      JsonNode json, String name, String description, String datePublished, String licenseId) {
-    Crate crate = new RoCrate.RoCrateBuilder(name, description, datePublished, licenseId)
-        .build();
+      JsonNode json,
+      Optional<String> name,
+      Optional<String> description,
+      Optional<String> datePublished,
+      Optional<String> licenseId) {
+
+    RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
+    name.ifPresent(builder::addName);
+    description.ifPresent(builder::addDescription);
+    datePublished.ifPresent(builder::addDatePublishedWithExceptions);
+    licenseId.ifPresent(builder::setLicense);
+
+    Crate crate = builder.build();
     addDataCiteToCrateFromJson(json, crate);
     return crate;
   }
@@ -508,7 +539,7 @@ public class ImportFromDataCite {
         .addProperty("description", descriptionArray)
         .addProperty("dateCreated", dateCreated)
         .addProperty("dateModified", dateModified)
-        .addProperty("datePublished", datePublished)
+        .addProperty(PROPTERY_DATE_PUBLISHED, datePublished)
         .addProperty("keywords", keyWordsArray)
         .addProperty("inLanguage", language)
         .addProperty("identifier", alternate)

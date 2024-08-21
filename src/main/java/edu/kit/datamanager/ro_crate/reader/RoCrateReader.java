@@ -11,8 +11,8 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
-import static edu.kit.datamanager.ro_crate.special.UriUtil.decode;
-import static edu.kit.datamanager.ro_crate.special.UriUtil.isUrl;
+import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.decode;
+import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
@@ -102,7 +102,8 @@ public class RoCrateReader {
           File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
           if (loc != null) {
             usedFiles.add(loc.getPath());
-            dataEntity.addContent(loc.toPath(), loc.getName());
+            dataEntity.setLocationWithExceptions(loc.toPath())
+                .setId(loc.getName());
           }
 
           crate.addDataEntity(dataEntity.build(), false);

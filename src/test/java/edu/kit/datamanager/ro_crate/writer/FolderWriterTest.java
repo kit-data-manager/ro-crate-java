@@ -24,7 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderWriterTest {
+class FolderWriterTest {
 
 
   @Test
@@ -54,7 +54,8 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .addContent(file1, "cp7glop.ai")
+                .setLocationWithExceptions(file1)
+                .setId("cp7glop.ai")
                 .build()
         )
         .addDataEntity(
@@ -62,7 +63,8 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .addContent(dirInCrate, "lots_of_little_files/")
+                .setLocationWithExceptions(dirInCrate)
+                .setId("lots_of_little_files/")
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -119,7 +121,8 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .addContent(file1, "cp7glop.ai")
+                .setLocationWithExceptions(file1)
+                .setId("cp7glop.ai")
                 .build()
         )
         .addDataEntity(
@@ -127,7 +130,8 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .addContent(dirInCrate, "lots_of_little_files/")
+                .setLocationWithExceptions(dirInCrate)
+                .setId("lots_of_little_files/")
                 .build()
         )
         .setPreview(new AutomaticPreview())
@@ -183,7 +187,8 @@ public class FolderWriterTest {
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
                 .setEncodingFormat("application/pdf")
-                .addContent(falseFile, "cp7glop.ai")
+                .setLocationWithExceptions(falseFile)
+                .setId("cp7glop.ai")
                 .build()
         )
         .addDataEntity(
@@ -192,7 +197,8 @@ public class FolderWriterTest {
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                     "This directory contains many small files, that we're not going to describe in detail.")
-                .addContent(dirInCrate, "lots_of_little_files/")
+                .setLocationWithExceptions(dirInCrate)
+                .setId("lots_of_little_files/")
                 .build()
         )
         .build();

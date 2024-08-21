@@ -684,3 +684,14 @@ If there is no special method for including relative entities (ID properties) on
         )
         .build();
 ```
+
+
+## Maintenance tasks
+
+- Building (with tests): `./gradlew clean build`
+- Building (without tests): `./gradlew clean build -x test`
+- Building with release profile: `./gradlew -Dprofile=release clean build`
+- Doing a release: `./gradlew -Dprofile=release clean build release`
+  - Will prompt you about version number to use and next version number
+  - Will make a git tag which can later be used in a GitHub release
+    - A GitHub release will trigger the CI for publication. See also `.github/workflows/publishRelease.yml`.

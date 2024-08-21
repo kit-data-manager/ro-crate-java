@@ -21,8 +21,8 @@ public class ActionEntity extends ContextualEntity {
         this.addProperty("name", entityBuilder.name);
         this.addProperty("description", entityBuilder.description);
 
-        this.addDateTimeProperty("startTime", entityBuilder.startTime);
-        this.addDateTimeProperty("endTime", entityBuilder.endTime);
+        this.addDateTimePropertyWithExceptions("startTime", entityBuilder.startTime);
+        this.addDateTimePropertyWithExceptions("endTime", entityBuilder.endTime);
 
         entityBuilder.status.ifPresent(status -> this.addIdProperty("actionStatus", status.getId()));
         this.addIdProperty("agent", entityBuilder.agent);

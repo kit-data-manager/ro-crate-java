@@ -29,7 +29,7 @@ public class HelpFunctions {
         JsonNode expectedJson = MyObjectMapper.getMapper().readTree(inputStream);
         JsonNode node = MyObjectMapper.getMapper().convertValue(entity, JsonNode.class);
         //compare the size of the expected and actual node. Both nodes should have the same number of properties.
-       assertEquals(expectedJson.size(), node.size());
+        assertEquals(expectedJson.size(), node.size());
         compare(expectedJson, node, true);
     }
     

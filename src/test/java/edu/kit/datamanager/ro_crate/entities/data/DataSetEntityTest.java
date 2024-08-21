@@ -27,7 +27,8 @@ public class DataSetEntityTest {
         String id = "lots_of_little_files/";
         DataSetEntity dir = new DataSetEntity.DataSetBuilder()
                 // this does not change anything, but it shows that the entity contains a physical file
-                .addContent(Paths.get("invalid_file"), id)
+                .setLocationWithExceptions(Paths.get("invalid_file"))
+                .setId(id)
                 .addProperty("name", "Too many files")
                 .addProperty("description",
                         "This directory contains many small files, that we're not going to describe in detail.")
@@ -47,13 +48,14 @@ public class DataSetEntityTest {
 
         String id = "second_content";
         DataEntity second_content = new DataEntity.DataEntityBuilder()
-                .addContent(Paths.get("does_not_matter"), id)
+                .setLocationWithExceptions(Paths.get("does_not_matter"))
+                .setId(id)
                 .addProperty("description", "This entity just describes one of the contents in the Dir")
                 .build();
 
         // we can add to hasPart using directly the id, or passing the entity to it
         DataSetEntity dir = new DataSetEntity.DataSetBuilder()
-                .addContent(URI.create("https://www.example.com/urltodir"))
+                .setLocation(URI.create("https://www.example.com/urltodir"))
                 .addProperty("name", "Directory that is located on the web")
                 .addToHasPart("first_content")
                 .addToHasPart(second_content)
@@ -70,7 +72,8 @@ public class DataSetEntityTest {
         propertyValue.put("@id", "http://example.com/downloads/2020/lots_of_little_files.zip");
 
         DataSetEntity dir = new DataSetEntity.DataSetBuilder()
-                .addContent(Paths.get("lots_of_little_files/"), "lots_of_little_files/")
+                .setLocationWithExceptions(Paths.get("lots_of_little_files/"))
+                .setId("lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description", "This directory contains many small files, that we're not going to describe in detail.")
                 .addProperty("distribution", propertyValue)
@@ -79,7 +82,7 @@ public class DataSetEntityTest {
         assertEquals(dir.getProperty("distribution"), propertyValue);
 
         DataEntity webDir = new DataEntity.DataEntityBuilder()
-                .addContent(URI.create("http://example.com/downloads/2020/lots_of_little_files.zip"))
+                .setLocation(URI.create("http://example.com/downloads/2020/lots_of_little_files.zip"))
                 .addType("DataDownload")
                 .addProperty("encodingFormat", "application/zip")
                 .addProperty("contentSize", "82818928")

@@ -41,7 +41,8 @@ class RealTest {
         FileUtils.writeStringToFile(newFile.toFile(), "blablablalblalblabla", Charset.defaultCharset());
         crate.addDataEntity(
                 new FileEntity.FileEntityBuilder()
-                        .addContent(newFile.toAbsolutePath(), "new_file.txt")
+                        .setLocationWithExceptions(newFile.toAbsolutePath())
+                        .setId("new_file.txt")
                         .addProperty("description", "my new file that I added")
                         .build(),
                 true);

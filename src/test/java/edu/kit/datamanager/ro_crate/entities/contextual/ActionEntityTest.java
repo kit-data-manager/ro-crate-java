@@ -78,8 +78,8 @@ class ActionEntityTest {
                 .addObject("#victoria_arch")
                 .addResult("wcc02_arch.laz")
                 .addResult("wcc02_arch_traj.txt")
-                .addDateTimeProperty("startTime","2017-06-10T12:56:14+10:00")
-                .addDateTimeProperty("endTime","2017-06-11T12:56:14+10:00")
+                .addDateTimePropertyWithExceptions("startTime","2017-06-10T12:56:14+10:00")
+                .addDateTimePropertyWithExceptions("endTime","2017-06-11T12:56:14+10:00")
                 .build();
         
         assertNotNull(createAction);

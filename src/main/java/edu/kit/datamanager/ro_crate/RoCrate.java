@@ -3,7 +3,6 @@ package edu.kit.datamanager.ro_crate;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
@@ -248,6 +247,8 @@ public class RoCrate implements Crate {
      */
     public static class RoCrateBuilder {
 
+        private static final String PROPERTY_DESCRIPTION = "description";
+
         CratePayload payload;
         CratePreview preview;
         CrateMetadataContext metadataContext;
@@ -265,18 +266,36 @@ public class RoCrate implements Crate {
          * @param datePublished the published date of the crate.
          * @param licenseId the license identifier of the crate.
          */
-        public RoCrateBuilder(String name, String description, String datePublished,String licenseId) {
+        public RoCrateBuilder(String name, String description, String datePublished, String licenseId) {
             this.payload = new RoCratePayload();
             this.untrackedFiles = new ArrayList<>();
             this.metadataContext = new RoCrateMetadataContext();
-            ObjectNode licenseNode = JsonNodeFactory.instance.objectNode();
-            licenseNode.put("@id", licenseId);
-            rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
+            this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                     .addProperty("name", name)
-                    .addProperty("description", description)
-                    .addProperty("datePublished", datePublished)
-                    .addProperty("license", licenseNode)
+                    .addProperty(PROPERTY_DESCRIPTION, description)
                     .build();
+            this.setLicense(licenseId);
+            this.addDatePublishedWithExceptions(datePublished);
+        }
+
+        /**
+         * The default constructor of a builder.
+         *
+         * @param name the name of the crate.
+         * @param description the description of the crate.
+         * @param datePublished the published date of the crate.
+         * @param license the license entity of the crate.
+         */
+        public RoCrateBuilder(String name, String description, String datePublished, ContextualEntity license) {
+            this.payload = new RoCratePayload();
+            this.untrackedFiles = new ArrayList<>();
+            this.metadataContext = new RoCrateMetadataContext();
+            this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
+                    .addProperty("name", name)
+                    .addProperty(PROPERTY_DESCRIPTION, description)
+                    .build();
+            this.setLicense(license);
+            this.addDatePublishedWithExceptions(datePublished);
         }
 
         /**
@@ -305,6 +324,16 @@ public class RoCrate implements Crate {
             this.descriptorBuilder = new JsonDescriptor.Builder(crate);
         }
 
+        public RoCrateBuilder addName(String name) {
+            this.rootDataEntity.addProperty("name", name);
+            return this;
+        }
+
+        public RoCrateBuilder addDescription(String description) {
+            this.rootDataEntity.addProperty(PROPERTY_DESCRIPTION, description);
+            return this;
+        }
+
         /**
          * Adding a data entity to the crate. The important part here is to also
          * add its id to the RootData Entity hasPart.
@@ -326,12 +355,44 @@ public class RoCrate implements Crate {
         /**
          * Setting the license of the crate.
          *
-         * @param license the license is a contextual entity.
-         * @return the builder for further usage.
+         * @param license the license to set.
+         * @return this builder.
          */
         public RoCrateBuilder setLicense(ContextualEntity license) {
             this.license = license;
+            // From our tests, it seems like if we only have the ID for our license, we do
+            // not need to add an extra entity.
+            if (license.getProperties().size() > 1) {
+                this.addContextualEntity(license);
+            }
             this.rootDataEntity.addIdProperty("license", license.getId());
+            return this;
+        }
+
+        /**
+         * Setting the license of the crate using only a license identifier.
+         *
+         * @param licenseId the licenses identifier. Should be a resolveable URI.
+         * @return the builder
+         */
+        public RoCrateBuilder setLicense(String licenseId) {
+            ContextualEntity licenseEntity = new ContextualEntity.ContextualEntityBuilder()
+                .setId(licenseId)
+                .build();
+            this.setLicense(licenseEntity);
+            return this;
+        }
+
+        /**
+         * Adds a property with date time format. The property should match the ISO 8601
+         * date format.
+         * 
+         * @param dateValue time string in ISO 8601 format
+         * @return this builder
+         * @throws IllegalArgumentException if format is not ISO 8601
+         */
+        public RoCrateBuilder addDatePublishedWithExceptions(String dateValue) throws IllegalArgumentException {
+            this.rootDataEntity.addDateTimePropertyWithExceptions("datePublished", dateValue);
             return this;
         }
 
@@ -392,8 +453,15 @@ public class RoCrate implements Crate {
         /**
          * @see RoCrateBuilder#RoCrateBuilder(String, String, String, String)
          */
-        public BuilderWithDraftFeatures(String name, String description) {
-            super();
+        public BuilderWithDraftFeatures(String name, String description, String datePublished, String licenseId) {
+            super(name, description, datePublished, licenseId);
+        }
+
+        /**
+         * @see RoCrateBuilder#RoCrateBuilder(String, String, String, ContextualEntity)
+         */
+        public BuilderWithDraftFeatures(String name, String description, String datePublished, ContextualEntity licenseId) {
+            super(name, description, datePublished, licenseId);
         }
 
         /**

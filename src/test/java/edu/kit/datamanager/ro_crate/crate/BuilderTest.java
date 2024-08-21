@@ -1,6 +1,7 @@
 package edu.kit.datamanager.ro_crate.crate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import java.io.IOException;
 
-public class BuilderTest {
+class BuilderTest {
     @Test
     void testReadBuilder() throws JsonProcessingException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
@@ -41,7 +42,14 @@ public class BuilderTest {
                 .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .addProperty("name", "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)")
                 .build();
-        RoCrate crate = new RoCrate.RoCrateBuilder("Data files", "Palliative care planning...", "2024-02-09T08:21:41Z", license.getId()).addContextualEntity(license).build();
+        assertNotNull(license);
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+            "Data files",
+            "Palliative care planning...",
+            "2024-02-09T08:21:41Z",
+            license
+        ).build();
+        assertNotNull(crate);
 
         HelpFunctions.compareEntityWithFile(crate.getRootDataEntity(), "/json/entities/data/rootMinimalExample.json");
         HelpFunctions.compareEntityWithFile(crate.getContextualEntityById("https://creativecommons.org/licenses/by-nc-sa/3.0/au/"), "/json/entities/data/license.json");

@@ -30,7 +30,8 @@ public class RootDataEntity extends DataSetEntity {
     @Override
     public RootDataEntity build() {
       // small hack not to get the command line message
-      this.addContent(Paths.get("./"), "./");
+      this.setLocation(Paths.get("./"))
+          .setId("./");
       return new RootDataEntity(this);
     }
   }
