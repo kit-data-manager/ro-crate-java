@@ -16,14 +16,11 @@ import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -114,14 +111,13 @@ public class RoCrateReader {
         }
       }
     }
-    var itr = files.listFiles();
-    List<File> list = new ArrayList<>();
-    for (var f : itr) {
-      if (!usedFiles.contains(f.getPath())) {
-        list.add(f);
-      }
-    }
-    crate.setUntrackedFiles(list);
+
+    Collection<File> untrackedFiles = FileUtils.listFiles(files, null, false)
+            .stream()
+            .filter(f -> !usedFiles.contains(f.getPath()))
+            .collect(Collectors.toSet());
+
+    crate.setUntrackedFiles(untrackedFiles);
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
     defaultValidation.validate(crate);
     return crate;
