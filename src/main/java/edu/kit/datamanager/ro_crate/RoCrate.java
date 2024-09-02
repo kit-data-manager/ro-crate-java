@@ -24,11 +24,7 @@ import edu.kit.datamanager.ro_crate.validation.Validator;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -50,7 +46,7 @@ public class RoCrate implements Crate {
     private RootDataEntity rootDataEntity;
     private ContextualEntity jsonDescriptor;
 
-    private List<File> untrackedFiles;
+    private Collection<File> untrackedFiles;
 
     @Override
     public CratePreview getPreview() {
@@ -86,7 +82,7 @@ public class RoCrate implements Crate {
      */
     public RoCrate() {
         this.roCratePayload = new RoCratePayload();
-        this.untrackedFiles = new ArrayList<>();
+        this.untrackedFiles = new HashSet<>();
         this.metadataContext = new RoCrateMetadataContext();
         rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                 .build();
@@ -135,7 +131,6 @@ public class RoCrate implements Crate {
             return StreamSupport.stream(conformsTo.spliterator(), false)
                     .filter(TreeNode::isObject)
                     .map(obj -> obj.path("@id").asText())
-                    .filter(txt -> !CrateVersion.fromSpecUri(txt).isPresent())
                     .collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
@@ -167,8 +162,8 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public List<DataEntity> getAllDataEntities() {
-        return this.roCratePayload.getAllDataEntities();
+    public Set<DataEntity> getAllDataEntities() {
+        return new HashSet<>(this.roCratePayload.getAllDataEntities());
     }
 
     @Override
@@ -177,8 +172,8 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public List<ContextualEntity> getAllContextualEntities() {
-        return this.roCratePayload.getAllContextualEntities();
+    public Set<ContextualEntity> getAllContextualEntities() {
+        return new HashSet<>(this.roCratePayload.getAllContextualEntities());
     }
 
     @Override
@@ -213,7 +208,7 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public void setUntrackedFiles(List<File> files) {
+    public void setUntrackedFiles(Collection<File> files) {
         this.untrackedFiles = files;
     }
 
@@ -238,7 +233,7 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public List<File> getUntrackedFiles() {
+    public Collection<File> getUntrackedFiles() {
         return this.untrackedFiles;
     }
 
@@ -254,7 +249,7 @@ public class RoCrate implements Crate {
         CrateMetadataContext metadataContext;
         ContextualEntity license;
         RootDataEntity rootDataEntity;
-        List<File> untrackedFiles;
+        Collection<File> untrackedFiles = new HashSet<>();
 
         JsonDescriptor.Builder descriptorBuilder = new JsonDescriptor.Builder();
 
@@ -268,7 +263,6 @@ public class RoCrate implements Crate {
          */
         public RoCrateBuilder(String name, String description, String datePublished, String licenseId) {
             this.payload = new RoCratePayload();
-            this.untrackedFiles = new ArrayList<>();
             this.metadataContext = new RoCrateMetadataContext();
             this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                     .addProperty("name", name)
@@ -288,7 +282,6 @@ public class RoCrate implements Crate {
          */
         public RoCrateBuilder(String name, String description, String datePublished, ContextualEntity license) {
             this.payload = new RoCratePayload();
-            this.untrackedFiles = new ArrayList<>();
             this.metadataContext = new RoCrateMetadataContext();
             this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                     .addProperty("name", name)
@@ -304,7 +297,6 @@ public class RoCrate implements Crate {
          */
         public RoCrateBuilder() {
             this.payload = new RoCratePayload();
-            this.untrackedFiles = new ArrayList<>();
             this.metadataContext = new RoCrateMetadataContext();
             rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                     .build();

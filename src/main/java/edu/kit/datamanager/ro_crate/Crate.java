@@ -2,8 +2,8 @@ package edu.kit.datamanager.ro_crate;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
@@ -25,13 +25,13 @@ public interface Crate {
    * Read version from the crate descriptor and return it as a class
    * representation.
    * 
-   * NOTE: If there is not version in the crate, it does not comply with the
+   * NOTE: If there is no version in the crate, it does not comply with the
    * specification.
    * 
    * @return the class representation indication the version of this crate, if
    *         available.
    */
-  public Optional<CrateVersion> getVersion();
+  Optional<CrateVersion> getVersion();
 
   /**
    * Returns strings indicating the conformance of a crate with other
@@ -45,7 +45,7 @@ public interface Crate {
    * @return a collection of the profiles or specifications this crate conforms
    *         to.
    */
-  public Collection<String> getProfiles();
+  Collection<String> getProfiles();
 
   CratePreview getPreview();
 
@@ -63,11 +63,11 @@ public interface Crate {
 
   DataEntity getDataEntityById(java.lang.String id);
 
-  List<DataEntity> getAllDataEntities();
+  Set<DataEntity> getAllDataEntities();
 
   ContextualEntity getContextualEntityById(java.lang.String id);
 
-  List<ContextualEntity> getAllContextualEntities();
+  Set<ContextualEntity> getAllContextualEntities();
 
   AbstractEntity getEntityById(java.lang.String id);
 
@@ -77,15 +77,15 @@ public interface Crate {
 
   void deleteEntityById(String entityId);
 
-  void setUntrackedFiles(List<File> files);
+  void setUntrackedFiles(Collection<File> files);
 
   void addFromCollection(Collection<AbstractEntity> entities);
 
   void addItemFromDataCite(String locationUrl);
 
-  public void deleteValuePairFromContext(String key);
+  void deleteValuePairFromContext(String key);
 
-  public void deleteUrlFromContext(String url);
+  void deleteUrlFromContext(String url);
 
-  List<File> getUntrackedFiles();
+  Collection<File> getUntrackedFiles();
 }

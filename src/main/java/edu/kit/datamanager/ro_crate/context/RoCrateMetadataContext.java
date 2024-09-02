@@ -12,7 +12,7 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -49,12 +49,10 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   /**
    * Constructor for creating the context from a list of url.
    *
-   * @param url the url list with different context.
+   * @param urls the url list with different context.
    */
-  public RoCrateMetadataContext(List<String> url) {
-    for (String e : url) {
-      this.addToContextFromUrl(e);
-    }
+  public RoCrateMetadataContext(Collection<String> urls) {
+    urls.forEach(this::addToContextFromUrl);
   }
 
   /**

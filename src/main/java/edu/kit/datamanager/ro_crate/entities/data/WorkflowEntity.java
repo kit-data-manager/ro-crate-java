@@ -2,25 +2,23 @@ package edu.kit.datamanager.ro_crate.entities.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A helping class for the creation of workflow data entities.
  */
 public class WorkflowEntity extends FileEntity {
 
-  private static final List<String> TYPES = List.of(
-      new String[]{"SoftwareSourceCode", "ComputationalWorkflow"});
+  private static final Set<String> TYPES = Set.of("SoftwareSourceCode", "ComputationalWorkflow");
 
   /**
    * Constructor for creating the workflow entity from a builder.
    *
    * @param entityBuilder the builder from which the entity should be created.
    */
-  public WorkflowEntity(AbstractWorkflowEntityBuilder<?> entityBuilder) {
+  private WorkflowEntity(AbstractWorkflowEntityBuilder<?> entityBuilder) {
     super(entityBuilder);
-    for (String str : TYPES) {
-      this.addType(str);
-    }
+    TYPES.forEach(this::addType);
     this.addIdListProperties("input", entityBuilder.input);
     this.addIdListProperties("output", entityBuilder.output);
   }
