@@ -16,12 +16,7 @@ import edu.kit.datamanager.ro_crate.payload.Observer;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,16 +52,14 @@ public class AbstractEntity {
     private final Set<String> linkedTo;
 
     @JsonIgnore
-    private final List<Observer> observers;
+    private final Set<Observer> observers;
 
     public void addObserver(Observer observer) {
         this.observers.add(observer);
     }
 
     private void notifyObservers() {
-        for (var obs : this.observers) {
-            obs.update(this.getId());
-        }
+        this.observers.forEach(observer -> observer.update(this.getId()));
     }
 
     /**
@@ -78,7 +71,7 @@ public class AbstractEntity {
         this.types = entityBuilder.types;
         this.properties = entityBuilder.properties;
         this.linkedTo = entityBuilder.relatedItems;
-        this.observers = new ArrayList<>();
+        this.observers = new HashSet<>();
         if (this.properties.get("@id") == null) {
             if (entityBuilder.id == null) {
                 this.properties.put("@id", UUID.randomUUID().toString());
@@ -154,9 +147,9 @@ public class AbstractEntity {
     }
 
     /**
-     * removes a list of properties from an entity.
+     * Removes a collection of properties from an entity.
      *
-     * @param keys list of keys, which will be removed.
+     * @param keys collection of keys, which will be removed.
      */
     public void removeProperties(Collection<String> keys) {
         this.getProperties().remove(keys);
@@ -265,12 +258,12 @@ public class AbstractEntity {
     }
 
     /**
-     * Adds everything from the stringList to the property "name" as id.
+     * Adds everything from the properties to the property "name" as id.
      *
      * @param name the key of the property.
-     * @param stringList List containing all the id as String.
+     * @param properties a collection containing all the id as String.
      */
-    public void addIdListProperties(String name, Collection<String> stringList) {
+    public void addIdListProperties(String name, Collection<String> properties) {
         ObjectMapper objectMapper = MyObjectMapper.getMapper();
         ArrayNode node = objectMapper.createArrayNode();
         if (this.properties.get(name) == null) {
@@ -280,7 +273,7 @@ public class AbstractEntity {
                 node.add(this.properties.get(name));
             }
         }
-        for (String s : stringList) {
+        for (String s : properties) {
             this.linkedTo.add(s);
             node.add(objectMapper.createObjectNode().put("@id", s));
         }
@@ -395,12 +388,12 @@ public class AbstractEntity {
         }
 
         /**
-         * Adding multiple types as list.
+         * Adds multiple types in one call.
          *
-         * @param types the types in a String List.
+         * @param types the types to add.
          * @return the generic builder.
          */
-        public T addTypes(List<String> types) {
+        public T addTypes(Collection<String> types) {
             if (this.types == null) {
                 this.types = new HashSet<>();
             }
