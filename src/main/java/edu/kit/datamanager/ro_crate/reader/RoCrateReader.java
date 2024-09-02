@@ -112,8 +112,8 @@ public class RoCrateReader {
       }
     }
 
-    Collection<File> untrackedFiles = FileUtils.listFiles(files, null, false)
-            .stream()
+    Collection<File> untrackedFiles = Arrays.stream(
+            Optional.ofNullable(files.listFiles()).orElse(new File[0]))
             .filter(f -> !usedFiles.contains(f.getPath()))
             .collect(Collectors.toSet());
 
