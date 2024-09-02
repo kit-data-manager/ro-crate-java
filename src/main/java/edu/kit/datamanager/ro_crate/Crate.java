@@ -77,7 +77,7 @@ public interface Crate {
 
   void deleteEntityById(String entityId);
 
-  void setUntrackedFiles(List<File> files);
+  void setUntrackedFiles(Collection<File> files);
 
   void addFromCollection(Collection<AbstractEntity> entities);
 
@@ -87,5 +87,5 @@ public interface Crate {
 
   public void deleteUrlFromContext(String url);
 
-  List<File> getUntrackedFiles();
+  Collection<File> getUntrackedFiles();
 }
