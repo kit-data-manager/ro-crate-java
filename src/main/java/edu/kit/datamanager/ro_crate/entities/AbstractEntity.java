@@ -156,10 +156,10 @@ public class AbstractEntity {
     /**
      * removes a list of properties from an entity.
      *
-     * @param keyList list of keys, which will be removed.
+     * @param keys list of keys, which will be removed.
      */
-    public void removeProperties(List<String> keyList) {
-        this.getProperties().remove(keyList);
+    public void removeProperties(Collection<String> keys) {
+        this.getProperties().remove(keys);
         this.notifyObservers();
     }
 
