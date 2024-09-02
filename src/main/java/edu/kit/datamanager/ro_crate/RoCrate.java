@@ -163,8 +163,8 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public List<DataEntity> getAllDataEntities() {
-        return this.roCratePayload.getAllDataEntities();
+    public Set<DataEntity> getAllDataEntities() {
+        return new HashSet<>(this.roCratePayload.getAllDataEntities());
     }
 
     @Override
@@ -173,8 +173,8 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public List<ContextualEntity> getAllContextualEntities() {
-        return this.roCratePayload.getAllContextualEntities();
+    public Set<ContextualEntity> getAllContextualEntities() {
+        return new HashSet<>(this.roCratePayload.getAllContextualEntities());
     }
 
     @Override

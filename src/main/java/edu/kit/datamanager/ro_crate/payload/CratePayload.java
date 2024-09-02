@@ -7,7 +7,7 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for the ROCrate payload.
@@ -32,11 +32,11 @@ public interface CratePayload {
 
   void addEntities(Collection<AbstractEntity> entity);
 
-  List<AbstractEntity> getAllEntities();
+  Set<AbstractEntity> getAllEntities();
 
-  List<DataEntity> getAllDataEntities();
+  Set<DataEntity> getAllDataEntities();
 
-  List<ContextualEntity> getAllContextualEntities();
+  Set<ContextualEntity> getAllContextualEntities();
 
   ArrayNode getEntitiesMetadata();
 

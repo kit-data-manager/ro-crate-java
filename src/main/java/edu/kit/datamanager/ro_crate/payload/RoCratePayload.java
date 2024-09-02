@@ -104,29 +104,21 @@ public class RoCratePayload implements CratePayload {
   }
 
   @Override
-  public List<AbstractEntity> getAllEntities() {
-    List<AbstractEntity> list = new ArrayList<>();
-    list.addAll(this.getAllDataEntities());
-    list.addAll(this.getAllContextualEntities());
-    return list;
+  public Set<AbstractEntity> getAllEntities() {
+    Set<AbstractEntity> result = new HashSet<>();
+    result.addAll(this.getAllDataEntities());
+    result.addAll(this.getAllContextualEntities());
+    return result;
   }
 
   @Override
-  public List<DataEntity> getAllDataEntities() {
-    List<DataEntity> list = new ArrayList<>();
-    for (HashMap.Entry<String, DataEntity> s : this.dataEntities.entrySet()) {
-      list.add(s.getValue());
-    }
-    return list;
+  public Set<DataEntity> getAllDataEntities() {
+    return new HashSet<>(this.dataEntities.values());
   }
 
   @Override
-  public List<ContextualEntity> getAllContextualEntities() {
-    List<ContextualEntity> list = new ArrayList<>();
-    for (HashMap.Entry<String, ContextualEntity> s : this.contextualEntities.entrySet()) {
-      list.add(s.getValue());
-    }
-    return list;
+  public Set<ContextualEntity> getAllContextualEntities() {
+    return new HashSet<>(this.contextualEntities.values());
   }
 
   @Override

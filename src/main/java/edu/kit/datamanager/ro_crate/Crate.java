@@ -2,8 +2,8 @@ package edu.kit.datamanager.ro_crate;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
@@ -31,7 +31,7 @@ public interface Crate {
    * @return the class representation indication the version of this crate, if
    *         available.
    */
-  public Optional<CrateVersion> getVersion();
+  Optional<CrateVersion> getVersion();
 
   /**
    * Returns strings indicating the conformance of a crate with other
@@ -63,11 +63,11 @@ public interface Crate {
 
   DataEntity getDataEntityById(java.lang.String id);
 
-  List<DataEntity> getAllDataEntities();
+  Set<DataEntity> getAllDataEntities();
 
   ContextualEntity getContextualEntityById(java.lang.String id);
 
-  List<ContextualEntity> getAllContextualEntities();
+  Set<ContextualEntity> getAllContextualEntities();
 
   AbstractEntity getEntityById(java.lang.String id);
 

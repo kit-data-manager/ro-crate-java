@@ -60,8 +60,10 @@ class BuilderTest {
         RoCrate built = new RoCrate.RoCrateBuilder().build();
         RoCrate constructed = new RoCrate();
 
-        assertEquals(built.getAllDataEntities(), constructed.getAllDataEntities());
-        assertEquals(built.getAllContextualEntities(), constructed.getAllContextualEntities());
+        assertEquals(0, built.getAllDataEntities().size());
+        assertEquals(0, built.getAllContextualEntities().size());
+        assertEquals(built.getAllDataEntities().size(), constructed.getAllDataEntities().size());
+        assertEquals(built.getAllContextualEntities().size(), constructed.getAllContextualEntities().size());
         assertEquals(built.getJsonDescriptor().getTypes(), constructed.getJsonDescriptor().getTypes());
         assertEquals(built.getJsonDescriptor().getProperties(), constructed.getJsonDescriptor().getProperties());
         HelpFunctions.compareTwoCrateJson(built, constructed);
