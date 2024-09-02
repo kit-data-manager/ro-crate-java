@@ -25,7 +25,7 @@ public interface Crate {
    * Read version from the crate descriptor and return it as a class
    * representation.
    * 
-   * NOTE: If there is not version in the crate, it does not comply with the
+   * NOTE: If there is no version in the crate, it does not comply with the
    * specification.
    * 
    * @return the class representation indication the version of this crate, if
@@ -45,7 +45,7 @@ public interface Crate {
    * @return a collection of the profiles or specifications this crate conforms
    *         to.
    */
-  public Collection<String> getProfiles();
+  Collection<String> getProfiles();
 
   CratePreview getPreview();
 
@@ -83,9 +83,9 @@ public interface Crate {
 
   void addItemFromDataCite(String locationUrl);
 
-  public void deleteValuePairFromContext(String key);
+  void deleteValuePairFromContext(String key);
 
-  public void deleteUrlFromContext(String url);
+  void deleteUrlFromContext(String url);
 
   Collection<File> getUntrackedFiles();
 }

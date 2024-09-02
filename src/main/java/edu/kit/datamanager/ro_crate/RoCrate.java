@@ -131,7 +131,6 @@ public class RoCrate implements Crate {
             return StreamSupport.stream(conformsTo.spliterator(), false)
                     .filter(TreeNode::isObject)
                     .map(obj -> obj.path("@id").asText())
-                    .filter(txt -> !CrateVersion.fromSpecUri(txt).isPresent())
                     .collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
