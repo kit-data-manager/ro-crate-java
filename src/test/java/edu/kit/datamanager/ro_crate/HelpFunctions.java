@@ -15,7 +15,6 @@ import io.json.compare.JsonComparator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -92,13 +91,14 @@ public class HelpFunctions {
 
     public static boolean compareTwoDir(File dir1, File dir2) throws IOException {
         // compare the content of the two directories
-        List<File> a = (List<java.io.File>) FileUtils.listFiles(dir1, null, true);
-        Map<String, File> result_map = a.stream()
+        Map<String, File> result_map = FileUtils.listFiles(dir1, null, true)
+                .stream()
                 .collect(Collectors.toMap(java.io.File::getName, Function.identity()));
 
-        List<java.io.File> b = (List<java.io.File>) FileUtils.listFiles(dir2, null, true);
-        Map<String, java.io.File> input_map = b.stream()
-                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));
+        Map<String, java.io.File> input_map = FileUtils.listFiles(dir2, null, true)
+                .stream()
+                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));;
+
 
         if (result_map.size() != input_map.size()) {
             return false;
