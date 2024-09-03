@@ -149,7 +149,7 @@ class ZipReaderTest {
         .setEncodingFormat("setnew")
         .setLocationWithExceptions(newFile)
         .setId("new_file")
-        .build(), true);
+        .build());
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());

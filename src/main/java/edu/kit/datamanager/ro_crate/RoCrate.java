@@ -181,13 +181,19 @@ public class RoCrate implements Crate {
         return this.roCratePayload.getEntityById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note: This will also link the DataEntity to the root node
+     * using the root nodes hasPart property.
+     *
+     * @param entity the DataEntity to add to this crate.
+     */
     @Override
-    public void addDataEntity(DataEntity entity, Boolean toHasPart) {
+    public void addDataEntity(DataEntity entity) {
         this.metadataContext.checkEntity(entity);
         this.roCratePayload.addDataEntity(entity);
-        if (Boolean.TRUE.equals(toHasPart)) {
-            this.rootDataEntity.addToHasPart(entity.getId());
-        }
+        this.rootDataEntity.addToHasPart(entity.getId());
     }
 
     @Override
@@ -327,10 +333,12 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * Adding a data entity to the crate. The important part here is to also
-         * add its id to the RootData Entity hasPart.
+         * Adds a data entity to the crate.
+         * <p>
+         * Note: This will also link the DataEntity to the root node
+         * using the root nodes hasPart property.
          *
-         * @param dataEntity the DataEntity object.
+         * @param dataEntity the DataEntity to add to this crate.
          * @return returns the builder for further usage.
          */
         public RoCrateBuilder addDataEntity(DataEntity dataEntity) {

@@ -103,7 +103,7 @@ public class RoCrateReader {
                 .setId(loc.getName());
           }
 
-          crate.addDataEntity(dataEntity.build(), false);
+          crate.addDataEntity(dataEntity.build());
         } else {
           // contextual entity
           crate.addContextualEntity(

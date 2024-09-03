@@ -71,7 +71,12 @@ public interface Crate {
 
   AbstractEntity getEntityById(java.lang.String id);
 
-  void addDataEntity(DataEntity entity, Boolean toHasPart);
+  /**
+   * Adds a data entity to the crate.
+   *
+   * @param entity the DataEntity to add to this crate.
+   */
+  void addDataEntity(DataEntity entity);
 
   void addContextualEntity(ContextualEntity entity);
 
