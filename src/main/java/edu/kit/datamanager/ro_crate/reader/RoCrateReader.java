@@ -19,6 +19,7 @@ import edu.kit.datamanager.ro_crate.validation.Validator;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -82,28 +83,32 @@ public class RoCrateReader {
     JsonNode graph = metadataJson.get(PROP_GRAPH);
 
     if (graph.isArray()) {
-
       moveRootEntitiesFromGraphToCrate(crate, (ArrayNode) graph);
-      for (JsonNode node : graph) {
-        // if the id is in the root hasPart list, we know this entity is a data entity
-        RootDataEntity root = crate.getRootDataEntity();
-        if (root != null && root.hasInHasPart(node.get(PROP_ID).asText())) {
-          // data entity
-          DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
-                  .setAll(node.deepCopy());
+      RootDataEntity root = crate.getRootDataEntity();
+      if (root != null) {
+        Set<String> dataEntityIds = getDataEntityIds(root, graph);
+        for (JsonNode entityJson : graph) {
+          String eId = unpackId(entityJson);
+          if (dataEntityIds.contains(eId)) {
+            // data entity
+            DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
+                    .setAll(entityJson.deepCopy());
 
-          // Handle data entities with corresponding file
-          checkFolderHasFile(node.get(PROP_ID).asText(), files).ifPresent(file -> {
-                    usedFiles.add(file.getPath());
-                    dataEntity.setLocationWithExceptions(file.toPath())
-                            .setId(file.getName());
-                  });
+            // Handle data entities with corresponding file
+            checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
+              usedFiles.add(file.getPath());
+              dataEntity.setLocationWithExceptions(file.toPath())
+                      .setId(file.getName());
+            });
 
-          crate.addDataEntity(dataEntity.build());
-        } else {
-          // contextual entity
-          crate.addContextualEntity(
-              new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
+            crate.addDataEntity(dataEntity.build());
+          } else {
+            // contextual entity
+            crate.addContextualEntity(
+                    new ContextualEntity.ContextualEntityBuilder()
+                            .setAll(entityJson.deepCopy())
+                            .build());
+          }
         }
       }
     }
@@ -117,6 +122,69 @@ public class RoCrateReader {
     Validator defaultValidation = new Validator(new JsonSchemaValidation());
     defaultValidation.validate(crate);
     return crate;
+  }
+
+  /**
+   * Extracts graph connections from top to bottom.
+   * <p>
+   * Example: (connections.get(parent) -> children)
+   *
+   * @param graph the ArrayNode with all Entities.
+   * @return the graph connections.
+   */
+  protected Map<String, Set<String>> makeEntityGraph(JsonNode graph) {
+    Map<String, Set<String>> connections = new HashMap<>();
+
+    Map<String, JsonNode> idToNodes = new HashMap<>();
+    StreamSupport.stream(graph.spliterator(), false)
+            .forEach(jsonNode -> idToNodes.put(unpackId(jsonNode), jsonNode));
+
+    for (JsonNode entityNode : graph) {
+      String currentId = unpackId(entityNode);
+      StreamSupport.stream(entityNode.path("hasPart").spliterator(), false)
+              .map(this::unpackId)
+              .map(s -> idToNodes.getOrDefault(s, null))
+              .filter(Objects::nonNull)
+              .forEach(child -> connections.computeIfAbsent(currentId, key -> new HashSet<>())
+                      .add(unpackId(child)));
+      StreamSupport.stream(entityNode.path("isPartOf").spliterator(), false)
+              .map(this::unpackId)
+              .map(s -> idToNodes.getOrDefault(s, null))
+              .filter(Objects::nonNull)
+              .forEach(parent -> connections.computeIfAbsent(unpackId(parent), key -> new HashSet<>())
+                      .add(currentId));
+    }
+    return connections;
+  }
+
+  protected Set<String> getDataEntityIds(RootDataEntity root, JsonNode graph) {
+    if (root == null) { return Set.of(); }
+    Map<String, Set<String>> network = makeEntityGraph(graph);
+    Set<String> directDataEntities = new HashSet<>(root.hasPart);
+    return Stream.concat(
+            directDataEntities.stream(),
+            directDataEntities.stream().flatMap(entity -> getDataEntityIdsRecursive(entity, network))
+    ).collect(Collectors.toSet());
+  }
+
+  protected Stream<String> getDataEntityIdsRecursive(
+          String parent,
+          Map<String, Set<String>> network
+  ) {
+    return Stream.concat(
+            Stream.of(parent),
+            network.getOrDefault(parent, new HashSet<>()).stream()
+                    .flatMap(s -> getDataEntityIdsRecursive(s, network))
+                    .filter(Objects::nonNull)
+    );
+  }
+
+  protected String unpackId(JsonNode node) {
+    if (node.isTextual()) {
+      return node.asText();
+    } else /*if (node.isObject())*/ {
+      return node.path(PROP_ID).asText();
+    }
   }
 
   protected Optional<File> checkFolderHasFile(String filepathOrId, File folder) {
