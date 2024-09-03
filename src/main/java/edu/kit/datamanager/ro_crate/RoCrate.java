@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * The class that represents a single ROCrate.
- *
+ * <p>
  * To build or modify it, use a instance of {@link RoCrateBuilder}. In the case
  * features of RO-Crate DRAFT specifications are needed, refer to
  * {@link BuilderWithDraftFeatures} and its documentation.
@@ -422,7 +422,7 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * Returns a crate with the information from this builder.
+         * @return a crate with the information from this builder.
          */
         public RoCrate build() {
             return new RoCrate(this);
@@ -432,9 +432,9 @@ public class RoCrate implements Crate {
     /**
      * Builder for Crates, supporting features which are not in a final
      * specification yet.
-     *
+     * <p>
      * NOTE: This will change the specification version of your crate.
-     *
+     * <p>
      * We only add features we expect to be in the new specification in the end.
      * In case a feature will not make it into the specification, we will mark
      * it as deprecated and remove it in new major versions. If a feature is
@@ -475,7 +475,7 @@ public class RoCrate implements Crate {
         /**
          * Indicate this crate also conforms to the given specification, in
          * addition to the version this builder adds.
-         *
+         * <p>
          * This is helpful for profiles or other specifications the crate
          * conforms to. Can be called multiple times to add more specifications.
          *

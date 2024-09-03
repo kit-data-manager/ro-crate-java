@@ -16,7 +16,7 @@ import java.net.URISyntaxException;
 /**
  * This class defines methods regarding URIs in general, which in RO-Crate
  * context means usually a valid, resolvable URL or a relative file path.
- *
+ * <p>
  * The purpose is to have a simple abstraction where the way e.g. a URL is
  * checked can be changed and tested easily for the whole library.
  */
@@ -28,7 +28,7 @@ public class IdentifierUtils {
     /**
      * Returns true, if the given String is encoded and can be used as an
      * identifier in RO-Crate.
-     * 
+     * <p>
      * Possible identifiers include:
      * - a uri
      * - a url
@@ -50,7 +50,9 @@ public class IdentifierUtils {
      */
     public static boolean isUrl(String uri) {
         try {
-            return asUrl(encode(uri).get()).isPresent();
+            return encode(uri)
+                    .map(decodedUri -> asUrl(decodedUri).isPresent())
+                    .orElse(false);
         } catch (Exception e) {
             return false;
         }

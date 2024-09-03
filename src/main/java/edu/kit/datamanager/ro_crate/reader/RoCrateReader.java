@@ -10,16 +10,13 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
-import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.decode;
-import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -27,7 +24,7 @@ import java.util.stream.StreamSupport;
 /**
  * This class allows reading crates from the outside into the library in order
  * to inspect or modify it.
- * 
+ * <p>
  * The class takes a strategy to support different ways of importing the crates.
  * (from zip, folder, etc.)
  */
@@ -96,12 +93,11 @@ public class RoCrateReader {
                   .setAll(node.deepCopy());
 
           // Handle data entities with corresponding file
-          File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
-          if (loc != null) {
-            usedFiles.add(loc.getPath());
-            dataEntity.setLocationWithExceptions(loc.toPath())
-                .setId(loc.getName());
-          }
+          checkFolderHasFile(node.get(PROP_ID).asText(), files).ifPresent(file -> {
+                    usedFiles.add(file.getPath());
+                    dataEntity.setLocationWithExceptions(file.toPath())
+                            .setId(file.getName());
+                  });
 
           crate.addDataEntity(dataEntity.build());
         } else {
@@ -123,18 +119,16 @@ public class RoCrateReader {
     return crate;
   }
 
-  protected File checkFolderHasFile(String id, File file) {
-    if (isUrl(id)) return null;
-    Path path = file.toPath().resolve(decode(id).get());
-    if (path.toFile().exists()) {
-      return path.toFile();
-    }
-    return null;
+  protected Optional<File> checkFolderHasFile(String filepathOrId, File folder) {
+    if (IdentifierUtils.isUrl(filepathOrId)) { return Optional.empty(); }
+    return IdentifierUtils.decode(filepathOrId)
+            .map(decoded -> folder.toPath().resolve(decoded).toFile())
+            .filter(File::exists);
   }
 
   /**
    * Moves the descriptor and the root entity from the graph to the crate.
-   * 
+   * <p>
    * Extracts the root data entity and the Metadata File Descriptor from the graph
    * and inserts them into the crate object. It also deletes it from the graph.
    * We will need the root dataset to distinguish between data entities and
@@ -170,7 +164,7 @@ public class RoCrateReader {
 
   /**
    * Find the metadata descriptor.
-   * 
+   * <p>
    * Currently prefers algorithm of version 1.1 over the one of 1.2-DRAFT.
    * 
    * @param graph the graph to search the descriptor in.
@@ -200,10 +194,12 @@ public class RoCrateReader {
   /**
    * Extracts the root entity from the graph, using the information from the
    * descriptor.
-   * 
+   * <p>
    * Basically implements step 5 of the algorithm described here:
-   * https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
-   * 
+   * <a href="https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity">
+   *     https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
+   * </a>
+   *
    * @param graph      the graph from the metadata JSON-LD file
    * @param descriptor the RO-Crate descriptor
    * @return the root entity, if found
