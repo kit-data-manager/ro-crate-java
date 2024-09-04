@@ -10,28 +10,39 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
-import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.decode;
-import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
  * This class allows reading crates from the outside into the library in order
  * to inspect or modify it.
- * 
+ * <p>
  * The class takes a strategy to support different ways of importing the crates.
  * (from zip, folder, etc.)
  */
 public class RoCrateReader {
+
+  /**
+   * This is a private inner class that shall not be exposed.
+   * **Do not make it public or protected.** It serves only the
+   * purpose of unsafe operations while reading a crate and
+   * may be specific to this implementation.
+   */
+  private static class RoCrateUnsafe extends RoCrate {
+    public void addDataEntityWithoutRootHasPart(DataEntity entity) {
+      this.metadataContext.checkEntity(entity);
+      this.roCratePayload.addDataEntity(entity);
+    }
+  }
 
   /**
    * If the number of JSON entities in the crate is larger than this number,
@@ -80,34 +91,37 @@ public class RoCrateReader {
     JsonNode context = metadataJson.get(PROP_CONTEXT);
     
     CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
-    RoCrate crate = new RoCrate();
+    RoCrateUnsafe crate = new RoCrateUnsafe();
     crate.setMetadataContext(crateContext);
     JsonNode graph = metadataJson.get(PROP_GRAPH);
 
     if (graph.isArray()) {
-
       moveRootEntitiesFromGraphToCrate(crate, (ArrayNode) graph);
-      for (JsonNode node : graph) {
-        // if the id is in the root hasPart list, we know this entity is a data entity
-        RootDataEntity root = crate.getRootDataEntity();
-        if (root != null && root.hasInHasPart(node.get(PROP_ID).asText())) {
-          // data entity
-          DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
-                  .setAll(node.deepCopy());
+      RootDataEntity root = crate.getRootDataEntity();
+      if (root != null) {
+        Set<String> dataEntityIds = getDataEntityIds(root, graph);
+        for (JsonNode entityJson : graph) {
+          String eId = unpackId(entityJson);
+          if (dataEntityIds.contains(eId)) {
+            // data entity
+            DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
+                    .setAll(entityJson.deepCopy());
 
-          // Handle data entities with corresponding file
-          File loc = checkFolderHasFile(node.get(PROP_ID).asText(), files);
-          if (loc != null) {
-            usedFiles.add(loc.getPath());
-            dataEntity.setLocationWithExceptions(loc.toPath())
-                .setId(loc.getName());
+            // Handle data entities with corresponding file
+            checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
+              usedFiles.add(file.getPath());
+              dataEntity.setLocationWithExceptions(file.toPath())
+                      .setId(file.getName());
+            });
+
+            crate.addDataEntityWithoutRootHasPart(dataEntity.build());
+          } else {
+            // contextual entity
+            crate.addContextualEntity(
+                    new ContextualEntity.ContextualEntityBuilder()
+                            .setAll(entityJson.deepCopy())
+                            .build());
           }
-
-          crate.addDataEntity(dataEntity.build(), false);
-        } else {
-          // contextual entity
-          crate.addContextualEntity(
-              new ContextualEntity.ContextualEntityBuilder().setAll(node.deepCopy()).build());
         }
       }
     }
@@ -123,18 +137,79 @@ public class RoCrateReader {
     return crate;
   }
 
-  protected File checkFolderHasFile(String id, File file) {
-    if (isUrl(id)) return null;
-    Path path = file.toPath().resolve(decode(id).get());
-    if (path.toFile().exists()) {
-      return path.toFile();
+  /**
+   * Extracts graph connections from top to bottom.
+   * <p>
+   * Example: (connections.get(parent) -> children)
+   *
+   * @param graph the ArrayNode with all Entities.
+   * @return the graph connections.
+   */
+  protected Map<String, Set<String>> makeEntityGraph(JsonNode graph) {
+    Map<String, Set<String>> connections = new HashMap<>();
+
+    Map<String, JsonNode> idToNodes = new HashMap<>();
+    StreamSupport.stream(graph.spliterator(), false)
+            .forEach(jsonNode -> idToNodes.put(unpackId(jsonNode), jsonNode));
+
+    for (JsonNode entityNode : graph) {
+      String currentId = unpackId(entityNode);
+      StreamSupport.stream(entityNode.path("hasPart").spliterator(), false)
+              .map(this::unpackId)
+              .map(s -> idToNodes.getOrDefault(s, null))
+              .filter(Objects::nonNull)
+              .forEach(child -> connections.computeIfAbsent(currentId, key -> new HashSet<>())
+                      .add(unpackId(child)));
+      StreamSupport.stream(entityNode.path("isPartOf").spliterator(), false)
+              .map(this::unpackId)
+              .map(s -> idToNodes.getOrDefault(s, null))
+              .filter(Objects::nonNull)
+              .forEach(parent -> connections.computeIfAbsent(unpackId(parent), key -> new HashSet<>())
+                      .add(currentId));
     }
-    return null;
+    return connections;
+  }
+
+  protected Set<String> getDataEntityIds(RootDataEntity root, JsonNode graph) {
+    if (root == null) { return Set.of(); }
+    Map<String, Set<String>> network = makeEntityGraph(graph);
+    Set<String> directDataEntities = new HashSet<>(root.hasPart);
+    return Stream.concat(
+            directDataEntities.stream(),
+            directDataEntities.stream().flatMap(entity -> getDataEntityIdsRecursive(entity, network))
+    ).collect(Collectors.toSet());
+  }
+
+  protected Stream<String> getDataEntityIdsRecursive(
+          String parent,
+          Map<String, Set<String>> network
+  ) {
+    return Stream.concat(
+            Stream.of(parent),
+            network.getOrDefault(parent, new HashSet<>()).stream()
+                    .flatMap(s -> getDataEntityIdsRecursive(s, network))
+                    .filter(Objects::nonNull)
+    );
+  }
+
+  protected String unpackId(JsonNode node) {
+    if (node.isTextual()) {
+      return node.asText();
+    } else /*if (node.isObject())*/ {
+      return node.path(PROP_ID).asText();
+    }
+  }
+
+  protected Optional<File> checkFolderHasFile(String filepathOrId, File folder) {
+    if (IdentifierUtils.isUrl(filepathOrId)) { return Optional.empty(); }
+    return IdentifierUtils.decode(filepathOrId)
+            .map(decoded -> folder.toPath().resolve(decoded).toFile())
+            .filter(File::exists);
   }
 
   /**
    * Moves the descriptor and the root entity from the graph to the crate.
-   * 
+   * <p>
    * Extracts the root data entity and the Metadata File Descriptor from the graph
    * and inserts them into the crate object. It also deletes it from the graph.
    * We will need the root dataset to distinguish between data entities and
@@ -170,7 +245,7 @@ public class RoCrateReader {
 
   /**
    * Find the metadata descriptor.
-   * 
+   * <p>
    * Currently prefers algorithm of version 1.1 over the one of 1.2-DRAFT.
    * 
    * @param graph the graph to search the descriptor in.
@@ -200,10 +275,12 @@ public class RoCrateReader {
   /**
    * Extracts the root entity from the graph, using the information from the
    * descriptor.
-   * 
+   * <p>
    * Basically implements step 5 of the algorithm described here:
-   * https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
-   * 
+   * <a href="https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity">
+   *     https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#finding-the-root-data-entity
+   * </a>
+   *
    * @param graph      the graph from the metadata JSON-LD file
    * @param descriptor the RO-Crate descriptor
    * @return the root entity, if found

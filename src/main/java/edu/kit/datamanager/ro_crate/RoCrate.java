@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * The class that represents a single ROCrate.
- *
+ * <p>
  * To build or modify it, use a instance of {@link RoCrateBuilder}. In the case
  * features of RO-Crate DRAFT specifications are needed, refer to
  * {@link BuilderWithDraftFeatures} and its documentation.
@@ -40,13 +40,13 @@ import java.util.stream.StreamSupport;
  */
 public class RoCrate implements Crate {
 
-    private final CratePayload roCratePayload;
-    private CrateMetadataContext metadataContext;
-    private CratePreview roCratePreview;
-    private RootDataEntity rootDataEntity;
-    private ContextualEntity jsonDescriptor;
+    protected final CratePayload roCratePayload;
+    protected CrateMetadataContext metadataContext;
+    protected CratePreview roCratePreview;
+    protected RootDataEntity rootDataEntity;
+    protected ContextualEntity jsonDescriptor;
 
-    private Collection<File> untrackedFiles;
+    protected Collection<File> untrackedFiles;
 
     @Override
     public CratePreview getPreview() {
@@ -181,13 +181,19 @@ public class RoCrate implements Crate {
         return this.roCratePayload.getEntityById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note: This will also link the DataEntity to the root node
+     * using the root nodes hasPart property.
+     *
+     * @param entity the DataEntity to add to this crate.
+     */
     @Override
-    public void addDataEntity(DataEntity entity, Boolean toHasPart) {
+    public void addDataEntity(DataEntity entity) {
         this.metadataContext.checkEntity(entity);
         this.roCratePayload.addDataEntity(entity);
-        if (Boolean.TRUE.equals(toHasPart)) {
-            this.rootDataEntity.addToHasPart(entity.getId());
-        }
+        this.rootDataEntity.addToHasPart(entity.getId());
     }
 
     @Override
@@ -327,10 +333,12 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * Adding a data entity to the crate. The important part here is to also
-         * add its id to the RootData Entity hasPart.
+         * Adds a data entity to the crate.
+         * <p>
+         * Note: This will also link the DataEntity to the root node
+         * using the root nodes hasPart property.
          *
-         * @param dataEntity the DataEntity object.
+         * @param dataEntity the DataEntity to add to this crate.
          * @return returns the builder for further usage.
          */
         public RoCrateBuilder addDataEntity(DataEntity dataEntity) {
@@ -414,7 +422,7 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * Returns a crate with the information from this builder.
+         * @return a crate with the information from this builder.
          */
         public RoCrate build() {
             return new RoCrate(this);
@@ -424,9 +432,9 @@ public class RoCrate implements Crate {
     /**
      * Builder for Crates, supporting features which are not in a final
      * specification yet.
-     *
+     * <p>
      * NOTE: This will change the specification version of your crate.
-     *
+     * <p>
      * We only add features we expect to be in the new specification in the end.
      * In case a feature will not make it into the specification, we will mark
      * it as deprecated and remove it in new major versions. If a feature is
@@ -467,7 +475,7 @@ public class RoCrate implements Crate {
         /**
          * Indicate this crate also conforms to the given specification, in
          * addition to the version this builder adds.
-         *
+         * <p>
          * This is helpful for profiles or other specifications the crate
          * conforms to. Can be called multiple times to add more specifications.
          *

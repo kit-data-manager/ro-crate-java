@@ -24,7 +24,7 @@ public interface Crate {
   /**
    * Read version from the crate descriptor and return it as a class
    * representation.
-   * 
+   * <p>
    * NOTE: If there is no version in the crate, it does not comply with the
    * specification.
    * 
@@ -36,9 +36,9 @@ public interface Crate {
   /**
    * Returns strings indicating the conformance of a crate with other
    * specifications than the RO-Crate version.
-   * 
+   * <p>
    * If you need the crate version too, refer to {@link #getVersion()}.
-   * 
+   * <p>
    * This corresponds technically to all conformsTo values, excluding the RO crate
    * version / specification.
    * 
@@ -71,7 +71,12 @@ public interface Crate {
 
   AbstractEntity getEntityById(java.lang.String id);
 
-  void addDataEntity(DataEntity entity, Boolean toHasPart);
+  /**
+   * Adds a data entity to the crate.
+   *
+   * @param entity the DataEntity to add to this crate.
+   */
+  void addDataEntity(DataEntity entity);
 
   void addContextualEntity(ContextualEntity entity);
 

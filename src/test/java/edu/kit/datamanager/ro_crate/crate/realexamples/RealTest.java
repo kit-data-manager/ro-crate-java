@@ -44,8 +44,7 @@ class RealTest {
                         .setLocationWithExceptions(newFile.toAbsolutePath())
                         .setId("new_file.txt")
                         .addProperty("description", "my new file that I added")
-                        .build(),
-                true);
+                        .build());
 
         PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
         crate.addContextualEntity(person);
