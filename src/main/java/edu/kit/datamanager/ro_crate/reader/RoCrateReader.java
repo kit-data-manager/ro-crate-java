@@ -26,8 +26,11 @@ import java.util.stream.StreamSupport;
  * This class allows reading crates from the outside into the library in order
  * to inspect or modify it.
  * <p>
- * The class takes a strategy to support different ways of importing the crates.
- * (from zip, folder, etc.)
+ * The constructor takes a strategy to support different ways of importing the crates.
+ * (from zip, folder, etc.).
+ * <p>
+ * The reader consideres "hasPart" and "isPartOf" properties and considers all
+ * entities (in-)directly connected to the root entity ("./") as DataEntities.
  */
 public class RoCrateReader {
 
