@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class ReadAndWriteTest {
+class ReadAndWriteTest {
 
   @Test
   void testReadingAndWriting(@TempDir Path path) throws IOException {
@@ -46,5 +46,13 @@ public class ReadAndWriteTest {
     assertEquals(0, newCrate.getUntrackedFiles().size());
 
     HelpFunctions.compareTwoCrateJson(newCrate, crate);
+  }
+
+  @Test
+  void testReadCrateWithHasPartHierarchy() {
+    RoCrateReader reader = new RoCrateReader(new FolderReader());
+    RoCrate crate = reader.readCrate(ReadAndWriteTest.class.getResource("/crates/hasPartHierarchy").getPath());
+    assertEquals(1, crate.getAllContextualEntities().size());
+    assertEquals(4, crate.getAllDataEntities().size());
   }
 }
