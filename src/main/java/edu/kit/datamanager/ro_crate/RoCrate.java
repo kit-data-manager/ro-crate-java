@@ -40,13 +40,13 @@ import java.util.stream.StreamSupport;
  */
 public class RoCrate implements Crate {
 
-    private final CratePayload roCratePayload;
-    private CrateMetadataContext metadataContext;
-    private CratePreview roCratePreview;
-    private RootDataEntity rootDataEntity;
-    private ContextualEntity jsonDescriptor;
+    protected final CratePayload roCratePayload;
+    protected CrateMetadataContext metadataContext;
+    protected CratePreview roCratePreview;
+    protected RootDataEntity rootDataEntity;
+    protected ContextualEntity jsonDescriptor;
 
-    private Collection<File> untrackedFiles;
+    protected Collection<File> untrackedFiles;
 
     @Override
     public CratePreview getPreview() {

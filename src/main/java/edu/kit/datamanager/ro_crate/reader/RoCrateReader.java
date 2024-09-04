@@ -32,6 +32,19 @@ import java.util.stream.StreamSupport;
 public class RoCrateReader {
 
   /**
+   * This is a private inner class that shall not be exposed.
+   * **Do not make it public or protected.** It serves only the
+   * purpose of unsafe operations while reading a crate and
+   * may be specific to this implementation.
+   */
+  private static class RoCrateUnsafe extends RoCrate {
+    public void addDataEntityWithoutRootHasPart(DataEntity entity) {
+      this.metadataContext.checkEntity(entity);
+      this.roCratePayload.addDataEntity(entity);
+    }
+  }
+
+  /**
    * If the number of JSON entities in the crate is larger than this number,
    * parallelization will be used.
    */
@@ -78,7 +91,7 @@ public class RoCrateReader {
     JsonNode context = metadataJson.get(PROP_CONTEXT);
     
     CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
-    RoCrate crate = new RoCrate();
+    RoCrateUnsafe crate = new RoCrateUnsafe();
     crate.setMetadataContext(crateContext);
     JsonNode graph = metadataJson.get(PROP_GRAPH);
 
@@ -101,7 +114,7 @@ public class RoCrateReader {
                       .setId(file.getName());
             });
 
-            crate.addDataEntity(dataEntity.build());
+            crate.addDataEntityWithoutRootHasPart(dataEntity.build());
           } else {
             // contextual entity
             crate.addContextualEntity(
