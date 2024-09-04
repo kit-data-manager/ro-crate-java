@@ -15,7 +15,7 @@ jobs:
           java-version: 21
           distribution: 'zulu' # openjdk
       - name: Publish package
-        run: gradle -PreleaseBuildConfig publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: gradle -Dprofile=release publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
            ORG_GRADLE_PROJECT_sonatypeUsername : ${{ secrets.OSSRH_USERNAME }}
            ORG_GRADLE_PROJECT_sonatypePassword : ${{ secrets.OSSRH_PASSWORD }}
