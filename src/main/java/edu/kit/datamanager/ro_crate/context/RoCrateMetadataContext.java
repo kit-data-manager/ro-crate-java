@@ -165,7 +165,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         jsonNode = objectMapper.readValue(response.getEntity().getContent(),
             JsonNode.class);
       } catch (IOException e) {
-        System.err.println("Cannot get context from this url.");
+        System.err.println(String.format("Cannot get context from url %s", url));
         return;
       }
       if (url.equals(DEFAULT_CONTEXT)) {
