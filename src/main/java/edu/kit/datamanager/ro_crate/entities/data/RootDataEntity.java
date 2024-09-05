@@ -9,7 +9,7 @@ import java.nio.file.Paths;
  */
 public class RootDataEntity extends DataSetEntity {
 
-  private static final String ID = "./";
+  public static final String ID = "./";
 
   public RootDataEntity(AbstractDataSetBuilder<?> entityBuilder) {
     super(entityBuilder);

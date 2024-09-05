@@ -2,8 +2,6 @@ package edu.kit.datamanager.ro_crate.entities.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -11,15 +9,28 @@ import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.net.URI;
 import java.nio.file.Paths;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Nikola Tzotchev on 5.2.2022 г.
  * @version 1
  */
 public class DataSetEntityTest {
+
+    @Test
+    void testImpossibleRootId() {
+        DataSetEntity e = new DataSetEntity.DataSetBuilder()
+                .setId("./")
+                .addProperty("not_root", true)
+                .build();
+        assertNotNull(e.getId());
+        assertFalse(e.getId().isBlank());
+        assertNotEquals(RootDataEntity.ID, e.getId());
+    }
 
     @Test
     void testSimpleDirDeserialization() throws IOException {
