@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.entities.serializers.ObjectNodeSerializer;
 import edu.kit.datamanager.ro_crate.entities.validation.EntityValidation;
 import edu.kit.datamanager.ro_crate.entities.validation.JsonSchemaValidation;
@@ -363,7 +364,7 @@ public class AbstractEntity {
          * @return the generic builder.
          */
         public T setId(String id) {
-            if (id != null) {
+            if (id != null && !id.equals(RootDataEntity.ID)) {
                 if (IdentifierUtils.isValidUri(id)) {
                     this.id = id;
                 } else {
