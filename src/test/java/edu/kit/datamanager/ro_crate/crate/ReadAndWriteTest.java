@@ -53,6 +53,6 @@ class ReadAndWriteTest {
     RoCrateReader reader = new RoCrateReader(new FolderReader());
     RoCrate crate = reader.readCrate(ReadAndWriteTest.class.getResource("/crates/hasPartHierarchy").getPath());
     assertEquals(1, crate.getAllContextualEntities().size());
-    assertEquals(4, crate.getAllDataEntities().size());
+    assertEquals(6, crate.getAllDataEntities().size());
   }
 }

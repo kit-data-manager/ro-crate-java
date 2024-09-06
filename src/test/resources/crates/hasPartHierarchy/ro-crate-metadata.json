@@ -42,12 +42,24 @@
         },
         {
             "@id": "sub-b-sub-a.file",
-            "@type": "File"
+            "@type": "File",
+            "hasPart": {"@id": "looper.file"}
         },
         {
             "@id": "sub-b-sub-b.file",
             "@type": "File",
             "isPartOf": { "@id": "sub-b.file" }
+        },
+        {
+            "@id": "looper.file",
+            "@type": "File",
+            "hasPart": {"@id": "sub-b.file"}
+        },
+        {
+            "@id": "looper-isPartOf.file",
+            "@type": "File",
+            "hasPart": {"@id": "sub-b.file"},
+            "isPartOf": {"@id": "sub-b.file"}
         }
     ]
 }
