@@ -177,22 +177,22 @@ public class RoCrateReader {
     if (root == null) { return Set.of(); }
     Map<String, Set<String>> network = makeEntityGraph(graph);
     Set<String> directDataEntities = new HashSet<>(root.hasPart);
-    return Stream.concat(
-            directDataEntities.stream(),
-            directDataEntities.stream().flatMap(entity -> getDataEntityIdsRecursive(entity, network))
-    ).collect(Collectors.toSet());
-  }
 
-  protected Stream<String> getDataEntityIdsRecursive(
-          String parent,
-          Map<String, Set<String>> network
-  ) {
-    return Stream.concat(
-            Stream.of(parent),
-            network.getOrDefault(parent, new HashSet<>()).stream()
-                    .flatMap(s -> getDataEntityIdsRecursive(s, network))
-                    .filter(Objects::nonNull)
-    );
+    Stack<String> processingQueue = new Stack<>();
+    processingQueue.addAll(directDataEntities);
+    Set<String> result = new HashSet<>();
+
+    while (!processingQueue.empty()) {
+      String currentId = processingQueue.pop();
+      result.add(currentId);
+      network.getOrDefault(currentId, new HashSet<>()).stream()
+              .filter(subId -> !result.contains(subId)) // avoid loops!
+              .forEach(subId -> {
+                result.add(subId);
+                processingQueue.add(subId);
+              });
+    }
+    return result;
   }
 
   protected String unpackId(JsonNode node) {
