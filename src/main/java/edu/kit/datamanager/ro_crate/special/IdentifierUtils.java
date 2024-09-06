@@ -51,7 +51,7 @@ public class IdentifierUtils {
     public static boolean isUrl(String uri) {
         try {
             return encode(uri)
-                    .map(decodedUri -> asUrl(decodedUri).isPresent())
+                    .map(encodedUri -> asUrl(encodedUri).isPresent())
                     .orElse(false);
         } catch (Exception e) {
             return false;
