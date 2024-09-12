@@ -33,8 +33,8 @@ java {
     //package Sources as part of publication
     withSourcesJar()
     // set java version compatibility
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 //for javadoc task

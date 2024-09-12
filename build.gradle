@@ -4,49 +4,72 @@ plugins {
 
     id 'jacoco'
     // Adds coveralls task for CI to send results to the coveralls service.
-    id "com.github.kt3k.coveralls" version "2.12.0"
+    id "com.github.kt3k.coveralls" version "2.12.2"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
-    id 'net.researchgate.release' version '3.0.0'
+    id 'net.researchgate.release' version '3.0.2'
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+    id "io.freefair.maven-publish-java" version "8.10"
 }
 
 group 'edu.kit.datamanager'
 description = "A library for easy creation and modification of valid RO-Crates."
 
+println "Running gradle version: $gradle.gradleVersion"
+println "Building ${name} version: ${version}"
+println "JDK version: ${JavaVersion.current()}"
+println "Profile (system property): ${System.getProperty('profile')}"
+
+if (JavaVersion.current() == JavaVersion.VERSION_17) {
+    println "Setting encoding to UTF-8 manually"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+}
+
 repositories {
     mavenCentral()
 }
 
+ext {
+    jacksonVersion  = '2.17.2'
+}
+
 dependencies {
     // JUnit setup for testing
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testImplementation(platform("org.junit:junit-bom:5.11.0"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // JSON object mapping / (de-)serialization
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     // http client
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
     // read from and write to zip files
-    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.1'
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:4.1'
+    implementation 'com.github.fslev:json-compare:6.15'
     // url validator
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.16'
     // JSON-LD, Zenodo mapping
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.3.1'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.4.1'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.72"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.1"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+
+def signingTasks = tasks.withType(Sign)
+tasks.withType(AbstractPublishToMaven).configureEach{
+    mustRunAfter(signingTasks)
+ }
 
 sourceSets {
     main {
@@ -80,42 +103,42 @@ configurations {
 task performanceContextEntitiesBenchmark(type: JavaExec) {
     description = "Run the context entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.singlecratebenchmarks.ContextualEntitiesPerformance'
+    mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.ContextualEntitiesPerformance'
 }
 
 task performanceLocalDataEntitiesBenchmark(type: JavaExec) {
     description = "Run the local data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.singlecratebenchmarks.LocalDataEntitiesPerformance'
+    mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.LocalDataEntitiesPerformance'
 }
 
 task performanceRemoteDataEntitiesBenchmark(type: JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.singlecratebenchmarks.RemoteDataEntitiesPerformance'
+    mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.RemoteDataEntitiesPerformance'
 }
 
 task performanceMixEntitiesBenchmark(type: JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.singlecratebenchmarks.MixtureOfEntitiesPerformance'
+    mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.MixtureOfEntitiesPerformance'
 }
 task performanceDeletionEntitiesBenchmark(type: JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.singlecratebenchmarks.DeletionEntitiesPerformance'
+    mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.DeletionEntitiesPerformance'
 }
 
 task performanceMultipleCratesBenchmark(type: JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.multiplecrates.MultipleCratesBenchmark'
+    mainClass = 'edu.kit.datamanager.ro_crate.multiplecrates.MultipleCratesBenchmark'
 }
 
 task performanceReadWriteMultipleCratesBenchmark(type: JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
-    mainClass = 'edu.kit.crate.multiplecrates.MultipleCratesWriteAndRead'
+    mainClass = 'edu.kit.datamanager.ro_crate.multiplecrates.MultipleCratesWriteAndRead'
 }
 test {
     useJUnitPlatform()
@@ -131,13 +154,13 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.11"
 }
 
 // maxParallelForks(2)
 // failFast = true
 
-if (project.hasProperty('release')) {
+if (System.getProperty('profile') == "release") {
     println 'Using release profile for building ' + project.getName()
     apply from: 'gradle/profile-release.gradle'
 }

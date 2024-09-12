@@ -19,11 +19,11 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ZipReaderTest {
+class ZipReaderTest {
 
   @Test
   void testReadingBasicCrate(@TempDir Path temp) throws IOException {
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .build();
 
     Path zipPath = temp.resolve("result.zip");
@@ -46,10 +46,11 @@ public class ZipReaderTest {
     Path cvs = temp.resolve("survey-responses-2019.csv");
     FileUtils.touch(cvs.toFile());
     FileUtils.writeStringToFile(cvs.toFile(), "fkdjaflkjfla", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setSource(cvs.toFile())
+                .setLocationWithExceptions(cvs)
+                .setId(cvs.toFile().getName())
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
@@ -75,14 +76,14 @@ public class ZipReaderTest {
   void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("survey-responses-2019.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -114,14 +115,14 @@ public class ZipReaderTest {
   void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
     Path file = temp.resolve("file.csv");
     FileUtils.writeStringToFile(file.toFile(), "fakecsv.1", Charset.defaultCharset());
-    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate")
+    RoCrate roCrate = new RoCrate.RoCrateBuilder("minimal", "minimal RO_crate", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .addProperty("encodingFormat", "text/csv")
-                .setSource(file.toFile())
+                .setLocationWithExceptions(file)
+                .setId("survey-responses-2019.csv")
                 .build()
         )
         .build();
@@ -145,10 +146,10 @@ public class ZipReaderTest {
     FileUtils.writeStringToFile(newFile.toFile(), "fkladjsl;fjasd;lfjda;lkf", Charset.defaultCharset());
 
     res.addDataEntity(new FileEntity.FileEntityBuilder()
-        .setId("new_file")
         .setEncodingFormat("setnew")
-        .setSource(newFile.toFile())
-        .build(), true);
+        .setLocationWithExceptions(newFile)
+        .setId("new_file")
+        .build());
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());

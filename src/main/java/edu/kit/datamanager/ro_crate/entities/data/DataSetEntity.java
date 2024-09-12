@@ -41,8 +41,8 @@ public class DataSetEntity extends DataEntity {
 
   @Override
   public void saveToZip(ZipFile zipFile) throws ZipException {
-    if (this.getSource() != null) {
-      zipFile.addFolder(this.getSource());
+    if (this.getPath() != null) {
+      zipFile.addFolder(this.getPath().toFile());
     }
   }
 

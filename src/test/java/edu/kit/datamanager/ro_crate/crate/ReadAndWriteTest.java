@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class ReadAndWriteTest {
+class ReadAndWriteTest {
 
   @Test
   void testReadingAndWriting(@TempDir Path path) throws IOException {
@@ -30,7 +30,7 @@ public class ReadAndWriteTest {
     Path fileInDir = htmlDir.resolve("file.html");
     FileUtils.writeStringToFile(fileInDir.toFile(), "fileN2", Charset.defaultCharset());
 
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description")
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
         .setPreview(new CustomPreview(htmlFile.toFile(), htmlDir.toFile()))
         .build();
 
@@ -46,5 +46,13 @@ public class ReadAndWriteTest {
     assertEquals(0, newCrate.getUntrackedFiles().size());
 
     HelpFunctions.compareTwoCrateJson(newCrate, crate);
+  }
+
+  @Test
+  void testReadCrateWithHasPartHierarchy() {
+    RoCrateReader reader = new RoCrateReader(new FolderReader());
+    RoCrate crate = reader.readCrate(ReadAndWriteTest.class.getResource("/crates/hasPartHierarchy").getPath());
+    assertEquals(1, crate.getAllContextualEntities().size());
+    assertEquals(6, crate.getAllDataEntities().size());
   }
 }

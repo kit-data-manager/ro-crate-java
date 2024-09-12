@@ -10,12 +10,10 @@ import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -49,12 +47,10 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   /**
    * Constructor for creating the context from a list of url.
    *
-   * @param url the url list with different context.
+   * @param urls the url list with different context.
    */
-  public RoCrateMetadataContext(List<String> url) {
-    for (String e : url) {
-      this.addToContextFromUrl(e);
-    }
+  public RoCrateMetadataContext(Collection<String> urls) {
+    urls.forEach(this::addToContextFromUrl);
   }
 
   /**
@@ -121,7 +117,22 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         new TypeReference<>() {
         });
     // check if the items in the array of types are present in the context
-    for (var s : types) {
+    for (String s : types) {
+      // special cases:
+      if (s.equals("@id")) {
+        // @id will refer to the value of the id of the node
+        // so we need to extract this value
+        s = entity.getId();
+      }
+      if (s.equals("@json")) {
+        // A linked data builtin type, which is fine.
+        continue;
+      }
+      if (IdentifierUtils.isUrl(s)) {
+        // full URLs are considered fine
+        continue;
+      }
+
       if (this.contextMap.get(s) == null) {
         System.err.println("type " + s + " is missing from the context!");
         return false;
@@ -131,8 +142,12 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     // check if the fields of the entity are present in the context
     for (var names = node.fieldNames(); names.hasNext();) {
       String s = names.next();
+      if (IdentifierUtils.isUrl(s)) {
+        // full URLs are considered fine
+        continue;
+      }
       if (this.contextMap.get(s) == null) {
-        System.err.println("entity " + s + " is missing from context;");
+        System.err.println("attribute name " + s + " is missing from context;");
         return false;
       }
     }
@@ -167,7 +182,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         jsonNode = objectMapper.readValue(response.getEntity().getContent(),
             JsonNode.class);
       } catch (IOException e) {
-        System.err.println("Cannot get context from this url.");
+        System.err.println(String.format("Cannot get context from url %s", url));
         return;
       }
       if (url.equals(DEFAULT_CONTEXT)) {

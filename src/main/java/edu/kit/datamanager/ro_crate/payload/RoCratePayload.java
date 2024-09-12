@@ -10,12 +10,8 @@ import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The crate payload is the class containing all the entities in the crate.
@@ -104,29 +100,21 @@ public class RoCratePayload implements CratePayload {
   }
 
   @Override
-  public List<AbstractEntity> getAllEntities() {
-    List<AbstractEntity> list = new ArrayList<>();
-    list.addAll(this.getAllDataEntities());
-    list.addAll(this.getAllContextualEntities());
-    return list;
+  public Set<AbstractEntity> getAllEntities() {
+    Set<AbstractEntity> result = new HashSet<>();
+    result.addAll(this.getAllDataEntities());
+    result.addAll(this.getAllContextualEntities());
+    return result;
   }
 
   @Override
-  public List<DataEntity> getAllDataEntities() {
-    List<DataEntity> list = new ArrayList<>();
-    for (HashMap.Entry<String, DataEntity> s : this.dataEntities.entrySet()) {
-      list.add(s.getValue());
-    }
-    return list;
+  public Set<DataEntity> getAllDataEntities() {
+    return new HashSet<>(this.dataEntities.values());
   }
 
   @Override
-  public List<ContextualEntity> getAllContextualEntities() {
-    List<ContextualEntity> list = new ArrayList<>();
-    for (HashMap.Entry<String, ContextualEntity> s : this.contextualEntities.entrySet()) {
-      list.add(s.getValue());
-    }
-    return list;
+  public Set<ContextualEntity> getAllContextualEntities() {
+    return new HashSet<>(this.contextualEntities.values());
   }
 
   @Override
@@ -151,22 +139,16 @@ public class RoCratePayload implements CratePayload {
   }
 
   private void removeAllOccurrencesOf(String entityId) {
-    for (var e : this.getAllEntitiesFromIds(this.associatedItems.get(entityId))) {
-      JsonUtilFunctions.removeFieldsWith(entityId, e.getProperties());
-    }
+    this.getEntitiesByIds(this.associatedItems.get(entityId))
+            .forEach(entity -> JsonUtilFunctions.removeFieldsWith(entityId, entity.getProperties()));
   }
 
-  private List<AbstractEntity> getAllEntitiesFromIds(Set<String> set) {
-    List<AbstractEntity> list = new ArrayList<>();
-    if (set != null) {
-      for (var element : set) {
-        var entity = this.getEntityById(element);
-        if (entity != null) {
-          list.add(entity);
-        }
-      }
-    }
-    return list;
+  private Set<AbstractEntity> getEntitiesByIds(Collection<String> ids) {
+    if (ids == null) { return new HashSet<>(); }
+    return ids.stream()
+            .map(this::getEntityById)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
   }
 
 }

@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import java.nio.file.Paths;
 
 /**
  * Deletion of entities performance Benchmark.
@@ -39,14 +40,15 @@ public class DeletionEntitiesPerformance {
   public static void deletionEntitiesTest(int numEntities, String baseLocation) throws IOException {
 
     final Instant start = Instant.now();
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       PersonEntity person = new PersonEntity.PersonEntityBuilder()
           .setId("#id" + i)
           .addProperty("name", "Joe")
           .build();
       DataEntity file = new DataEntity.DataEntityBuilder()
-          .setSource(new File(baseLocation + "file" + i))
+          .setLocationWithExceptions(Paths.get(baseLocation + "file" + i))
+          .setId(baseLocation + "file" + i )
           .addType("File")
           .addIdProperty("author", person)
           .build();

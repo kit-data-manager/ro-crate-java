@@ -6,23 +6,45 @@
 [![Publish to Maven Central / OSSRH](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/publishRelease.yml/badge.svg)](https://github.com/kit-data-manager/ro-crate-java/actions/workflows/publishRelease.yml)
 
 A Java library to create and modify RO-Crates.
-Read [Quickstart](#quickstart) for a short overview of the API
-or take a look at [how to adapt the examples from the official specification](#adapting-the-specification-examples).
+The aim of this implementation is to **not** require too deep knowledge of the specification,
+and avoiding crates which do not fully comply to the specification, at the same time.
 
-Build and run tests: `./gradlew build`  
-Build documentation: `./gradlew javadoc`
+## Use it in your application
+
+- [Instructions for your build manager (e.g., Gradle, Maven, etc.)](https://central.sonatype.com/artifact/edu.kit.datamanager/ro-crate-java/1.1.0)
+- [Quick-Start](#quick-start)
+- [Adapting Specification Examples](#adapting-the-specification-examples)
+- [Related Publications](https://publikationen.bibliothek.kit.edu/publikationslisten/get.php?referencing=all&external_publications=kit&lang=de&format=html&style=kit-3lines-title_b-authors-other&consider_suborganizations=true&order=desc%20year&contributors=%5B%5B%5B%5D%2C%5B%22p20751.105%22%5D%5D%5D&title_contains=crate)
+
+## Build the library / documentation
+
+- Building (with tests): `./gradlew clean build`
+- Building (without tests): `./gradlew clean build -x test`
+- Building with release profile: `./gradlew -Dprofile=release clean build`
+- Doing a release: `./gradlew -Dprofile=release clean build release`
+  - Will prompt you about version number to use and next version number
+  - Will make a git tag which can later be used in a GitHub release
+    - A GitHub release will trigger the CI for publication. See also `.github/workflows/publishRelease.yml`.
+- Build documentation: `./gradlew javadoc`
 
 On Windows, replace `./gradlew` with `gradlew.bat`.
+
+## RO-Crate Specification Compatibility
+
+- ✅ Version 1.1
+- 🛠️ Version 1.2-DRAFT
+  - ✅ Reading and writing crates with additional profiles or specifications ([examples for reading](src/test/java/edu/kit/datamanager/ro_crate/reader/RoCrateReaderSpec12Test.java), [examples for writing](src/test/java/edu/kit/datamanager/ro_crate/writer/RoCrateWriterSpec12Test.java))
+  - ✅ Adding profiles or other specifications to a crate ([examples](src/test/java/edu/kit/datamanager/ro_crate/crate/BuilderSpec12Test.java))
 
 ## Quick-start
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
 ```java
-RoCrate roCrate = new RoCrateBuilder("name", "description").build();
+RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier").build();
 ```
 
 ### Example adding a File (Data Entity) and a context pair
 ```java
-RoCrate roCrate = new RoCrateBuilder("name", "description")
+RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier")
     .addValuePairToContext("Station", "www.station.com")
     .addUrlToContext("contextUrl")
     .addDataEntity(
@@ -40,8 +62,6 @@ RoCrate roCrate = new RoCrateBuilder("name", "description")
     .build();
 ```
 
-Note: Adding an entity with an ID ("@id") which is already being used by another entity in the crate, the old entity will be overwritten.
-
 The library currently comes with three specialized DataEntities:
 
 1. `DataSetEntity`
@@ -58,15 +78,24 @@ new DataEntity.DataEntityBuilder()
 ```
 Note that here you are supposed to add the type of your `DataEntity` because it is not known.
 
+A `DataEntity` and its subclasses can have a file located on the web. Example:
+
+Example adding file:
+```java
+new FileEntity.FileEntityBuilder()
+    .addContent(URI.create("https://github.com/kit-data-manager/ro-crate-java/issues/5"))
+    .addProperty("description", "my new file that I added")
+    .build();
+```
+
 A `DataEntity` and its subclasses can have a local file associated with them,
 instead of one located on the web (which link is the ID of the data entity). Example:
 
 Example adding file:
 ```java
 new FileEntity.FileEntityBuilder()
-    .setId("new_file.txt")
-    .setSource(new File("file"))
-    .addProperty("description", "my new file that I added")
+    .addContent(Paths.get("file"), "new_file.txt")
+    .addProperty("description", "my new local file that I added")
     .build();
 ```
 
@@ -123,7 +152,7 @@ By setting the preview to an `AutomaticPreview`, the library will automatically 
 It has to be installed using `npm install --global ro-crate-html-js` in order to use it.
 If you want to use a custom-made preview, you can set it using the `CustomPreview` class. `AutomaticPreview` is currently **not** set by default.
 ```java
-RoCrate roCrate = new RoCrateBuilder("name", "description")
+RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier")
     .setPreview(new AutomaticPreview())
     .build();
 ```
@@ -256,8 +285,7 @@ The Data Entity file in the crate will have the name of the entity's ID.
   RoCrate crate = new RoCrate.RoCrateBuilder()
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("cp7glop.ai")
-                .setSource(new File("path to file"))
+                .addContent (Paths.get("path to file"), "cp7glop.ai")
                 .addProperty("name", "Diagram showing trend to increase")
                 .addProperty("contentSize", "383766")
                 .addProperty("description", "Illustrator file for Glop Pot")
@@ -266,8 +294,7 @@ The Data Entity file in the crate will have the name of the entity's ID.
         )
         .addDataEntity(
             new DataSetEntity.DataSetBuilder()
-                .setId("lots_of_little_files/")
-                .setSource(new File("path_to_files"))
+                .addContent (Paths.get("path_to_files"), "lots_of_little_files/")
                 .addProperty("name", "Too many files")
                 .addProperty("description", "This directory contains many small files, that we're not going to describe in detail.")
                 .build()
@@ -325,8 +352,7 @@ The web resource does not use `.setSource()`, but uses the ID to indicate the fi
  RoCrate crate = new RoCrate.RoCrateBuilder()
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("survey-responses-2019.csv")
-                .setSource(new File("README.md"))
+                .addContent (Paths.get("README.md"), "survey-responses-2019.csv")
                 .addProperty("name", "Survey responses")
                 .addProperty("contentSize", "26452")
                 .setEncodingFormat("text/csv")
@@ -334,7 +360,7 @@ The web resource does not use `.setSource()`, but uses the ID to indicate the fi
         )
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf")
+                .addContent(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
                 .addProperty("name", "RO-Crate specification")
                 .addProperty("contentSize", "310691")
                 .addProperty("description", "RO-Crate specification")
@@ -362,6 +388,8 @@ The web resource does not use `.setSource()`, but uses the ID to indicate the fi
       "@type": "Dataset",
       "name": "Example RO-Crate",
       "description": "The RO-Crate Root Data Entity",
+      "datePublished": "2020",
+      "license": {"@id": "https://spdx.org/licenses/CC-BY-NC-SA-4.0"},
       "hasPart": [
         {"@id": "data1.txt"},
         {"@id": "data2.txt"}
@@ -405,23 +433,21 @@ If there is no special method for including relative entities (ID properties) on
         .addProperty("description", "One of hopefully many Contextual Entities")
         .build();
     PlaceEntity park = new PlaceEntity.PlaceEntityBuilder()
-        .setId("http://sws.geonames.org/8152662/")
+        .addContent(URI.create("http://sws.geonames.org/8152662/"))
         .addProperty("name", "Catalina Park")
         .build();
 
-    RoCrate crate = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
+    RoCrate crate = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity", "2020", "https://spdx.org/licenses/CC-BY-NC-SA-4.0")
         .addContextualEntity(park)
         .addContextualEntity(alice)
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("data2.txt")
-                .setSource(new File(.......))
+                .addContent(Paths.get("......."), "data2.txt")
                 .build()
         )
         .addDataEntity(
             new FileEntity.FileEntityBuilder()
-                .setId("data1.txt")
-                .setSource(new File(.......))
+                .addContent(Paths.get("......."), "data1.txt")
                 .addProperty("description", "One of hopefully many Data Entities")
                 .addAuthor(alice.getId())
                 .addIdProperty("contentLocation", park)
@@ -444,6 +470,10 @@ If there is no special method for including relative entities (ID properties) on
     {
       "@id": "./",
       "@type": "Dataset",
+      "name": "Example RO-Crate",
+      "description": "The RO-Crate Root Data Entity",
+      "datePublished": "2020",
+      "license": {"@id": "https://spdx.org/licenses/CC-BY-NC-SA-4.0"},
       "hasPart": [
           { "@id": "workflow/alignment.knime" }
       ]
@@ -626,7 +656,7 @@ If there is no special method for including relative entities (ID properties) on
         .addIdProperty("encodingFormat", clustalW)
         .build();
 
-    RoCrate crate = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity")
+    RoCrate crate = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity", "2020", "https://spdx.org/licenses/CC-BY-NC-SA-4.0")
         .addContextualEntity(license)
         .addContextualEntity(knime)
         .addContextualEntity(workflowHub)

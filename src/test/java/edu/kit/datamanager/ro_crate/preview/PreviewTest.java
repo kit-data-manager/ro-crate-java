@@ -73,7 +73,7 @@ public class PreviewTest {
     assertTrue(FileUtils.contentEqualsIgnoreEOL(roDirFile.toFile(), fileInDir.toFile(), String.valueOf(Charset.defaultCharset())));
 
   }
-
+  
   @Test
   void testAutomaticPreviewAddToFolder(@TempDir Path dir) throws IOException {
     AutomaticPreview automaticPreview = new AutomaticPreview();

@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import java.nio.file.Paths;
 
 /**
  * Benchmark for adding data entities to a crate.
@@ -41,10 +42,11 @@ public class LocalDataEntitiesPerformance {
       throws IOException {
 
     Instant start = Instant.now();
-    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description").build();
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "datePublished", "licenseId").build();
     for (int i = 0; i < numEntities; i++) {
       DataEntity person = new DataEntity.DataEntityBuilder()
-          .setSource(new File(baseLocation + "file" + i))
+          .setLocationWithExceptions(Paths.get(baseLocation + "file" + i))
+          .setId(baseLocation + "file" + i)
           .addType("File")
           .build();
       crate.addDataEntity(person, true);
