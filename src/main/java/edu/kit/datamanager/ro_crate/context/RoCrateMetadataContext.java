@@ -122,7 +122,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
       if (s.equals("@id")) {
         // @id will refer to the value of the id of the node
         // so we need to extract this value
-        s = node.path(s).asText(s);
+        s = entity.getId();
       }
       if (s.equals("@json")) {
         // A linked data builtin type, which is fine.

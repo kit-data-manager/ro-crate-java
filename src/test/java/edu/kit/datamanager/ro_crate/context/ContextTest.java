@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
+import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
@@ -189,5 +190,38 @@ public class ContextTest {
         .build();
     // house is in the context
     assertTrue(newContext.checkEntity(data));
+  }
+
+  @Test
+  void testIdType() {
+    AbstractEntity validEntity = new DataEntity.DataEntityBuilder()
+            .setId("Airline")  // this is defined in the context!
+            .addType("@id")  // this is a JSON-LD feature to refer to the ID ("Airline") as a type
+            .addType("@json")  // this is a JSON-LD built-in type
+            .build();
+    assertTrue(this.context.checkEntity(validEntity));
+
+    AbstractEntity invalidEntity = new DataEntity.DataEntityBuilder()
+            .setId("Something which is definitely not in the context")
+            .addType("@id")
+            .build();
+    assertFalse(this.context.checkEntity(invalidEntity));
+  }
+
+  @Test
+  void testJsonType() {
+    AbstractEntity validEntity = new DataEntity.DataEntityBuilder()
+            .addType("@json")  // this is a JSON-LD built-in type
+            .build();
+    assertTrue(this.context.checkEntity(validEntity));
+  }
+
+  @Test
+  void testAbsoluteUrlType() {
+    AbstractEntity validEntity = new DataEntity.DataEntityBuilder()
+            .addType("http://example.org/Person")  // this is not in the context!
+            .addProperty("http://example.org/Thing", "Some thing")
+            .build();
+    assertTrue(this.context.checkEntity(validEntity));
   }
 }
