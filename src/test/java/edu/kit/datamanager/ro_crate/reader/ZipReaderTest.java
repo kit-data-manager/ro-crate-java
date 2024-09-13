@@ -158,4 +158,46 @@ class ZipReaderTest {
     assertFalse(HelpFunctions.compareTwoDir(locationSource.toFile(), destinationDir.toFile()));
     HelpFunctions.compareTwoMetadataJsonNotEqual(roCrate, res);
   }
+
+  @Test
+  void testReadingBasicCrateWithCustomPath(@TempDir Path temp) throws IOException {
+    RoCrate roCrate = new RoCrate.RoCrateBuilder(
+            "minimal",
+            "minimal RO_crate",
+            "2024",
+            "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+            .build();
+
+    Path zipPath = temp.resolve("result.zip");
+
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
+    roCrateZipWriter.save(roCrate, zipPath.toString());
+
+    File zipFile = zipPath.toFile();
+    assertTrue(zipFile.isFile());
+
+    Path differentFolder = temp.resolve("differentFolder");
+    ZipReader readerType = new ZipReader(differentFolder, true);
+    assertFalse(readerType.isExtracted());
+    assertEquals(readerType.getTemporaryFolder().getFileName().toString(), readerType.getID());
+    assertTrue(readerType.getTemporaryFolder().startsWith(differentFolder));
+
+    RoCrateReader roCrateFolderReader = new RoCrateReader(readerType);
+    Crate crate = roCrateFolderReader.readCrate(zipFile.getAbsolutePath());
+    assertTrue(readerType.isExtracted());
+    HelpFunctions.compareTwoCrateJson(roCrate, crate);
+
+    {
+      // try it again without the UUID subfolder and test if the directory is being cleaned up (using coverage).
+      ZipReader newReaderType = new ZipReader(differentFolder, false);
+      assertFalse(newReaderType.isExtracted());
+      assertNotEquals(newReaderType.getTemporaryFolder().getFileName().toString(), newReaderType.getID());
+      assertTrue(newReaderType.getTemporaryFolder().startsWith(differentFolder));
+
+      RoCrateReader newRoCrateFolderReader = new RoCrateReader(newReaderType);
+      Crate crate2 = newRoCrateFolderReader.readCrate(zipFile.getAbsolutePath());
+      assertTrue(newReaderType.isExtracted());
+      HelpFunctions.compareTwoCrateJson(roCrate, crate2);
+    }
+  }
 }
