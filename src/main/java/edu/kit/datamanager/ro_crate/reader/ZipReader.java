@@ -8,33 +8,64 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.nio.file.Path;
 
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Implementation of the reader strategy, providing a way of reading crates from
- * a zip archive.
+ * A ReaderStrategy implementation which reads from ZipFiles.
+ * <p>
+ * May be used as a dependency for RoCrateReader. It will unzip
+ * the ZipFile in a path relative to the directory this application runs in.
+ * By default, it will be `./.tmp/ro-crate-java/zipReader/$UUID/`.
+ * <p>
+ * NOTE: The resulting crate may refer to these temporary files. Therefore,
+ * these files are only being deleted before the JVM exits.
  */
 public class ZipReader implements ReaderStrategy {
 
-  private String uuid = UUID.randomUUID().toString();
+  protected final String ID = UUID.randomUUID().toString();
+  protected Path tempFolder = Path.of(String.format("./.tmp/ro-crate-java/zipReader/%s/", ID));
+  protected boolean read = false;
 
-  private String tempFolder = "./temp/" + uuid + "/";
+  public ZipReader() {}
 
-  private boolean read = false;
+  /**
+   * Creates a ZipReader which will extract the contents temporary
+   * to the given location instead of the default location.
+   *
+   * @param folderPath            the custom directory to extract
+   *                              content to for temporary access.
+   * @param shallAddUuidSubfolder if true, the reader will extract
+   *                              into subdirectories of the given
+   *                              directory. These subdirectories
+   *                              will have UUIDs as their names.
+   */
+  public ZipReader(Path folderPath, boolean shallAddUuidSubfolder) {
+    if (shallAddUuidSubfolder) {
+      this.tempFolder = folderPath.resolve(ID);
+    } else {
+      this.tempFolder = folderPath;
+    }
+  }
 
   private void readCrate(String location) {
     try {
-      File temp = new File(tempFolder);
-      if (temp.exists()) {
-        FileUtils.cleanDirectory(new File(tempFolder));
+      File folder = tempFolder.toFile();
+      // ensure the directory is clean
+      if (folder.isDirectory()) {
+        FileUtils.cleanDirectory(folder);
+      } else if (folder.isFile()) {
+        FileUtils.delete(folder);
       }
+      // extract
       try (ZipFile zf = new ZipFile(location)) {
-        zf.extractAll(tempFolder);
+        zf.extractAll(tempFolder.toAbsolutePath().toString());
+        this.read = true;
       }
-      FileUtils.forceDeleteOnExit(new File(tempFolder));
-      this.read = true;
+      // register deletion on exit
+      FileUtils.forceDeleteOnExit(folder);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -47,7 +78,7 @@ public class ZipReader implements ReaderStrategy {
     }
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = new File(tempFolder + "ro-crate-metadata.json");
+    File jsonMetadata = tempFolder.resolve("ro-crate-metadata.json").toFile();
     
     try {
       return objectMapper.readTree(jsonMetadata).deepCopy();
@@ -62,6 +93,6 @@ public class ZipReader implements ReaderStrategy {
     if (!read) {
       this.readCrate(location);
     }
-    return new File(tempFolder);
+    return tempFolder.toFile();
   }
 }
