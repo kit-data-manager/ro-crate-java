@@ -13,7 +13,7 @@ plugins {
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id "io.freefair.maven-publish-java" version "8.10.2"
+    id "io.freefair.maven-publish-java" version "8.11"
 }
 
 group 'edu.kit.datamanager'
@@ -35,13 +35,13 @@ repositories {
 }
 
 ext {
-    jacksonVersion  = '2.18.1'
+    jacksonVersion  = '2.18.2'
 }
 
 dependencies {
     // JUnit setup for testing
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
-    testImplementation(platform("org.junit:junit-bom:5.11.3"))
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // JSON object mapping / (de-)serialization
@@ -50,7 +50,7 @@ dependencies {
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.17.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
@@ -62,7 +62,7 @@ dependencies {
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.4.1'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.3"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.4"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
@@ -154,7 +154,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.12"
 }
 
 // maxParallelForks(2)
