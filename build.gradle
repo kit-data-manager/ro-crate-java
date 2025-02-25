@@ -58,7 +58,7 @@ dependencies {
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.16'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.4.1'
     // metadata validation, profiles based on JSON schema
