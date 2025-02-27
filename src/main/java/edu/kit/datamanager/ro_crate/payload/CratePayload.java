@@ -30,7 +30,7 @@ public interface CratePayload {
 
   void addEntity(AbstractEntity entity);
 
-  void addEntities(Collection<AbstractEntity> entity);
+  void addEntities(Collection<? extends AbstractEntity> entity);
 
   Set<AbstractEntity> getAllEntities();
 

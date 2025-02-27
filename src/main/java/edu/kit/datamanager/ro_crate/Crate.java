@@ -84,7 +84,7 @@ public interface Crate {
 
   void setUntrackedFiles(Collection<File> files);
 
-  void addFromCollection(Collection<AbstractEntity> entities);
+  void addFromCollection(Collection<? extends AbstractEntity> entities);
 
   void addItemFromDataCite(String locationUrl);
 

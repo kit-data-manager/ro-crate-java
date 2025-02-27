@@ -77,7 +77,7 @@ public class RoCratePayload implements CratePayload {
   }
 
   @Override
-  public void addEntities(Collection<AbstractEntity> entities) {
+  public void addEntities(Collection<? extends AbstractEntity> entities) {
     if (entities != null) {
       for (var element : entities) {
         this.addEntity(element);
