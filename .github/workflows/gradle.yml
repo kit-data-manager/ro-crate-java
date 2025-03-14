@@ -19,7 +19,6 @@ env:
 
 jobs:
   build:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -32,6 +31,8 @@ jobs:
         echo "github.event_name=${{ github.event_name }}"
         echo "github.event.pull_request.head.repo.full_name=${{ github.event.pull_request.head.repo.full_name }}"
         echo "github.event.pull_request.base.repo.full_name=${{ github.event.pull_request.base.repo.full_name }}"
+        echo "github.event.action=${{ github.event.action }}"
+        echo "github.event=${{ toJson(github.event) }}"
     - uses: actions/checkout@v4
     - name: Set up openJDK version
       uses: actions/setup-java@v4
