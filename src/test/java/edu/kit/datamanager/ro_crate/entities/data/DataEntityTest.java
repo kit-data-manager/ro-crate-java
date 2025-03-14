@@ -1,6 +1,8 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
@@ -16,7 +18,11 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -184,5 +190,47 @@ class DataEntityTest {
         List<String> keyList = Arrays.asList("encodingFormat", "name");
         dataEntity.removeProperties(keyList);
         assertEquals(dataEntity.getProperties().size(), 2);
+    }
+
+    @Test
+    void testMixedArrayProperties() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ArrayNode propertyValue = mapper.createArrayNode();
+        propertyValue
+                .add(1)
+                .add("2")
+                .add(3.14)
+                .add(true)
+                .add((JsonNode) null)
+                .add(mapper.nullNode());
+        String propertyName = "mixedArray";
+
+        DataEntity entity = new DataEntityBuilder()
+                .addProperty(propertyName, propertyValue)
+                .build();
+        System.out.println(entity.getProperty(propertyName));
+        assertEquals(propertyValue, entity.getProperty(propertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidPropertyValues")
+    void testNestedArrayProperties(ArrayNode propertyValue) {
+        String propertyName = "invalidArray";
+        DataEntity entity = new DataEntityBuilder()
+                .addProperty(propertyName, propertyValue)
+                .build();
+        System.out.println(entity.getProperty(propertyName));
+        assertNull(entity.getProperty(propertyName));
+    }
+
+    private static Stream<ArrayNode> provideInvalidPropertyValues() {
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode withSubArray = mapper.createArrayNode().add(1).add("2");
+        withSubArray.addArray();
+        ArrayNode withSubObject = mapper.createArrayNode().add(1).add("2");
+        withSubObject.addObject();
+
+        return Stream.of(withSubArray, withSubObject);
     }
 }
