@@ -19,7 +19,7 @@ env:
 
 jobs:
   # avoid double CI runs on push and PR, from https://github.com/orgs/community/discussions/57827
-  if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+  if: github.event_name != 'push' || github.event.push.head.repo.full_name != github.event.push.base.repo.full_name
   build:
     strategy:
       matrix:
