@@ -18,9 +18,8 @@ env:
   COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
 jobs:
-  # avoid double CI runs on push and PR, from https://github.com/orgs/community/discussions/57827
   build:
-    if: github.event_name != 'push' || github.event.push.head.repo.full_name != github.event.push.base.repo.full_name
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -28,6 +27,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Debug trigger conditions
+      run: |
+        echo "github.event_name=${{ github.event_name }}"
+        echo "github.event.pull_request.head.repo.full_name=${{ github.event.pull_request.head.repo.full_name }}"
+        echo "github.event.pull_request.base.repo.full_name=${{ github.event.pull_request.base.repo.full_name }}"
     - uses: actions/checkout@v4
     - name: Set up openJDK version
       uses: actions/setup-java@v4
