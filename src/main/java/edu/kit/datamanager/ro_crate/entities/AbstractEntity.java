@@ -158,11 +158,12 @@ public class AbstractEntity {
     }
 
     /**
-     * Add a JSON property to the entity. Here the value of the property is a
-     * String.
+     * Adds a property to the entity.
+     * <p>
+     * It may override values, if the key already exists.
      *
-     * @param key the name of the property (term).
-     * @param value the value that the property has.
+     * @param key the key of the property.
+     * @param value value of the property.
      */
     public void addProperty(String key, String value) {
         if (key != null && value != null) {
@@ -172,11 +173,12 @@ public class AbstractEntity {
     }
 
     /**
-     * This is another way of adding a property, this time the value is a long
-     * integer.
+     * Adds a property to the entity.
+     * <p>
+     * It may override values, if the key already exists.
      *
-     * @param key the String key of the property.
-     * @param value the long value.
+     * @param key the key of the property.
+     * @param value value of the property.
      */
     public void addProperty(String key, long value) {
         if (key != null) {
@@ -186,10 +188,12 @@ public class AbstractEntity {
     }
 
     /**
-     * Another way of adding a property this time the value is a double.
+     * Adds a property to the entity.
+     * <p>
+     * It may override values, if the key already exists.
      *
-     * @param key the string key of the property.
-     * @param value double value of the property.
+     * @param key the key of the property.
+     * @param value value of the property.
      */
     public void addProperty(String key, double value) {
         if (key != null) {
@@ -199,11 +203,17 @@ public class AbstractEntity {
     }
 
     /**
-     * This is the most generic way of adding a property. The value is a
-     * JsonNode that could contain anything possible. This is way firstly it is
-     * validated that it follows the correct guidelines.
+     * Adds a generic property to the entity.
+     * <p>
+     * It may fail with an error message on stdout, in which case the
+     * value is not added.
+     * It may override values, if the key already exists.
+     * This is the most generic way to add a property. The value is a
+     * JsonNode that could contain anything possible. It is limited to
+     * objects allowed to flattened documents, which means any literal,
+     * an array of literals, or an object with an @id property.
      *
-     * @param key String key of the property.
+     * @param key   String key of the property.
      * @param value The JsonNode representing the value.
      */
     public void addProperty(String key, JsonNode value) {
@@ -222,8 +232,8 @@ public class AbstractEntity {
     }
 
     /**
-     * Add a property that looks like this: "name" : {"@id" : "id"} If the name
-     * property already exists add a second @id to it.
+     * Add a property that looks like this: "name" : {"@id" : "id"} If the
+     * name property already exists add a second @id to it.
      *
      * @param name the "key" of the property.
      * @param id the "id" of the property.
