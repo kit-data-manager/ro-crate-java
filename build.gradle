@@ -8,12 +8,12 @@ plugins {
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
-    id 'net.researchgate.release' version '3.0.2'
+    id 'net.researchgate.release' version '3.1.0'
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id "io.freefair.maven-publish-java" version "8.10.2"
+    id "io.freefair.maven-publish-java" version "8.13"
 }
 
 group 'edu.kit.datamanager'
@@ -35,22 +35,21 @@ repositories {
 }
 
 ext {
-    jacksonVersion  = '2.18.1'
+    jacksonVersion  = '2.18.3'
 }
 
 dependencies {
     // JUnit setup for testing
-    testImplementation 'org.junit.jupiter:junit-jupiter-params'
-    testImplementation(platform("org.junit:junit-bom:5.11.3"))
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation(platform("org.junit:junit-bom:5.12.1"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
     // JSON object mapping / (de-)serialization
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.17.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
@@ -58,11 +57,11 @@ dependencies {
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.16'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
     // JSON-LD, Zenodo mapping
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.4.1'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.6.0'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.3"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.6"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
 
@@ -100,46 +99,48 @@ configurations {
 }
 
 
-task performanceContextEntitiesBenchmark(type: JavaExec) {
+tasks.register('performanceContextEntitiesBenchmark', JavaExec) {
     description = "Run the context entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.ContextualEntitiesPerformance'
 }
 
-task performanceLocalDataEntitiesBenchmark(type: JavaExec) {
+tasks.register('performanceLocalDataEntitiesBenchmark', JavaExec) {
     description = "Run the local data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.LocalDataEntitiesPerformance'
 }
 
-task performanceRemoteDataEntitiesBenchmark(type: JavaExec) {
+tasks.register('performanceRemoteDataEntitiesBenchmark', JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.RemoteDataEntitiesPerformance'
 }
 
-task performanceMixEntitiesBenchmark(type: JavaExec) {
+tasks.register('performanceMixEntitiesBenchmark', JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.MixtureOfEntitiesPerformance'
 }
-task performanceDeletionEntitiesBenchmark(type: JavaExec) {
+
+tasks.register('performanceDeletionEntitiesBenchmark', JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.singlecratebenchmarks.DeletionEntitiesPerformance'
 }
 
-task performanceMultipleCratesBenchmark(type: JavaExec) {
+tasks.register('performanceMultipleCratesBenchmark', JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.multiplecrates.MultipleCratesBenchmark'
 }
 
-task performanceReadWriteMultipleCratesBenchmark(type: JavaExec) {
+tasks.register('performanceReadWriteMultipleCratesBenchmark', JavaExec) {
     description = "Run the remote data entities benchmarks."
     classpath = sourceSets.performanceTest.runtimeClasspath
     mainClass = 'edu.kit.datamanager.ro_crate.multiplecrates.MultipleCratesWriteAndRead'
 }
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
@@ -154,7 +155,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.12"
 }
 
 // maxParallelForks(2)
