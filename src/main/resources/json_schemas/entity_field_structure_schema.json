@@ -7,7 +7,10 @@
       "items": {
         "anyOf": [
           { "$ref": "#/$defs/idProperty"},
-          {"type": "string"}
+          {"type": "string"},
+          {"type": "number"},
+          {"type": "boolean"},
+          {"type": "null"}
         ]
 
       }
@@ -30,14 +33,15 @@
   ],
   "$defs" : {
     "idProperty": {
-      "type": "object",
+      "type": ["object"],
       "properties": {
         "@id": {
-          "type": "string"
+          "type": ["string"]
         }
       },
+      "required": ["@id"],
       "additionalProperties": false
     }
 
-  }
+    }
 }
