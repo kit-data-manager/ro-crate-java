@@ -214,7 +214,6 @@ class DataEntityTest {
         DataEntity entity = new DataEntityBuilder()
                 .addProperty(propertyName, propertyValue)
                 .build();
-        System.out.println(entity.getProperty(propertyName));
         assertEquals(propertyValue, entity.getProperty(propertyName));
     }
 
@@ -225,7 +224,6 @@ class DataEntityTest {
         DataEntity entity = new DataEntityBuilder()
                 .addProperty(propertyName, propertyValue)
                 .build();
-        System.out.println(entity.getProperty(propertyName));
         assertNull(entity.getProperty(propertyName));
     }
 
