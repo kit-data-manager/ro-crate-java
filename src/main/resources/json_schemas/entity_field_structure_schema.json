@@ -33,10 +33,10 @@
   ],
   "$defs" : {
     "idProperty": {
-      "type": "object",
+      "type": ["object"],
       "properties": {
         "@id": {
-          "type": "string"
+          "type": ["string"]
         }
       },
       "required": ["@id"],
