@@ -11,10 +11,10 @@ import java.net.URL;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity.DataEntityBuilder;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-import java.net.MalformedURLException;
 import java.net.URI;
 
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -99,12 +99,14 @@ class DataEntityTest {
 
         assertNotNull(dataEntity);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new DataEntity.DataEntityBuilder()
-                    .addType("File")
-                    .setLocationWithExceptions(URI.create("zzz://wrong/url"))
-                    .build();
-        });
+        Exception exception = assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        new DataEntity.DataEntityBuilder()
+                                .addType("File")
+                                .setLocationWithExceptions(URI.create("zzz://wrong/url"))
+                                .build()
+        );
 
         assertEquals("This Data Entity remote ID does not resolve to a valid URL.", exception.getMessage());
 
@@ -120,22 +122,25 @@ class DataEntityTest {
                 .addProperty("name", "RO-Crate specification")
                 .setEncodingFormat("application/json")
                 .build();
-        assertEquals(dataEntity.getId(), "example.json");
+        assertEquals("example.json", dataEntity.getId());
         HelpFunctions.compareEntityWithFile(dataEntity, "/json/entities/data/localFile.json");
 
+        String fileName = "cp7glop.ai";
+        Path filePath = Paths.get(fileName);
+
         dataEntity = new FileEntity.FileEntityBuilder()
-                .setLocationWithExceptions(Paths.get("cp7glop.ai"))
-                .setId("cp7glop.ai")
+                .setLocationWithExceptions(filePath)
+                .setId(fileName)
                 .addProperty("name", "Diagram showing trend to increase")
                 .setEncodingFormat("application/pdf")
                 .build();
-        assertEquals(dataEntity.getId(), "cp7glop.ai");
-        assertEquals(dataEntity.getPath(), Paths.get("cp7glop.ai"));
-        assertEquals(dataEntity.getProperty("encodingFormat").asText(), "application/pdf");
+        assertEquals(fileName, dataEntity.getId());
+        assertEquals(dataEntity.getPath(), filePath);
+        assertEquals("application/pdf", dataEntity.getProperty("encodingFormat").asText());
     }
 
     @Test
-    void testEncodedUrl() throws MalformedURLException, URISyntaxException {
+    void testEncodedUrl() throws URISyntaxException {
         //this entity id is a valid URL so there should not be any console information
         DataEntity dataEntity = new DataEntity.DataEntityBuilder()
                 .addType("File")
@@ -162,7 +167,7 @@ class DataEntityTest {
                 .build();
 
         assertTrue(dataEntity.getTypes().contains("File"));
-        assertEquals(dataEntity.getId(), "almost-50%25.json");
+        assertEquals("almost-50%25.json", dataEntity.getId());
 
         // even if the Path is not correctly encoded, the data entity will be added with an encoded Path.
         dataEntity = new DataEntity.DataEntityBuilder()
@@ -170,7 +175,7 @@ class DataEntityTest {
                 .setLocationWithExceptions(Paths.get("/json/crate/Results and Diagrams/almost-50%.json"))
                 .setId("almost-50%.json")
                 .build();
-        assertEquals(dataEntity.getId(), "almost-50%25.json");
+        assertEquals("almost-50%25.json", dataEntity.getId());
 
     }
 
@@ -185,11 +190,11 @@ class DataEntityTest {
 
         dataEntity.removeProperty("url");
         assertNull(dataEntity.getProperty("url"));
-        assertEquals(dataEntity.getProperties().size(), 4);
+        assertEquals(4, dataEntity.getProperties().size());
 
         List<String> keyList = Arrays.asList("encodingFormat", "name");
         dataEntity.removeProperties(keyList);
-        assertEquals(dataEntity.getProperties().size(), 2);
+        assertEquals(2, dataEntity.getProperties().size());
     }
 
     @Test
