@@ -24,6 +24,9 @@ println "Building ${name} version: ${version}"
 println "JDK version: ${JavaVersion.current()}"
 println "Profile (system property): ${System.getProperty('profile')}"
 
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
 if (JavaVersion.current() == JavaVersion.VERSION_17) {
     println "Setting encoding to UTF-8 manually"
     compileJava.options.encoding = "UTF-8"
@@ -64,6 +67,8 @@ dependencies {
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.6"
     implementation 'org.glassfish:jakarta.json:2.0.1'
 }
+
+logging.captureStandardOutput LogLevel.INFO
 
 def signingTasks = tasks.withType(Sign)
 tasks.withType(AbstractPublishToMaven).configureEach{

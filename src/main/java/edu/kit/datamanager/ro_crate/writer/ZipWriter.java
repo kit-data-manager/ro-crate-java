@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 
 /**
@@ -24,6 +25,8 @@ public class ZipWriter implements WriterStrategy {
 
   @Override
   public void save(Crate crate, String destination) {
+      
+      
     try (ZipFile zipFile = new ZipFile(destination)) {
       saveMetadataJson(crate, zipFile);
       saveDataEntities(crate, zipFile);

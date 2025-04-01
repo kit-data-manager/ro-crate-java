@@ -15,5 +15,5 @@ public interface CratePreview {
   void saveAllToZip(ZipFile zipFile);
 
   void saveAllToFolder(File folder);
-
+  
 }

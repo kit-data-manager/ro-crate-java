@@ -7,13 +7,16 @@ import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
@@ -44,9 +47,9 @@ public class DataEntity extends AbstractEntity {
 
     /**
      * Adds an author ID to the entity.
-     * 
+     *
      * Calling this multiple times will add multiple author IDs.
-     * 
+     *
      * @param id the identifier of the author.
      */
     public void addAuthorId(String id) {
@@ -66,6 +69,31 @@ public class DataEntity extends AbstractEntity {
             ZipParameters zipParameters = new ZipParameters();
             zipParameters.setFileNameInZip(this.getId());
             zipFile.addFile(this.path.toFile(), zipParameters);
+        }
+    }
+
+    /**
+     * If the data entity contains a physical file. This method will write it
+     * when the crate is being written to a zip archive.
+     *
+     * @param zipStream The zip output stream where it should be written.
+     * @throws ZipException when something goes wrong with the writing to the
+     * zip file.
+     * @throws IOException If opening the file input stream fails.
+     */
+    public void saveToStream(ZipOutputStream zipStream) throws ZipException, IOException {
+        if (this.path != null) {
+            byte[] buff = new byte[4096];
+            int readLen;
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip(this.getId());
+            zipStream.putNextEntry(zipParameters);
+            try (InputStream inputStream = new FileInputStream(this.path.toFile())) {
+                while ((readLen = inputStream.read(buff)) != -1) {
+                    zipStream.write(buff, 0, readLen);
+                }
+            }
+            zipStream.closeEntry();
         }
     }
 
@@ -99,14 +127,14 @@ public class DataEntity extends AbstractEntity {
 
         /**
          * Sets the location of the data entity.
-         * 
-         * If the ID has not been set manually in beforehand, it will be derived from
-         * the path. Use {@link #setId(String)} to override it or set it in beforehand.
-         * Note that another call of {@link #setLocation(Path)} will not override the ID
-         * as it has been set by the previous call!
          *
-         * @param path the location of the data. May be null, in which case nothing
-         *             happens.
+         * If the ID has not been set manually in beforehand, it will be derived
+         * from the path. Use {@link #setId(String)} to override it or set it in
+         * beforehand. Note that another call of {@link #setLocation(Path)} will
+         * not override the ID as it has been set by the previous call!
+         *
+         * @param path the location of the data. May be null, in which case
+         * nothing happens.
          * @return this builder
          */
         public T setLocation(Path path) {
@@ -134,13 +162,14 @@ public class DataEntity extends AbstractEntity {
         }
 
         /**
-         * Same as {@link #setLocation(Path)} but instead of associating this entity
-         * with a file, it will point to some place on the internet.
-         * 
-         * Via the specification, this means the uri will be set as the ID. This call is
-         * therefore equivalent to {@link #setId(String)}.
-         * 
-         * @param uri the URI, should point at the data reachable on the internet.
+         * Same as {@link #setLocation(Path)} but instead of associating this
+         * entity with a file, it will point to some place on the internet.
+         *
+         * Via the specification, this means the uri will be set as the ID. This
+         * call is therefore equivalent to {@link #setId(String)}.
+         *
+         * @param uri the URI, should point at the data reachable on the
+         * internet.
          * @return this builder
          */
         public T setLocation(URI uri) {
@@ -190,10 +219,10 @@ public class DataEntity extends AbstractEntity {
 
     /**
      * Data Entity builder class that allows for easier data entity creation.
-     * 
-     * If not explicitly mentioned, all methods avoid Exceptions and will silently
-     * ignore null-parameters, in which case nothing will happen. Use the available
-     * *WithExceptions-methods in case you need them.
+     *
+     * If not explicitly mentioned, all methods avoid Exceptions and will
+     * silently ignore null-parameters, in which case nothing will happen. Use
+     * the available *WithExceptions-methods in case you need them.
      */
     public static final class DataEntityBuilder extends AbstractDataEntityBuilder<DataEntityBuilder> {
 
