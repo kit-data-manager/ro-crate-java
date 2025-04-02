@@ -229,7 +229,7 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public void addFromCollection(Collection<AbstractEntity> entities) {
+    public void addFromCollection(Collection<? extends AbstractEntity> entities) {
         this.roCratePayload.addEntities(entities);
     }
 

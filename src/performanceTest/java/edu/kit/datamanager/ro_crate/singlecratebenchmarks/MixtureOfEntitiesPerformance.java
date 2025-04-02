@@ -52,7 +52,7 @@ public class MixtureOfEntitiesPerformance {
           .addType("File")
           .addIdProperty("author", person)
           .build();
-      crate.addDataEntity(file, true);
+      crate.addDataEntity(file);
     }
     Instant end = Instant.now();
     String duration = String.valueOf(Duration.between(start, end).toMillis() / 1000.f);

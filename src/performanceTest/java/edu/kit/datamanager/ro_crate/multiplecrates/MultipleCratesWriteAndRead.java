@@ -67,7 +67,7 @@ public class MultipleCratesWriteAndRead {
             .addIdProperty("author", person)
             .build();
         crate.addContextualEntity(person);
-        crate.addDataEntity(file, true);
+        crate.addDataEntity(file);
       }
       RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
       writer.save(crate, "crate" + i);

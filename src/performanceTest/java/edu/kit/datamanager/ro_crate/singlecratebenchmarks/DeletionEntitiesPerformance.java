@@ -52,7 +52,7 @@ public class DeletionEntitiesPerformance {
           .addType("File")
           .addIdProperty("author", person)
           .build();
-      crate.addDataEntity(file, true);
+      crate.addDataEntity(file);
     }
 
     for (int i = 0; i < numEntities; i++) {

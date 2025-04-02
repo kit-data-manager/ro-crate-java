@@ -36,7 +36,7 @@ public class LocalDataEntitiesPerformance {
    *
    * @param numEntities the amount of entities.
    * @param baseLocation their base location (where are the files present).
-   * @throws IOException if writint the results at the end fails.
+   * @throws IOException if writing the results at the end fails.
    */
   public static void localDataEntitiesTest(int numEntities, String baseLocation)
       throws IOException {
@@ -49,7 +49,7 @@ public class LocalDataEntitiesPerformance {
           .setId(baseLocation + "file" + i)
           .addType("File")
           .build();
-      crate.addDataEntity(person, true);
+      crate.addDataEntity(person);
     }
     Instant end = Instant.now();
     String duration = String.valueOf(Duration.between(start, end).toMillis() / 1000.f);

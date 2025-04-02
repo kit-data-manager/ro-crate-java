@@ -40,7 +40,7 @@ public class RemoteDataEntitiesPerformance {
           .setId(baseId + i)
           .addType("File")
           .build();
-      crate.addDataEntity(person, true);
+      crate.addDataEntity(person);
     }
     Instant end = Instant.now();
     String duration = String.valueOf(Duration.between(start, end).toMillis() / 1000.f);
