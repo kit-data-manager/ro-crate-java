@@ -68,6 +68,7 @@ public class DataEntity extends AbstractEntity {
         if (this.path != null) {
             ZipParameters zipParameters = new ZipParameters();
             zipParameters.setFileNameInZip(this.getId());
+            System.out.println("ADD FILE " + this.path.toFile());
             zipFile.addFile(this.path.toFile(), zipParameters);
         }
     }

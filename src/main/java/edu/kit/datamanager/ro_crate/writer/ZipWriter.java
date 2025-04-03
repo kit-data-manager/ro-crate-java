@@ -14,58 +14,57 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the writing strategy
- * to provide a way of writing crates to a zip archive.
+ * Implementation of the writing strategy to provide a way of writing crates to
+ * a zip archive.
  */
 public class ZipWriter implements WriterStrategy {
 
-  @Override
-  public void save(Crate crate, String destination) {
-      
-      
-    try (ZipFile zipFile = new ZipFile(destination)) {
-      saveMetadataJson(crate, zipFile);
-      saveDataEntities(crate, zipFile);
-    } catch (IOException e) {
-      // can not close ZipFile (threw Exception)
-    }
-  }
+    private static Logger logger = LoggerFactory.getLogger(ZipWriter.class);
 
-  private void saveDataEntities(Crate crate, ZipFile zipFile) {
-    for (DataEntity dataEntity : crate.getAllDataEntities()) {
-      try {
-        dataEntity.saveToZip(zipFile);
-      } catch (ZipException e) {
-        System.out.println("could not save " + dataEntity.getId() + " to zip file!");
-      }
+    @Override
+    public void save(Crate crate, String destination) {
+        try (ZipFile zipFile = new ZipFile(destination)) {
+            saveMetadataJson(crate, zipFile);
+            saveDataEntities(crate, zipFile);
+        } catch (IOException e) {
+            // can not close ZipFile (threw Exception)
+            logger.error("Failed to write ro-crate to destination " + destination + ".", e);
+        }
     }
-  }
 
-  private void saveMetadataJson(Crate crate, ZipFile zipFile) {
-    try {
-      // write the metadata.json file
-      ZipParameters zipParameters = new ZipParameters();
-      zipParameters.setFileNameInZip("ro-crate-metadata.json");
-      ObjectMapper objectMapper = MyObjectMapper.getMapper();
-      // we create an JsonNode only to have the file written pretty
-      JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-      String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-      InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
-      // write the ro-crate-metadata
-      zipFile.addStream(inputStream, zipParameters);
-      inputStream.close();
-      if (crate.getPreview() != null) {
-        crate.getPreview().saveAllToZip(zipFile);
-      }
-    } catch (ZipException | JsonProcessingException e) {
-      System.out.println("Exception writing ro-crate-metadata.json file to zip");
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    private void saveDataEntities(Crate crate, ZipFile zipFile) {
+        for (DataEntity dataEntity : crate.getAllDataEntities()) {
+            try {
+                dataEntity.saveToZip(zipFile);
+            } catch (ZipException e) {
+                logger.error("Could not save " + dataEntity.getId() + " to zip file!", e);
+            }
+        }
     }
-  }
+
+    private void saveMetadataJson(Crate crate, ZipFile zipFile) {
+        try {
+            // write the metadata.json file
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip("ro-crate-metadata.json");
+            ObjectMapper objectMapper = MyObjectMapper.getMapper();
+            // we create an JsonNode only to have the file written pretty
+            JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
+            String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+            InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
+            // write the ro-crate-metadata
+            zipFile.addStream(inputStream, zipParameters);
+            inputStream.close();
+            if (crate.getPreview() != null) {
+                crate.getPreview().saveAllToZip(zipFile);
+            }
+        } catch (IOException e) {
+            logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
+        }
+    }
 }

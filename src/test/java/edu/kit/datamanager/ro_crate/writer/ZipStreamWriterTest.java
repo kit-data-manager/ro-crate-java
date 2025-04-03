@@ -14,27 +14,25 @@ import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
 import edu.kit.datamanager.ro_crate.preview.PreviewGenerator;
-import java.nio.file.Paths;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * @author Nikola Tzotchev on 9.2.2022 г.
- * @version 1
+ * @author jejkal
  */
-class ZipWriterTest {
+class ZipStreamWriterTest {
 
   @Test
-  void testWritingToZip(@TempDir Path tempDir) throws IOException {
+  void testWritingToZipStream(@TempDir Path tempDir) throws IOException {
     // create the RO_crate directory in the tempDir
     Path roDir = tempDir.resolve("ro_dir");
     FileUtils.forceMkdir(roDir.toFile());
 
     // the .json of our crate
     InputStream fileJson=
-        ZipWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+        ZipStreamWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
 
     // fill the expected directory with files and dirs
 
@@ -55,7 +53,6 @@ class ZipWriterTest {
     FileUtils.writeStringToFile(dirInCrate.resolve("third.txt").toFile(),
         "content of third file in dir",
         Charset.defaultCharset());
-
     // create the RO_Crate including the files that should be present in it
     RoCrate roCrate = new RoCrate.RoCrateBuilder("Example RO-Crate",
         "The RO-Crate Root Data Entity", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
@@ -84,13 +81,11 @@ class ZipWriterTest {
     // safe the crate in the test.zip file
     Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipStreamWriter());
+    
+    
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toString());
-        roCrateZipWriter.save(roCrate, "/Users/jejkal/cra.zip");
-
-    
-    
     Path res = tempDir.resolve("dest");
     try (ZipFile zf = new ZipFile(test.toFile())) {
         zf.extractAll(res.toString());
@@ -110,7 +105,7 @@ class ZipWriterTest {
 
     // the .json of our crate
     InputStream fileJson=
-        ZipWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+        ZipStreamWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
 
     // fill the expected directory with files and dirs
 
@@ -161,7 +156,7 @@ class ZipWriterTest {
     // safe the crate in the test.zip file
     Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
+    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipStreamWriter());
     // save the content of the roCrate to the dest zip
     roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
     Path res = tempDir.resolve("dest");

@@ -23,7 +23,11 @@ public class AutomaticPreview implements CratePreview {
         try {
             // extract the .json file so we can run the "rochtml" tool on it"
             zipFile.extractFile("ro-crate-metadata.json", "temp");
-            PreviewGenerator.generatePreview("temp");
+            if (PreviewGenerator.isRochtmlAvailable()) {
+                PreviewGenerator.generatePreview("temp");
+            } else {
+                DefaultPreviewGenerator.generatePreview(FileUtils.readFileToString(new File("temp/ro-crate-metadata.json"), "UTF-8"), zipFile);
+            }
             zipFile.addFile("temp/ro-crate-preview.html");
             FileUtils.deleteDirectory(new File("temp"));
         } catch (IOException e) {
@@ -33,6 +37,16 @@ public class AutomaticPreview implements CratePreview {
 
     @Override
     public void saveAllToFolder(File folder) {
-        PreviewGenerator.generatePreview(folder.getAbsolutePath());
+
+        if (PreviewGenerator.isRochtmlAvailable()) {
+            PreviewGenerator.generatePreview(folder.getAbsolutePath());
+        } else {
+            try {
+                DefaultPreviewGenerator.generatePreview(FileUtils.readFileToString(new File(folder, "ro-crate-metadata.json"), "UTF-8"), folder);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
     }
 }

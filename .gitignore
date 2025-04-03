@@ -169,4 +169,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 ### Gradle Patch ###
+.DS_Store
 **/build/
+**/jte-classes
+**/temp

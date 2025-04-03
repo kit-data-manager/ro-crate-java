@@ -1,6 +1,5 @@
 package edu.kit.datamanager.ro_crate.writer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,20 +8,22 @@ import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the writing strategy to provide a way of writing crates to
  * a zip archive.
  */
 public class ZipStreamWriter implements StreamWriterStrategy {
+
+    private static Logger logger = LoggerFactory.getLogger(ZipStreamWriter.class);
 
     @Override
     public void save(Crate crate, OutputStream destination) {
@@ -32,6 +33,7 @@ public class ZipStreamWriter implements StreamWriterStrategy {
             saveDataEntities(crate, zipFile);
         } catch (IOException e) {
             // can not close ZipOutputStream (threw Exception)
+            logger.error("Failed to save ro-crate to zip stream.", e);
         }
     }
 
@@ -40,7 +42,7 @@ public class ZipStreamWriter implements StreamWriterStrategy {
             try {
                 dataEntity.saveToStream(zipStream);
             } catch (IOException e) {
-                System.out.println("could not save " + dataEntity.getId() + " to zip stream!");
+                logger.error("Could not save " + dataEntity.getId() + " to zip stream!", e);
             }
         }
     }
@@ -71,11 +73,8 @@ public class ZipStreamWriter implements StreamWriterStrategy {
             /*  if (crate.getPreview() != null) {
                 crate.getPreview().saveAllToStream(zipStream);
             }*/
-        } catch (ZipException | JsonProcessingException e) {
-            System.out.println("Exception writing ro-crate-metadata.json file to zip");
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
         }
     }
 }

@@ -66,6 +66,9 @@ dependencies {
     // metadata validation, profiles based on JSON schema
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.6"
     implementation 'org.glassfish:jakarta.json:2.0.1'
+    //JTE for template processing
+    implementation('gg.jte:jte:3.1.16')
+
 }
 
 logging.captureStandardOutput LogLevel.INFO
