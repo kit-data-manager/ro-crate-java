@@ -163,7 +163,7 @@ public class DefaultPreviewGenerator {
         TemplateOutput output = new StringOutput();
         templateEngine.render("default_preview.jte", input, output);
         System.out.println(output.toString());
-        FileWriter w = new FileWriter(new java.io.File("ro-crate-preview.html"));
+        FileWriter w = new FileWriter(new java.io.File(folder, "ro-crate-preview.html"));
         w.write(output.toString());
         w.flush();
         w.close();
