@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'jvm-test-suite'
-
+    id 'application'
     id 'jacoco'
     // Adds coveralls task for CI to send results to the coveralls service.
     id "com.github.kt3k.coveralls" version "2.12.2"
@@ -68,7 +68,7 @@ dependencies {
     implementation 'org.glassfish:jakarta.json:2.0.1'
     //JTE for template processing
     implementation('gg.jte:jte:3.1.16')
-
+    implementation("org.freemarker:freemarker:2.3.34")
 }
 
 logging.captureStandardOutput LogLevel.INFO

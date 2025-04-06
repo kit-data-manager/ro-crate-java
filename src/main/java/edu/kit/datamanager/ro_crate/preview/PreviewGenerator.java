@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  */
 public class PreviewGenerator {
 
-    private static final String command = "rochtml";
+    private static final String command = "rochtml1";
 
     public static boolean isRochtmlAvailable() {
         ProcessBuilder builder = new ProcessBuilder();
@@ -29,9 +29,7 @@ public class PreviewGenerator {
         Process process;
         try {
             process = builder.start();
-
             int exitVal = process.waitFor();
-            System.out.println("EXIT " + exitVal);
             return exitVal == 0;
         } catch (InterruptedException | IOException ex) {
 
