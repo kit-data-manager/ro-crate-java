@@ -103,13 +103,4 @@ public class JsonLdExpander {
 
         return result;
     }
-
-    // Example usage
-    public static void main(String[] args) throws Exception {
-        File file = new File("E:\\Software\\NetbeansProjects\\ro-crate-java\\src\\test\\resources\\crates\\workflowhub\\workflow1\\ro-crate-metadata.json");
-        JsonNode expanded = expandAndPrune(file);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, expanded);
-    }
 }

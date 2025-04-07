@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  */
 public class PreviewGenerator {
 
-    private static final String command = "rochtml1";
+    private static final String command = "rochtml";
 
     public static boolean isRochtmlAvailable() {
         ProcessBuilder builder = new ProcessBuilder();
