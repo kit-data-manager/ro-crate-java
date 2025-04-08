@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
+import edu.kit.datamanager.ro_crate.util.ZipUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +69,6 @@ public class DataEntity extends AbstractEntity {
         if (this.path != null) {
             ZipParameters zipParameters = new ZipParameters();
             zipParameters.setFileNameInZip(this.getId());
-            System.out.println("ADD FILE " + this.path.toFile());
             zipFile.addFile(this.path.toFile(), zipParameters);
         }
     }
@@ -84,17 +84,7 @@ public class DataEntity extends AbstractEntity {
      */
     public void saveToStream(ZipOutputStream zipStream) throws ZipException, IOException {
         if (this.path != null) {
-            byte[] buff = new byte[4096];
-            int readLen;
-            ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setFileNameInZip(this.getId());
-            zipStream.putNextEntry(zipParameters);
-            try (InputStream inputStream = new FileInputStream(this.path.toFile())) {
-                while ((readLen = inputStream.read(buff)) != -1) {
-                    zipStream.write(buff, 0, readLen);
-                }
-            }
-            zipStream.closeEntry();
+            ZipUtil.addFileToZipStream(zipStream, this.path.toFile(), this.getId());
         }
     }
 

@@ -4,6 +4,7 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.preview.CustomPreview;
+import edu.kit.datamanager.ro_crate.preview.StaticPreview;
 import edu.kit.datamanager.ro_crate.reader.FolderReader;
 import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
@@ -31,7 +32,7 @@ class ReadAndWriteTest {
     FileUtils.writeStringToFile(fileInDir.toFile(), "fileN2", Charset.defaultCharset());
 
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
-        .setPreview(new CustomPreview(htmlFile.toFile(), htmlDir.toFile()))
+        .setPreview(new StaticPreview(htmlFile.toFile(), htmlDir.toFile()))
         .build();
 
     Path writeDir = path.resolve("crate");

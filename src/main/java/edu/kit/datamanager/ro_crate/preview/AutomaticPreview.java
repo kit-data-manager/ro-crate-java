@@ -1,8 +1,11 @@
 package edu.kit.datamanager.ro_crate.preview;
 
+import edu.kit.datamanager.ro_crate.util.ZipUtil;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -19,34 +22,41 @@ public class AutomaticPreview implements CratePreview {
     }
 
     @Override
-    public void saveAllToZip(ZipFile zipFile) {
+    public void saveAllToZip(ZipFile zipFile) throws IOException {
+        // extract the .json file so we can run the "rochtml" tool on it"
         try {
-            // extract the .json file so we can run the "rochtml" tool on it"
             zipFile.extractFile("ro-crate-metadata.json", "temp");
             if (PreviewGenerator.isRochtmlAvailable()) {
                 PreviewGenerator.generatePreview("temp");
-            } else {
-                DefaultPreviewGenerator.generatePreview(FileUtils.readFileToString(new File("temp/ro-crate-metadata.json"), "UTF-8"), zipFile);
+                zipFile.addFile("temp/ro-crate-preview.html");
             }
-            zipFile.addFile("temp/ro-crate-preview.html");
+        } finally {
             FileUtils.deleteDirectory(new File("temp"));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     @Override
-    public void saveAllToFolder(File folder) {
-
+    public void saveAllToFolder(File folder) throws IOException {
         if (PreviewGenerator.isRochtmlAvailable()) {
             PreviewGenerator.generatePreview(folder.getAbsolutePath());
-        } else {
-            try {
-                DefaultPreviewGenerator.generatePreview(FileUtils.readFileToString(new File(folder, "ro-crate-metadata.json"), "UTF-8"), folder);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
-
     }
+
+    @Override
+    public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
+        try {
+            FileUtils.forceMkdir(new File("temp"));
+            FileWriter writer = new FileWriter(new File("temp/ro-crate-metadata.json"));
+            writer.write(metadata);
+            writer.flush();
+            writer.close();
+            if (PreviewGenerator.isRochtmlAvailable()) {
+                PreviewGenerator.generatePreview("temp");
+                ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
+            }
+        } finally {
+            FileUtils.deleteDirectory(new File("temp"));
+        }
+    }
+
 }

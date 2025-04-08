@@ -27,7 +27,6 @@ public class ZipStreamWriter implements StreamWriterStrategy {
 
     @Override
     public void save(Crate crate, OutputStream destination) {
-
         try (ZipOutputStream zipFile = new ZipOutputStream(destination)) {
             saveMetadataJson(crate, zipFile);
             saveDataEntities(crate, zipFile);
@@ -68,11 +67,9 @@ public class ZipStreamWriter implements StreamWriterStrategy {
             }
             zipStream.closeEntry();
 
-            //TODO: Preview not written as creation requires extracted crate, 
-            //which is not possible if directly written to stream. To be done later.
-            /*  if (crate.getPreview() != null) {
-                crate.getPreview().saveAllToStream(zipStream);
-            }*/
+            if (crate.getPreview() != null) {
+                crate.getPreview().saveAllToStream(str, zipStream);
+            }
         } catch (IOException e) {
             logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
         }

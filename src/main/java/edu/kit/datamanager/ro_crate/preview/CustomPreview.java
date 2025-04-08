@@ -2,13 +2,15 @@ package edu.kit.datamanager.ro_crate.preview;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import static edu.kit.datamanager.ro_crate.preview.DefaultPreviewGenerator.mapFromJson;
 import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel;
+import edu.kit.datamanager.ro_crate.util.ZipUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -19,16 +21,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
 /**
- * This class represents the custom preview of a crate, which means html files
- * created from outside sources.
+ * This class generates a custom preview without requiring external
+ * dependencies, i.e., rochtml. Therefore, the FreeMarker template located under
+ * resources/templates/custom_preview.ftl is used.
  *
- * @author Nikola Tzotchev on 12.2.2022 г.
- * @version 1
+ * @author jejkal
  */
 public class CustomPreview implements CratePreview {
 
@@ -36,7 +37,7 @@ public class CustomPreview implements CratePreview {
 
     public CustomPreview() {
         cfg = new Configuration(Configuration.VERSION_2_3_34);
-        cfg.setClassForTemplateLoading(DefaultPreviewGenerator.class, "/");
+        cfg.setClassForTemplateLoading(CustomPreview.class, "/");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
@@ -121,23 +122,66 @@ public class CustomPreview implements CratePreview {
     }
 
     @Override
-    public void saveAllToZip(ZipFile zipFile) {
-
-    }
-
-    @Override
-    public void saveAllToFolder(File folder) {
-
+    public void saveAllToZip(ZipFile zipFile) throws IOException {
+        zipFile.extractFile("ro-crate-metadata.json", "temp");
+        String metadata = FileUtils.readFileToString(new File("temp/ro-crate-metadata.json"), "UTF-8");
         try {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
-            Template temp = cfg.getTemplate("templates/custom_preview.frm");
+            Template temp = cfg.getTemplate("templates/custom_preview.ftl");
+            Writer out = new OutputStreamWriter(new FileOutputStream("temp/ro-crate-preview.html"));
+            temp.process(dataModel, out);
+            zipFile.addFile("temp/ro-crate-preview.html");
+        } catch (TemplateException ex) {
+            throw new IOException("Failed to generate preview.", ex);
+        } finally {
+            try {
+                FileUtils.deleteDirectory(new File("temp"));
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
+    }
+
+    @Override
+    public void saveAllToFolder(File folder) throws IOException {
+        String metadata = FileUtils.readFileToString(new File(folder, "ro-crate-metadata.json"), "UTF-8");
+        try {
+            Map<String, Object> dataModel = new HashMap<>();
+            dataModel.put("crateModel", mapFromJson(metadata));
+            Template temp = cfg.getTemplate("templates/custom_preview.ftl");
             Writer out = new OutputStreamWriter(new FileOutputStream("prev.html"));
 
             temp.process(dataModel, out);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-
+        } catch (TemplateException ex) {
+            throw new IOException("Failed to generate preview.", ex);
         }
     }
+
+    @Override
+    public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
+        try {
+            //prepare metadata for template
+            Map<String, Object> dataModel = new HashMap<>();
+            dataModel.put("crateModel", mapFromJson(metadata));
+            
+            //prepare output folder and writer
+            FileUtils.forceMkdir(new File("temp"));
+            FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"));
+
+            //load and process template
+            Template temp = cfg.getTemplate("templates/custom_preview.frm");
+            temp.process(dataModel, writer);
+            writer.flush();
+            writer.close();
+            
+            ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
+        } catch (TemplateException ex) {
+            throw new IOException("Failed to generate preview.", ex);
+        } finally {
+            FileUtils.deleteDirectory(new File("temp"));
+        }
+
+    }
+
 }

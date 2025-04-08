@@ -7,6 +7,7 @@ import org.junit.jupiter.api.io.TempDir;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
 import edu.kit.datamanager.ro_crate.preview.CustomPreview;
+import edu.kit.datamanager.ro_crate.preview.StaticPreview;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
@@ -31,7 +32,7 @@ public class PreviewCrateTest {
     writer.save(crate, ".");
     assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
   }
-
+ 
   @Test
   void testAutomaticPreviewAddingLater(@TempDir Path temp) {
     Path location = temp.resolve("ro_crate2");
@@ -44,13 +45,27 @@ public class PreviewCrateTest {
     assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
   }
 
+   
+   @Test
+  void testCustomPreview(@TempDir Path temp) {
+    Path location = temp.resolve("ro_crate1");
+    RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+        .setPreview(new CustomPreview())
+        .build();
+    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
+    writer.save(crate, location.toFile().getAbsolutePath());
+    writer.save(crate, ".");
+    assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
+  }
+
+  
   @Test
-  void testCustomPreviewOnlyHtmlFile(@TempDir Path temp) throws IOException {
+  void testStaticPreviewOnlyHtmlFile(@TempDir Path temp) throws IOException {
     Path location = temp.resolve("ro_crate3");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
-        .setPreview(new CustomPreview(previewFile.toFile()))
+        .setPreview(new StaticPreview(previewFile.toFile()))
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
@@ -58,7 +73,7 @@ public class PreviewCrateTest {
   }
 
   @Test
-  void testCustomPreviewHtmlFileWithOtherFiles(@TempDir Path temp) throws IOException {
+  void testStaticPreviewHtmlFileWithOtherFiles(@TempDir Path temp) throws IOException {
     Path location = temp.resolve("ro_crate4");
     Path previewFile = temp.resolve("random.html");
     FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
@@ -66,7 +81,7 @@ public class PreviewCrateTest {
     Path css_file = dirHtml.resolve("test.css");
     FileUtils.writeStringToFile(css_file.toFile(), "random css it is not important that it is valid for know", Charset.defaultCharset());
     RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
-        .setPreview(new CustomPreview(previewFile.toFile(), dirHtml.toFile()))
+        .setPreview(new StaticPreview(previewFile.toFile(), dirHtml.toFile()))
         .build();
     RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
     writer.save(crate, location.toFile().toString());
