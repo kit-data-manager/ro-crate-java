@@ -1,14 +1,9 @@
 package edu.kit.datamanager.ro_crate.preview;
 
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
@@ -52,6 +47,10 @@ public class StaticPreview implements CratePreview {
 
     @Override
     public void saveAllToFolder(File folder) throws IOException {
+        if (folder == null || !folder.exists()) {
+            throw new IOException("Preview target folder " + folder + " does not exist.");
+        }
+        
         if (this.metadataHtml != null) {
             File fileInCrate = folder.toPath().resolve("ro-crate-preview.html").toFile();
             FileUtils.copyFile(this.metadataHtml, fileInCrate);

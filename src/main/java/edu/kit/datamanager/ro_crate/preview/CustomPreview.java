@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
@@ -67,7 +68,9 @@ public class CustomPreview implements CratePreview {
                     crate.name = node.get("name").asText();
                     crate.description = node.get("description") == null ? null : node.get("description").asText();
                     crate.type = "Dataset";
-                    crate.license = node.get("license").isObject() ? node.get("license").get("@id").asText() : node.get("license").asText();
+                    if (node.get("license") != null) {
+                        crate.license = node.get("license").isObject() ? node.get("license").get("@id").asText() : node.get("license").asText();
+                    }
                     crate.datePublished = node.get("datePublished") == null ? null : node.get("datePublished").asText();
                     crate.hasPart = new ArrayList<>();
 
@@ -123,7 +126,15 @@ public class CustomPreview implements CratePreview {
 
     @Override
     public void saveAllToZip(ZipFile zipFile) throws IOException {
-        zipFile.extractFile("ro-crate-metadata.json", "temp");
+        if (zipFile == null) {
+            throw new IOException("Argument zipFile must not be null.");
+        }
+        try {
+            zipFile.extractFile("ro-crate-metadata.json", "temp");
+        } catch (ZipException ex) {
+            throw new IOException("ro-crate-metadata.json not found in provided ZIP.", ex);
+        }
+
         String metadata = FileUtils.readFileToString(new File("temp/ro-crate-metadata.json"), "UTF-8");
         try {
             Map<String, Object> dataModel = new HashMap<>();
@@ -145,12 +156,15 @@ public class CustomPreview implements CratePreview {
 
     @Override
     public void saveAllToFolder(File folder) throws IOException {
+        if (folder == null || !folder.exists()) {
+            throw new IOException("Preview target folder " + folder + " does not exist.");
+        }
         String metadata = FileUtils.readFileToString(new File(folder, "ro-crate-metadata.json"), "UTF-8");
         try {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
             Template temp = cfg.getTemplate("templates/custom_preview.ftl");
-            Writer out = new OutputStreamWriter(new FileOutputStream("prev.html"));
+            Writer out = new OutputStreamWriter(new FileOutputStream(new File(folder, "ro-crate-preview.html")));
 
             temp.process(dataModel, out);
         } catch (TemplateException ex) {
@@ -164,7 +178,7 @@ public class CustomPreview implements CratePreview {
             //prepare metadata for template
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
-            
+
             //prepare output folder and writer
             FileUtils.forceMkdir(new File("temp"));
             FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"));
@@ -174,7 +188,7 @@ public class CustomPreview implements CratePreview {
             temp.process(dataModel, writer);
             writer.flush();
             writer.close();
-            
+
             ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
         } catch (TemplateException ex) {
             throw new IOException("Failed to generate preview.", ex);

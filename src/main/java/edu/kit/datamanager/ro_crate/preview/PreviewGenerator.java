@@ -25,14 +25,12 @@ public class PreviewGenerator {
         } else {
             builder.command("sh", "-c", command);
         }
-
         Process process;
         try {
             process = builder.start();
             int exitVal = process.waitFor();
             return exitVal == 0;
         } catch (InterruptedException | IOException ex) {
-
         }
         return false;
     }
