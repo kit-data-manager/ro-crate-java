@@ -37,7 +37,11 @@ public class AutomaticPreview implements CratePreview {
                     zipFile.addFile("temp/ro-crate-preview.html");
                 }
             } finally {
-                FileUtils.deleteDirectory(new File("temp"));
+                try {
+                    FileUtils.deleteDirectory(new File("temp"));
+                } catch (IOException ex) {
+                    //ignore
+                }
             }
         } else {
             new CustomPreview().saveAllToZip(zipFile);
@@ -62,16 +66,20 @@ public class AutomaticPreview implements CratePreview {
         if (PreviewGenerator.isRochtmlAvailable()) {
             try {
                 FileUtils.forceMkdir(new File("temp"));
-                FileWriter writer = new FileWriter(new File("temp/ro-crate-metadata.json"));
-                writer.write(metadata);
-                writer.flush();
-                writer.close();
+                try (FileWriter writer = new FileWriter(new File("temp/ro-crate-metadata.json"))) {
+                    writer.write(metadata);
+                    writer.flush();
+                }
                 if (PreviewGenerator.isRochtmlAvailable()) {
                     PreviewGenerator.generatePreview("temp");
                     ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
                 }
             } finally {
-                FileUtils.deleteDirectory(new File("temp"));
+                try {
+                    FileUtils.deleteDirectory(new File("temp"));
+                } catch (IOException ex) {
+                    //ignore
+                }
             }
         } else {
             new CustomPreview().saveAllToStream(metadata, stream);

@@ -140,8 +140,10 @@ public class CustomPreview implements CratePreview {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
             Template temp = cfg.getTemplate("templates/custom_preview.ftl");
-            Writer out = new OutputStreamWriter(new FileOutputStream("temp/ro-crate-preview.html"));
-            temp.process(dataModel, out);
+            try (Writer out = new OutputStreamWriter(new FileOutputStream("temp/ro-crate-preview.html"))) {
+                temp.process(dataModel, out);
+                out.flush();
+            }
             zipFile.addFile("temp/ro-crate-preview.html");
         } catch (TemplateException ex) {
             throw new IOException("Failed to generate preview.", ex);
@@ -164,9 +166,10 @@ public class CustomPreview implements CratePreview {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
             Template temp = cfg.getTemplate("templates/custom_preview.ftl");
-            Writer out = new OutputStreamWriter(new FileOutputStream(new File(folder, "ro-crate-preview.html")));
-
-            temp.process(dataModel, out);
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(new File(folder, "ro-crate-preview.html")))) {
+                temp.process(dataModel, out);
+                out.flush();
+            }
         } catch (TemplateException ex) {
             throw new IOException("Failed to generate preview.", ex);
         }
@@ -181,21 +184,24 @@ public class CustomPreview implements CratePreview {
 
             //prepare output folder and writer
             FileUtils.forceMkdir(new File("temp"));
-            FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"));
-
             //load and process template
-            Template temp = cfg.getTemplate("templates/custom_preview.frm");
-            temp.process(dataModel, writer);
-            writer.flush();
-            writer.close();
+            try (FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"))) {
+                //load and process template
+                Template temp = cfg.getTemplate("templates/custom_preview.frm");
+                temp.process(dataModel, writer);
+                writer.flush();
+            }
 
             ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
         } catch (TemplateException ex) {
             throw new IOException("Failed to generate preview.", ex);
         } finally {
-            FileUtils.deleteDirectory(new File("temp"));
+            try {
+                FileUtils.deleteDirectory(new File("temp"));
+            } catch (IOException ex) {
+                //ignore
+            }
         }
-
     }
 
 }
