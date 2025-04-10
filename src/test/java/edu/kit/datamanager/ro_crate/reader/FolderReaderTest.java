@@ -159,6 +159,7 @@ class FolderReaderTest {
                 .setId("survey-responses-2019.csv")
                 .build()
         )
+        .setPreview(null)//disable preview to allow to compare folders before and after
         .build();
     Path locationSource = temp.resolve("src");
     FileUtils.forceMkdir(locationSource.toFile());

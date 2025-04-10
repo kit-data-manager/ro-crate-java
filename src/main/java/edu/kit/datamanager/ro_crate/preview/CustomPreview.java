@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
-import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
-import freemarker.core.ParseException;
 import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import freemarker.template.TemplateNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -90,11 +86,15 @@ public class CustomPreview implements CratePreview {
                     if (node.has("hasPart")) {
                         for (JsonNode part : node.get("hasPart")) {
                             ROCratePreviewModel.Part p = new ROCratePreviewModel.Part();
-                            p.id = part.get("@id").asText();
-                            p.name = part.get("@id").asText(); // Name will be replaced later
+                            if (part.isObject()) {
+                                p.id = part.get("@id").asText();
+                                p.name = part.get("@id").asText(); // Name will be replaced later
+                            } else {
+                                p.id = part.asText();
+                            }
+                            
                             crate.hasPart.add(p);
                         }
-
                     }
                 } else if (types.contains("Dataset")) {
                     ROCratePreviewModel.Dataset dataset = new ROCratePreviewModel.Dataset();

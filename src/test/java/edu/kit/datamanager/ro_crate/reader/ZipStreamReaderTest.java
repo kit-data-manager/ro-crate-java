@@ -86,6 +86,7 @@ class ZipStreamReaderTest {
                                 .setId("survey-responses-2019.csv")
                                 .build()
                 )
+                .setPreview(null)//disable preview to allow to compare folders before and after
                 .build();
 
         Path zipPath = temp.resolve("result.zip");
