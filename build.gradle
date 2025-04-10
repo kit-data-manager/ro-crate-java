@@ -67,7 +67,7 @@ dependencies {
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.6"
     implementation 'org.glassfish:jakarta.json:2.0.1'
     //JTE for template processing
-    implementation('gg.jte:jte:3.1.16')
+    implementation('gg.jte:jte:3.2.0')
     implementation("org.freemarker:freemarker:2.3.34")
 }
 
@@ -163,7 +163,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 
 // maxParallelForks(2)
