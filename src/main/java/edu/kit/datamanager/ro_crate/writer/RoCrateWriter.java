@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RoCrateWriter {
 
-    private static Logger logger = LoggerFactory.getLogger(FolderWriter.class);
+    private static Logger logger = LoggerFactory.getLogger(RoCrateWriter.class);
 
     private final WriterStrategy writer;
 
@@ -42,8 +42,8 @@ public class RoCrateWriter {
     public void save(Crate crate, OutputStream destination) {
         Validator defaultValidation = new Validator(new JsonSchemaValidation());
         defaultValidation.validate(crate);
-        if (writer instanceof StreamWriterStrategy) {
-            ((StreamWriterStrategy) this.writer).save(crate, destination);
+        if (writer instanceof StreamWriterStrategy streamWriterStrategy) {
+            streamWriterStrategy.save(crate, destination);
         } else {
             logger.error("Provided writer does not implement StreamWriterStrategy. Please use 'save(Crate crate, String destination)'.");
         }

@@ -17,6 +17,7 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;
 import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.preview.CustomPreview;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
@@ -251,7 +252,7 @@ public class RoCrate implements Crate {
         private static final String PROPERTY_DESCRIPTION = "description";
 
         CratePayload payload;
-        CratePreview preview;
+        CratePreview preview = new CustomPreview();
         CrateMetadataContext metadataContext;
         ContextualEntity license;
         RootDataEntity rootDataEntity;

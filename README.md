@@ -117,18 +117,24 @@ PersonEntity person = ORCIDProvider.getPerson("https://orcid.org/*")
 OrganizationEntity organization = RORProvider.getOrganization("https://ror.org/*");
 ```
 
-### Writing Crate to folder or zip file
+### Writing Crate to folder, zip file, or zip stream
 
 Writing to folder:
 ```java
 RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
-folderRoCrateWriter.save(roCrate, "destination");
+folderRoCrateWriter.save(roCrate, "destinationFolder");
 ```
 
 Writing to zip file:
 ```java
 RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipWriter());
-roCrateZipWriter.save(roCrate, "destination");
+roCrateZipWriter.save(roCrate, "destinationFolder");
+```
+
+Writing to zip stream:
+```java
+RoCrateWriter roCrateZipStreamWriter = new RoCrateWriter(new ZipStreamWriter());
+roCrateZipStreamWriter.save(roCrate, outputStream);
 ```
 
 More writing strategies can be implemented, if required.
@@ -138,22 +144,45 @@ More writing strategies can be implemented, if required.
 Reading from folder:
 ```java
 RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-RoCrate res = roCrateFolderReader.readCrate("source");
+RoCrate res = roCrateFolderReader.readCrate("destinationFolder");
 ```
 
 Reading from zip file:
 ```java
 RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-RoCrate crate = roCrateFolderReader.readCrate("source");
+RoCrate crate = roCrateFolderReader.readCrate("sourceZipFile");
+```
+
+Reading from zip stream:
+```java
+RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipStreamReader());
+RoCrate crate = roCrateFolderReader.readCrate(inputStream);
 ```
 
 ### RO-Crate Website (HTML preview file)
-By setting the preview to an `AutomaticPreview`, the library will automatically create a preview using the [ro-crate-html-js](https://www.npmjs.com/package/ro-crate-html-js) tool.
-It has to be installed using `npm install --global ro-crate-html-js` in order to use it.
-If you want to use a custom-made preview, you can set it using the `CustomPreview` class. `AutomaticPreview` is currently **not** set by default.
+ro-crate-java offers tree different kinds of previews:
+
+* AutomaticPreview: Uses third-party library [ro-crate-html-js](https://www.npmjs.com/package/ro-crate-html-js), which must be installed separately. 
+* CustomPreview: Pure Java-based preview using an included template processed by the FreeMarker template engine. At the same time, CustomPreview is the fallback for AutomaticPreview if ro-crate-html-js is not installed.
+* StaticPreview: Allows to provide a static HTML page (including additional dependencies, e.g., CSS, JS) which is then shipped with the RO-Crate. 
+
+When creating a new RO-Crate using the builder, the default setting is to use CustomPreview. If you want to change this behaviour, thr preview method is set as follows: 
+
 ```java
 RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier")
     .setPreview(new AutomaticPreview())
+    .build();
+```
+
+Keep in mind that, if you want to use AutomaticPreview, you have to install ro-crate-html-js via `npm install --global ro-crate-html-js` first. 
+
+For StaticPreview, the constuctor is a bit different, such that it looks as follows: 
+
+```java
+File pathToMainPreviewHtml = new File("localPath");
+File pathToAdditionalFiles = new File("localFolder");
+RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier")
+    .setPreview(new StaticPreview(pathToMainPreviewHtml, pathToAdditionalFiles)
     .build();
 ```
 
@@ -395,8 +424,6 @@ The web resource does not use `.setSource()`, but uses the ID to indicate the fi
         {"@id": "data2.txt"}
       ]
     },
-
-
     {
       "@id": "data1.txt",
       "@type": "File",
@@ -637,7 +664,6 @@ If there is no special method for including relative entities (ID properties) on
         .addIdProperty("additionalType", nucSec)
         .addIdProperty("encodingFormat", fasta)
         .build();
-
     ContextualEntity clnParam = new ContextualEntity.ContextualEntityBuilder()
         .addType("FormalParameter")
         .setId("#6c703fee-6af7-4fdb-a57d-9e8bc4486044")
@@ -646,7 +672,6 @@ If there is no special method for including relative entities (ID properties) on
         .addIdProperty("additionalType", nucSec)
         .addIdProperty("encodingFormat", ban)
         .build();
-
     ContextualEntity alignParam = new ContextualEntity.ContextualEntityBuilder()
         .addType("FormalParameter")
         .setId("#2f32b861-e43c-401f-8c42-04fd84273bdf")

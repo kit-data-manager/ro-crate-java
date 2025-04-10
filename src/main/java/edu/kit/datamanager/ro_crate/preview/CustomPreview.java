@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
+import freemarker.core.ParseException;
 import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.TemplateNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -24,6 +28,8 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class generates a custom preview without requiring external
@@ -34,17 +40,24 @@ import org.apache.commons.io.FileUtils;
  */
 public class CustomPreview implements CratePreview {
 
+    private final static Logger logger = LoggerFactory.getLogger(CustomPreview.class);
+
     private final Configuration cfg;
+    private Template template = null;
 
     public CustomPreview() {
         cfg = new Configuration(Configuration.VERSION_2_3_34);
         cfg.setClassForTemplateLoading(CustomPreview.class, "/");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
+        try {
+            template = cfg.getTemplate("templates/custom_preview.ftl");
+        } catch (IOException ex) {
+            logger.error("Failed to read template for CustomPreview.", ex);
+        }
     }
 
-    public ROCratePreviewModel mapFromJson(String metadata) throws IOException {
+    private ROCratePreviewModel mapFromJson(String metadata) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = (JsonNode) mapper.readValue(metadata, JsonNode.class);
         JsonNode graph = root.get("@graph");
@@ -126,6 +139,9 @@ public class CustomPreview implements CratePreview {
 
     @Override
     public void saveAllToZip(ZipFile zipFile) throws IOException {
+        if (template == null) {
+            throw new IOException("Preview template did not load. Unable to proceed.");
+        }
         if (zipFile == null) {
             throw new IOException("Argument zipFile must not be null.");
         }
@@ -139,9 +155,9 @@ public class CustomPreview implements CratePreview {
         try {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
-            Template temp = cfg.getTemplate("templates/custom_preview.ftl");
+
             try (Writer out = new OutputStreamWriter(new FileOutputStream("temp/ro-crate-preview.html"))) {
-                temp.process(dataModel, out);
+                template.process(dataModel, out);
                 out.flush();
             }
             zipFile.addFile("temp/ro-crate-preview.html");
@@ -158,6 +174,9 @@ public class CustomPreview implements CratePreview {
 
     @Override
     public void saveAllToFolder(File folder) throws IOException {
+        if (template == null) {
+            throw new IOException("Preview template did not load. Unable to proceed.");
+        }
         if (folder == null || !folder.exists()) {
             throw new IOException("Preview target folder " + folder + " does not exist.");
         }
@@ -165,9 +184,8 @@ public class CustomPreview implements CratePreview {
         try {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("crateModel", mapFromJson(metadata));
-            Template temp = cfg.getTemplate("templates/custom_preview.ftl");
             try (Writer out = new OutputStreamWriter(new FileOutputStream(new File(folder, "ro-crate-preview.html")))) {
-                temp.process(dataModel, out);
+                template.process(dataModel, out);
                 out.flush();
             }
         } catch (TemplateException ex) {
@@ -177,6 +195,9 @@ public class CustomPreview implements CratePreview {
 
     @Override
     public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
+        if (template == null) {
+            throw new IOException("Preview template did not load. Unable to proceed.");
+        }
         try {
             //prepare metadata for template
             Map<String, Object> dataModel = new HashMap<>();
@@ -187,8 +208,7 @@ public class CustomPreview implements CratePreview {
             //load and process template
             try (FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"))) {
                 //load and process template
-                Template temp = cfg.getTemplate("templates/custom_preview.frm");
-                temp.process(dataModel, writer);
+                template.process(dataModel, writer);
                 writer.flush();
             }
 
