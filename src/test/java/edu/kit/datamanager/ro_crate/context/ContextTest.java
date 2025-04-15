@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -239,11 +240,7 @@ public class ContextTest {
 
   @Test
   void testReadDeleteGetPair() throws IOException {
-    final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
-    ContextTest.class.getResource(crateManifestPath).getPath();
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
-    this.context = new RoCrateMetadataContext(jsonNode.get("@context"));
+    setupComplexContext();
     String key = "custom";
     String value = "_:";
     assertEquals(value, context.getValueOf(key));
@@ -251,5 +248,36 @@ public class ContextTest {
     assertNull(context.getValueOf(key));
     context.addToContext(key, value);
     assertEquals(value, context.getValueOf(key));
+  }
+
+  @Test
+  void testReadKeys() throws IOException {
+    setupComplexContext();
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = context.getImmutableKeys();
+    for (String key : expected) {
+      assertTrue(given.contains(key), "Key " + key + " not found in the context");
+    }
+  }
+
+  @Test
+  void testReadPairs() throws IOException {
+    setupComplexContext();
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = context.getImmutablePairs();
+    var keys = given.keySet();
+    var values = given.values();
+    for (String key : expected) {
+      assertTrue(keys.contains(key), "Key " + key + " not found in the context");
+      values.forEach(s -> assertFalse(s.isEmpty(), "Value for key " + key + " is empty"));
+    }
+  }
+
+  private void setupComplexContext() throws IOException {
+    final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
+    ContextTest.class.getResource(crateManifestPath).getPath();
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
+    this.context = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 }

@@ -9,8 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRemoveAddContext {
   @Test
@@ -45,5 +46,32 @@ public class TestRemoveAddContext {
     assertEquals(value, crate.getMetadataContextValueOf(key));
     crate.deleteValuePairFromContext(key);
     assertNull(crate.getMetadataContextValueOf(key));
+  }
+
+  @Test
+  void testReadContextKeys() {
+    String crateManifestPath = "/crates/extendedContextExample/";
+    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
+    RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = crate.getMetadataContextKeys();
+    for (String key : expected) {
+        assertTrue(given.contains(key), "Key " + key + " not found in the context");
+    }
+  }
+
+  @Test
+  void testReadContextPairs() {
+    String crateManifestPath = "/crates/extendedContextExample/";
+    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
+    RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = crate.getMetadataContextPairs();
+    var keys = given.keySet();
+    var values = given.values();
+    for (String key : expected) {
+        assertTrue(keys.contains(key), "Key " + key + " not found in the context");
+        values.forEach(s -> assertFalse(s.isEmpty(), "Value for key " + key + " is empty"));
+    }
   }
 }

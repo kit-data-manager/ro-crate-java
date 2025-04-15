@@ -207,6 +207,23 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   }
 
   @Override
+  public Set<String> getImmutableKeys() {
+    List<String> merged = new ArrayList<>();
+    merged.addAll(this.contextMap.keySet());
+    merged.addAll(this.other.keySet());
+    return Set.copyOf(merged);
+  }
+
+  @Override
+  public Map<String, String> getImmutablePairs() {
+    Map<String, String> merged = new HashMap<>();
+    merged.putAll(this.contextMap);
+    merged.putAll(this.other);
+    return Map.copyOf(merged);
+  }
+
+
+  @Override
   public void deleteValuePairFromContext(String key) {
     this.contextMap.remove(key);
     this.other.remove(key);

@@ -2,6 +2,7 @@ package edu.kit.datamanager.ro_crate;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -57,6 +58,18 @@ public interface Crate {
    * @return the value of the key, null if not found
    */
   String getMetadataContextValueOf(String key);
+
+  /**
+   * Get an immutable collection of the keys in the metadata context.
+   * @return the keys in the metadata context
+   */
+  Set<String> getMetadataContextKeys();
+
+  /**
+   * Get an immutable map of the context.
+   * @return an immutable map containing the context key-value pairs
+   */
+  Map<String, String> getMetadataContextPairs();
 
   RootDataEntity getRootDataEntity();
 
