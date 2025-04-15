@@ -30,19 +30,19 @@ public interface CrateMetadataContext {
    * @param key the key to be searched
    * @return the value of the key, null if not found
    */
-  String getValueOf(String key);
+  String readValueOf(String key);
 
   /**
    * Get an immutable collection of the keys in the metadata context.
    * @return the keys in the metadata context
    */
-  Set<String> getImmutableKeys();
+  Set<String> readKeys();
 
   /**
   * Get an immutable map of the context.
   * @return an immutable map containing the context key-value pairs
   */
-  Map<String, String> getImmutablePairs();
+  Map<String, String> readPairs();
 
   void deleteValuePairFromContext(String key);
 

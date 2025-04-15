@@ -62,18 +62,18 @@ public class RoCrate implements Crate {
         this.metadataContext = metadataContext;
     }
 
-    public String getMetadataContextValueOf(String key) {
-        return this.metadataContext.getValueOf(key);
+    public String readMetadataContextValueOf(String key) {
+        return this.metadataContext.readValueOf(key);
     }
 
     @Override
-    public Set<String> getMetadataContextKeys() {
-        return this.metadataContext.getImmutableKeys();
+    public Set<String> readMetadataContextKeys() {
+        return this.metadataContext.readKeys();
     }
 
     @Override
-    public Map<String, String> getMetadataContextPairs() {
-        return this.metadataContext.getImmutablePairs();
+    public Map<String, String> readMetadataContextPairs() {
+        return this.metadataContext.readPairs();
     }
 
     public ContextualEntity getJsonDescriptor() {

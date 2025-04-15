@@ -233,9 +233,9 @@ public class ContextTest {
     String key = "key";
     String value = "value";
     context.addToContext(key, value);
-    assertEquals(value, context.getValueOf(key));
+    assertEquals(value, context.readValueOf(key));
     context.deleteValuePairFromContext(key);
-    assertNull(context.getValueOf(key));
+    assertNull(context.readValueOf(key));
   }
 
   @Test
@@ -243,18 +243,18 @@ public class ContextTest {
     setupComplexContext();
     String key = "custom";
     String value = "_:";
-    assertEquals(value, context.getValueOf(key));
+    assertEquals(value, context.readValueOf(key));
     context.deleteValuePairFromContext(key);
-    assertNull(context.getValueOf(key));
+    assertNull(context.readValueOf(key));
     context.addToContext(key, value);
-    assertEquals(value, context.getValueOf(key));
+    assertEquals(value, context.readValueOf(key));
   }
 
   @Test
   void testReadKeys() throws IOException {
     setupComplexContext();
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = context.getImmutableKeys();
+    var given = context.readKeys();
     for (String key : expected) {
       assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
@@ -264,7 +264,7 @@ public class ContextTest {
   void testReadPairs() throws IOException {
     setupComplexContext();
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = context.getImmutablePairs();
+    var given = context.readPairs();
     var keys = given.keySet();
     var values = given.values();
     for (String key : expected) {

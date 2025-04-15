@@ -57,19 +57,19 @@ public interface Crate {
    * @param key the key to be searched
    * @return the value of the key, null if not found
    */
-  String getMetadataContextValueOf(String key);
+  String readMetadataContextValueOf(String key);
 
   /**
    * Get an immutable collection of the keys in the metadata context.
    * @return the keys in the metadata context
    */
-  Set<String> getMetadataContextKeys();
+  Set<String> readMetadataContextKeys();
 
   /**
    * Get an immutable map of the context.
    * @return an immutable map containing the context key-value pairs
    */
-  Map<String, String> getMetadataContextPairs();
+  Map<String, String> readMetadataContextPairs();
 
   RootDataEntity getRootDataEntity();
 

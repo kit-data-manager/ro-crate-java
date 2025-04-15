@@ -43,9 +43,9 @@ public class TestRemoveAddContext {
     RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     String key = "custom";
     String value = "_:";
-    assertEquals(value, crate.getMetadataContextValueOf(key));
+    assertEquals(value, crate.readMetadataContextValueOf(key));
     crate.deleteValuePairFromContext(key);
-    assertNull(crate.getMetadataContextValueOf(key));
+    assertNull(crate.readMetadataContextValueOf(key));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class TestRemoveAddContext {
     crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
     RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = crate.getMetadataContextKeys();
+    var given = crate.readMetadataContextKeys();
     for (String key : expected) {
         assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
@@ -66,7 +66,7 @@ public class TestRemoveAddContext {
     crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
     RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = crate.getMetadataContextPairs();
+    var given = crate.readMetadataContextPairs();
     var keys = given.keySet();
     var values = given.values();
     for (String key : expected) {
