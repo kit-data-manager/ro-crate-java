@@ -62,6 +62,8 @@ public class TestRemoveAddContext {
     for (String key : expected) {
         assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
+    // prove immutability
+    assertThrows(UnsupportedOperationException.class, () -> given.add("newKey"));
   }
 
   @Test
@@ -74,5 +76,7 @@ public class TestRemoveAddContext {
         assertTrue(keys.contains(key), "Key " + key + " not found in the context");
         values.forEach(s -> assertFalse(s.isEmpty(), "Value for key " + key + " is empty"));
     }
+    // prove immutability
+    assertThrows(UnsupportedOperationException.class, () -> given.put("newKey", "newValue"));
   }
 }
