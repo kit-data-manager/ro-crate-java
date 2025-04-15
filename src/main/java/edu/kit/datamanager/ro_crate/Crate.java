@@ -51,6 +51,13 @@ public interface Crate {
 
   void setMetadataContext(CrateMetadataContext metadataContext);
 
+  /**
+   * Get the value of a key from the metadata context.
+   * @param key the key to be searched
+   * @return the value of the key, null if not found
+   */
+  String getMetadataContextValueOf(String key);
+
   RootDataEntity getRootDataEntity();
 
   void setRootDataEntity(RootDataEntity rootDataEntity);

@@ -22,6 +22,13 @@ public interface CrateMetadataContext {
 
   void addToContext(String key, String value);
 
+  /**
+   * Get the value of a key from the context.
+   * @param key the key to be searched
+   * @return the value of the key, null if not found
+   */
+  String getValueOf(String key);
+
   void deleteValuePairFromContext(String key);
 
   void deleteUrlFromContext(String url);

@@ -62,6 +62,10 @@ public class RoCrate implements Crate {
         this.metadataContext = metadataContext;
     }
 
+    public String getMetadataContextValueOf(String key) {
+        return this.metadataContext.getValueOf(key);
+    }
+
     public ContextualEntity getJsonDescriptor() {
         return jsonDescriptor;
     }

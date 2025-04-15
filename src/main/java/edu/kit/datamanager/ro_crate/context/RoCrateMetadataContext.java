@@ -201,6 +201,12 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   }
 
   @Override
+  public String getValueOf(String key) {
+    return Optional.ofNullable(this.contextMap.get(key))
+            .orElseGet(() -> this.other.get(key));
+  }
+
+  @Override
   public void deleteValuePairFromContext(String key) {
     this.contextMap.remove(key);
     this.other.remove(key);
