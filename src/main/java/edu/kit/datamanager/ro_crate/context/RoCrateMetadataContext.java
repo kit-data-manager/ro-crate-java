@@ -31,7 +31,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   protected static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
   protected static JsonNode defaultContext = null;
 
-  protected final Set<String> url = new HashSet<>();
+  protected final Set<String> urls = new HashSet<>();
   protected final HashMap<String, String> contextMap = new HashMap<>();
   // we need to keep the ones that are no coming from url
   // for the final representation
@@ -89,7 +89,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     ArrayNode array = objectMapper.createArrayNode();
     ObjectNode jsonNode = objectMapper.createObjectNode();
     ObjectNode finalNode = objectMapper.createObjectNode();
-    for (String e : url) {
+    for (String e : urls) {
       array.add(e);
     }
     for (Map.Entry<String, String> s : other.entrySet()) {
@@ -156,7 +156,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
 
   @Override
   public void addToContextFromUrl(String url) {
-    this.url.add(url);
+    this.urls.add(url);
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
 
@@ -208,7 +208,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
 
   @Override
   public void deleteUrlFromContext(String url) {
-    this.url.remove(url);
+    this.urls.remove(url);
   }
 
 }
