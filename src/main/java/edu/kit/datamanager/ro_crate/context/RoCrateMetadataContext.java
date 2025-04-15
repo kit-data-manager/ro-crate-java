@@ -201,13 +201,13 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   }
 
   @Override
-  public String readValueOf(String key) {
+  public String getValueOf(String key) {
     return Optional.ofNullable(this.contextMap.get(key))
             .orElseGet(() -> this.other.get(key));
   }
 
   @Override
-  public Set<String> readKeys() {
+  public Set<String> getKeys() {
     List<String> merged = new ArrayList<>();
     merged.addAll(this.contextMap.keySet());
     merged.addAll(this.other.keySet());
@@ -215,7 +215,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   }
 
   @Override
-  public Map<String, String> readPairs() {
+  public Map<String, String> getPairs() {
     Map<String, String> merged = new HashMap<>();
     merged.putAll(this.contextMap);
     merged.putAll(this.other);

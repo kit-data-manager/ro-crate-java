@@ -50,15 +50,15 @@ public class TestRemoveAddContext {
   void testReadDeleteGetContextPair() {
     String key = "custom";
     String value = "_:";
-    assertEquals(value, this.crateWithComplexContext.readMetadataContextValueOf(key));
+    assertEquals(value, this.crateWithComplexContext.getMetadataContextValueOf(key));
     this.crateWithComplexContext.deleteValuePairFromContext(key);
-    assertNull(this.crateWithComplexContext.readMetadataContextValueOf(key));
+    assertNull(this.crateWithComplexContext.getMetadataContextValueOf(key));
   }
 
   @Test
   void testReadContextKeys() {
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = this.crateWithComplexContext.readMetadataContextKeys();
+    var given = this.crateWithComplexContext.getMetadataContextKeys();
     for (String key : expected) {
         assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
@@ -69,7 +69,7 @@ public class TestRemoveAddContext {
   @Test
   void testReadContextPairs() {
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = this.crateWithComplexContext.readMetadataContextPairs();
+    var given = this.crateWithComplexContext.getMetadataContextPairs();
     var keys = given.keySet();
     var values = given.values();
     for (String key : expected) {
