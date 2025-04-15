@@ -2,18 +2,27 @@ package edu.kit.datamanager.ro_crate.crate;
 
 import edu.kit.datamanager.ro_crate.reader.FolderReader;
 import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
-import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRemoveAddContext {
+  private RoCrate crateWithComplexContext;
+
+  @BeforeEach
+  void setup() {
+    String crateManifestPath = "/crates/extendedContextExample/";
+    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
+    this.crateWithComplexContext = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
+  }
+
   @Test
   void testAddRemoveValuePair() throws JsonProcessingException {
     RoCrate crate = new RoCrate.RoCrateBuilder().addValuePairToContext("key", "value").build();
@@ -38,23 +47,17 @@ public class TestRemoveAddContext {
 
   @Test
   void testReadDeleteGetContextPair() {
-    String crateManifestPath = "/crates/extendedContextExample/";
-    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
-    RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     String key = "custom";
     String value = "_:";
-    assertEquals(value, crate.readMetadataContextValueOf(key));
-    crate.deleteValuePairFromContext(key);
-    assertNull(crate.readMetadataContextValueOf(key));
+    assertEquals(value, this.crateWithComplexContext.readMetadataContextValueOf(key));
+    this.crateWithComplexContext.deleteValuePairFromContext(key);
+    assertNull(this.crateWithComplexContext.readMetadataContextValueOf(key));
   }
 
   @Test
   void testReadContextKeys() {
-    String crateManifestPath = "/crates/extendedContextExample/";
-    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
-    RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = crate.readMetadataContextKeys();
+    var given = this.crateWithComplexContext.readMetadataContextKeys();
     for (String key : expected) {
         assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
@@ -62,11 +65,8 @@ public class TestRemoveAddContext {
 
   @Test
   void testReadContextPairs() {
-    String crateManifestPath = "/crates/extendedContextExample/";
-    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
-    RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = crate.readMetadataContextPairs();
+    var given = this.crateWithComplexContext.readMetadataContextPairs();
     var keys = given.keySet();
     var values = given.values();
     for (String key : expected) {

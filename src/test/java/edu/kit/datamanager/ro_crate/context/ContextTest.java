@@ -24,11 +24,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ContextTest {
 
   RoCrateMetadataContext context;
+  RoCrateMetadataContext complexContext;
 
   @BeforeEach
-  void initContext() {
+  void initContext() throws IOException {
     // this will load the default context
     this.context = new RoCrateMetadataContext();
+
+    final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
+    ContextTest.class.getResource(crateManifestPath).getPath();
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
+    this.complexContext = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 
   @Test
@@ -240,21 +247,19 @@ public class ContextTest {
 
   @Test
   void testReadDeleteGetPair() throws IOException {
-    setupComplexContext();
     String key = "custom";
     String value = "_:";
-    assertEquals(value, context.readValueOf(key));
-    context.deleteValuePairFromContext(key);
-    assertNull(context.readValueOf(key));
-    context.addToContext(key, value);
-    assertEquals(value, context.readValueOf(key));
+    assertEquals(value, this.complexContext.readValueOf(key));
+    this.complexContext.deleteValuePairFromContext(key);
+    assertNull(this.complexContext.readValueOf(key));
+    this.complexContext.addToContext(key, value);
+    assertEquals(value, this.complexContext.readValueOf(key));
   }
 
   @Test
   void testReadKeys() throws IOException {
-    setupComplexContext();
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = context.readKeys();
+    var given = this.complexContext.readKeys();
     for (String key : expected) {
       assertTrue(given.contains(key), "Key " + key + " not found in the context");
     }
@@ -262,22 +267,13 @@ public class ContextTest {
 
   @Test
   void testReadPairs() throws IOException {
-    setupComplexContext();
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
-    var given = context.readPairs();
+    var given = this.complexContext.readPairs();
     var keys = given.keySet();
     var values = given.values();
     for (String key : expected) {
       assertTrue(keys.contains(key), "Key " + key + " not found in the context");
       values.forEach(s -> assertFalse(s.isEmpty(), "Value for key " + key + " is empty"));
     }
-  }
-
-  private void setupComplexContext() throws IOException {
-    final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
-    ContextTest.class.getResource(crateManifestPath).getPath();
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
-    this.context = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 }
