@@ -1,6 +1,5 @@
 package edu.kit.datamanager.ro_crate.context;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -32,7 +31,6 @@ public class ContextTest {
     this.context = new RoCrateMetadataContext();
 
     final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
-    ContextTest.class.getResource(crateManifestPath).getPath();
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
     this.complexContext = new RoCrateMetadataContext(jsonNode.get("@context"));
@@ -147,7 +145,7 @@ public class ContextTest {
   }
 
   @Test
-  void doubledContextUrlsTest() throws JsonProcessingException {
+  void doubledContextUrlsTest() {
     String url = "www.example.com";
     RoCrateMetadataContext context = new RoCrateMetadataContext();
     assertFalse(context.urls.contains(url));
@@ -246,7 +244,7 @@ public class ContextTest {
   }
 
   @Test
-  void testReadDeleteGetPair() throws IOException {
+  void testReadDeleteGetPair() {
     String key = "custom";
     String value = "_:";
     assertEquals(value, this.complexContext.readValueOf(key));
@@ -257,7 +255,7 @@ public class ContextTest {
   }
 
   @Test
-  void testReadKeys() throws IOException {
+  void testReadKeys() {
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
     var given = this.complexContext.readKeys();
     for (String key : expected) {
@@ -266,7 +264,7 @@ public class ContextTest {
   }
 
   @Test
-  void testReadPairs() throws IOException {
+  void testReadPairs() {
     var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
     var given = this.complexContext.readPairs();
     var keys = given.keySet();

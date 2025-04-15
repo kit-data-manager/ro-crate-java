@@ -7,6 +7,7 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,7 @@ public class TestRemoveAddContext {
   @BeforeEach
   void setup() {
     String crateManifestPath = "/crates/extendedContextExample/";
-    crateManifestPath = TestRemoveAddContext.class.getResource(crateManifestPath).getPath();
+    crateManifestPath = Objects.requireNonNull(TestRemoveAddContext.class.getResource(crateManifestPath)).getPath();
     this.crateWithComplexContext = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
   }
 
