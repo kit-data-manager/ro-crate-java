@@ -215,11 +215,21 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   }
 
   @Override
+  public Set<String> getExplicitKeys() {
+    return Set.copyOf(this.other.keySet());
+  }
+
+  @Override
   public Map<String, String> getPairs() {
     Map<String, String> merged = new HashMap<>();
     merged.putAll(this.contextMap);
     merged.putAll(this.other);
     return Map.copyOf(merged);
+  }
+
+  @Override
+  public Set<String> getUrls() {
+    return Set.copyOf(this.urls);
   }
 
 

@@ -233,12 +233,45 @@ public class RoCrate implements Crate {
         this.untrackedFiles = files;
     }
 
+    private boolean isKeyUnused(String key, ObjectNode node) {
+        Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            String fieldName = entry.getKey();
+            if (fieldName.startsWith(key)) {
+                return false;
+            }
+            JsonNode value = entry.getValue();
+            if (value.isObject()) {
+                if (!isKeyUnused(key, (ObjectNode) value)) {
+                    return false;
+                }
+            } else if (value.isArray()) {
+                for (JsonNode element : value) {
+                    if (element.isObject() && !isKeyUnused(key, (ObjectNode) element)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean cleanupContext() {
+        // TODO we are missing the relations between the pairs and the URL, in order to check if a URL can be removed.
+        var contextUrls = this.metadataContext.getUrls();
+        var contextAllKeys = this.metadataContext.getKeys();
+        var contextExplicitKeys = this.metadataContext.getExplicitKeys();
+    }
+
     @Override
+    @Deprecated(forRemoval = true)
     public void deleteValuePairFromContext(String key) {
         this.metadataContext.deleteValuePairFromContext(key);
     }
 
     @Override
+    @Deprecated(forRemoval = true)
     public void deleteUrlFromContext(String key) {
         this.metadataContext.deleteUrlFromContext(key);
     }
