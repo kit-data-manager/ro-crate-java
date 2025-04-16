@@ -9,7 +9,7 @@ import java.io.File;
 
 /**
  * Utility class for expanding and pruning JSON-LD documents.
- *
+ * <p>
  * This class provides functionality to resolve references in JSON-LD based on "@id" values,
  * expanding the data structure by replacing references with their full content.
  * It also handles circular references to prevent infinite recursion.
@@ -19,6 +19,12 @@ import java.io.File;
 public class JsonLdExpander {
 
     public static JsonNode expandAndPrune(File jsonLdFile) throws Exception {
+        if (jsonLdFile == null) {
+            throw new IllegalArgumentException("JSON-LD file must not be null.");
+        }
+        if (!jsonLdFile.exists() || !jsonLdFile.canRead()) {
+            throw new IllegalArgumentException("JSON-LD file does not exist or cannot be read: " + jsonLdFile.getAbsolutePath());
+        }
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonLdFile);
         return expandAndPrune(root);
