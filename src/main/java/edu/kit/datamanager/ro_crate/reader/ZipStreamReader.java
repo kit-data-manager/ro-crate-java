@@ -100,7 +100,11 @@ public class ZipStreamReader implements StreamReaderStrategy {
 
             try (ZipInputStream zipInputStream = new ZipInputStream(stream)) {
                 while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-                    File extractedFile = new File(folder, localFileHeader.getFileName());
+                    String fileName = localFileHeader.getFileName();
+                    File extractedFile = new File(folder, fileName).getCanonicalFile();
+                    if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
+                        throw new IOException("Entry is outside of target directory: " + fileName);
+                    }
                     try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
                         while ((readLen = zipInputStream.read(readBuffer)) != -1) {
                             outputStream.write(readBuffer, 0, readLen);
