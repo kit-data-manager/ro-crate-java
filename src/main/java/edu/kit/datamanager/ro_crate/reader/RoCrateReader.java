@@ -95,7 +95,7 @@ public class RoCrateReader {
             usedFiles.add(content.toPath().resolve(FILE_PREVIEW_FILES).toFile().getPath());
             result = rebuildCrate(metadata, content, usedFiles);
         } else {
-            logger.error("Provided writer does not implement StreamWriterStrategy. Please use 'save(Crate crate, String destination)'.");
+            logger.error("Provided writer does not implement StreamReaderStrategy. Please use 'readCrate(String location)'.");
         }
         return result;
     }
