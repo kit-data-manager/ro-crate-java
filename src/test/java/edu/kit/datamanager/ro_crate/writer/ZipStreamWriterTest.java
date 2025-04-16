@@ -39,7 +39,7 @@ class ZipStreamWriterTest {
     Path json = roDir.resolve("ro-crate-metadata.json");
     FileUtils.copyInputStreamToFile(fileJson, json.toFile());
 
-    PreviewGenerator.generatePreview(roDir.toString());
+    PreviewGenerator.generatePreview(roDir.toFile().getAbsolutePath());
 
     Path file1 = roDir.resolve("cp7glop.ai");
     FileUtils.writeStringToFile(file1.toFile(), "content of Local File", Charset.defaultCharset());
@@ -85,10 +85,10 @@ class ZipStreamWriterTest {
     
     
     // save the content of the roCrate to the dest zip
-    roCrateZipWriter.save(roCrate, test.toString());
+    roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
     Path res = tempDir.resolve("dest");
     try (ZipFile zf = new ZipFile(test.toFile())) {
-        zf.extractAll(res.toString());
+        zf.extractAll(res.toFile().getAbsolutePath());
     }
     assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
 
@@ -151,6 +151,7 @@ class ZipStreamWriterTest {
                 .setId("lots_of_little_files/")
                 .build()
         )
+        .setPreview(new AutomaticPreview())
         .build();
 
     // safe the crate in the test.zip file
