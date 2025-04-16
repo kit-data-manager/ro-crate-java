@@ -63,51 +63,43 @@ public class CustomPreview implements CratePreview {
         if (graph.isArray()) {
 
             for (JsonNode node : graph) {
-                String id = node.get("@id").asText();
+                String id = node.path("@id").asText();
                 List<String> types = new LinkedList<>();
-                if (node.get("@type").isArray()) {
+                if (node.path("@type").isArray()) {
 
-                    Collections.addAll(types, (String[]) mapper.convertValue(node.get("@type"), String[].class));
+                    Collections.addAll(types, mapper.convertValue(node.path("@type"), String[].class));
                 } else {
-                    types.add(node.get("@type").asText());
+                    types.add(node.path("@type").asText());
                 }
 
                 if (types.contains("Dataset") && "./".equals(id)) {
-                    crate.name = node.get("name").asText();
-                    crate.description = node.get("description") == null ? null : node.get("description").asText();
+                    crate.name = node.path("name").asText();
+                    crate.description = node.path("description").asText(null);
                     crate.type = "Dataset";
-                    if (node.get("license") != null) {
-                        crate.license = node.get("license").isObject() ? node.get("license").get("@id").asText() : node.get("license").asText();
-                    }
-                    crate.datePublished = node.get("datePublished") == null ? null : node.get("datePublished").asText();
+                    crate.license = node.path("license").path("@id").asText(node.path("license").asText(null));
+                    crate.datePublished = node.path("datePublished").asText(null);
                     crate.hasPart = new ArrayList<>();
 
-                    if (node.has("hasPart")) {
-                        for (JsonNode part : node.get("hasPart")) {
-                            CustomPreviewModel.Part p = new CustomPreviewModel.Part();
-                            if (part.isObject()) {
-                                p.id = part.get("@id").asText();
-                                p.name = part.get("@id").asText(); // Name will be replaced later
-                            } else {
-                                p.id = part.asText();
-                            }
-                            
-                            crate.hasPart.add(p);
-                        }
+                    for (JsonNode part : node.path("hasPart")) {
+                        CustomPreviewModel.Part p = new CustomPreviewModel.Part();
+                        String tmpId = part.path("@id").asText(part.asText());
+                        p.id = tmpId;
+                        p.name = tmpId; // Name will be replaced later
+                        crate.hasPart.add(p);
                     }
                 } else if (types.contains("Dataset")) {
                     CustomPreviewModel.Dataset dataset = new CustomPreviewModel.Dataset();
                     dataset.id = id;
-                    dataset.name = node.get("name").asText();
-                    dataset.description = node.get("description").asText();
+                    dataset.name = node.path("name").asText();
+                    dataset.description = node.path("description").asText();
                     datasets.add(dataset);
                 } else if (types.contains("File")) {
                     CustomPreviewModel.File file = new CustomPreviewModel.File();
                     file.id = id;
-                    file.name = node.get("name") == null ? null : node.get("name").asText();
-                    file.description = node.get("description") == null ? null : node.get("description").asText();
-                    file.contentSize = node.get("contentSize") == null ? null : node.get("contentSize").asText();
-                    file.encodingFormat = node.get("encodingFormat") == null ? null : node.get("encodingFormat").asText();
+                    file.name = node.path("name").asText(null);
+                    file.description = node.path("description").asText(null);
+                    file.contentSize = node.path("contentSize").asText(null);
+                    file.encodingFormat = node.path("encodingFormat").asText(null);
                     files.add(file);
                 }
             }
