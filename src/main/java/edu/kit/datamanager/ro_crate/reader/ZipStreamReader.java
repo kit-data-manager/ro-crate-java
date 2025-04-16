@@ -15,6 +15,9 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import org.apache.commons.io.FileUtils;
 
 /**
+ * A ZIP file reader implementation of the StreamReaderStrategy interface.
+ * This class handles reading and extraction of RO-Crate content from ZIP archives
+ * into a temporary directory structure, which allows for accessing the contained files.
  *
  * @author jejkal
  */
