@@ -3,6 +3,8 @@ package edu.kit.datamanager.ro_crate.preview;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
@@ -64,6 +66,8 @@ public class StaticPreview implements CratePreview {
     @Override
     public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
         ZipUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
-        ZipUtil.addFolderToZipStream(stream, this.otherFiles, this.otherFiles.getName());
+        if (this.otherFiles != null) {
+            ZipUtil.addFolderToZipStream(stream, this.otherFiles, this.otherFiles.getName());
+        }
     }
 }
