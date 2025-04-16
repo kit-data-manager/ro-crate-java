@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface StreamReaderStrategy extends ReaderStrategy {
 
-    static org.slf4j.Logger logger = LoggerFactory.getLogger(StreamWriterStrategy.class);
+    org.slf4j.Logger logger = LoggerFactory.getLogger(StreamReaderStrategy.class);
 
     /**
      * Default override of readMetadataJson interface from ReaderStrategy. The
