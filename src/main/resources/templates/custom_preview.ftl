@@ -191,5 +191,11 @@
 
 </main>
 
+<footer>
+    <p style="text-align: center; margin-top: 2rem; font-size: 0.8rem;">
+        This human-readable preview has been created using ro-crate-java.
+    </p>
+</footer>
+
 </body>
 </html>
