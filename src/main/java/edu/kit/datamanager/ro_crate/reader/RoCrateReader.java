@@ -122,6 +122,14 @@ public class RoCrateReader {
     }
 
     private RoCrate rebuildCrate(ObjectNode metadataJson, File files, HashSet<String> usedFiles) {
+        if (metadataJson == null) {
+            logger.error("Metadata JSON is null, cannot rebuild crate");
+            return null;
+        }
+        if (files == null) {
+            logger.error("Content files directory is null, cannot rebuild crate");
+            return null;
+        }
         JsonNode context = metadataJson.get(PROP_CONTEXT);
 
         CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
