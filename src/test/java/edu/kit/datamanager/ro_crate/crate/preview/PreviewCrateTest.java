@@ -55,7 +55,6 @@ public class PreviewCrateTest {
                 .build();
         RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
         writer.save(crate, location.toFile().getAbsolutePath());
-        writer.save(crate, ".");
         assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
     }
 
