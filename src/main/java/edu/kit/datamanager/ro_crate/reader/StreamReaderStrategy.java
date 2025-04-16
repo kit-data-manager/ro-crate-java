@@ -9,6 +9,7 @@ import java.io.InputStream;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Interface for reading RO-Crate metadata and content from input streams.
  *
  * @author jejkal
  */
