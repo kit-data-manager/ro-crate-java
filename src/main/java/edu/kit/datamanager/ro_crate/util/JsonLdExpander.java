@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.kit.datamanager.ro_crate.util;
 
-/**
- *
- * @author jejkal
- */
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 
@@ -15,6 +7,15 @@ import java.util.*;
 
 import java.io.File;
 
+/**
+ * Utility class for expanding and pruning JSON-LD documents.
+ *
+ * This class provides functionality to resolve references in JSON-LD based on "@id" values,
+ * expanding the data structure by replacing references with their full content.
+ * It also handles circular references to prevent infinite recursion.
+ *
+ * @author jejkal
+ */
 public class JsonLdExpander {
 
     public static JsonNode expandAndPrune(File jsonLdFile) throws Exception {
@@ -23,14 +24,17 @@ public class JsonLdExpander {
         return expandAndPrune(root);
     }
 
-    public static JsonNode expandAndPrune(JsonNode root) throws Exception {
-        ArrayNode graph = (ArrayNode) root.get("@graph");
+    public static JsonNode expandAndPrune(JsonNode root) throws IllegalArgumentException {
+        if (root == null) {
+            throw new IllegalArgumentException("Root node must not be null.");
+        }
+        JsonNode graph = root.path("@graph");
         ObjectMapper mapper = new ObjectMapper();
         // Index all items by @id
         Map<String, JsonNode> idMap = new HashMap<>();
         for (JsonNode node : graph) {
             if (node.has("@id")) {
-                idMap.put(node.get("@id").asText(), node);
+                idMap.put(node.path("@id").asText(), node);
             }
         }
 
@@ -40,7 +44,7 @@ public class JsonLdExpander {
         ArrayNode expandedGraph = mapper.createArrayNode();
         for (JsonNode node : graph) {
             // Include only if it's NOT a referenced/expanded object
-            if (node.has("@id") && expandedIds.contains(node.get("@id").asText())) {
+            if (node.has("@id") && expandedIds.contains(node.path("@id").asText())) {
                 continue; // skip referenced/expanded nodes
             }
 
@@ -50,7 +54,7 @@ public class JsonLdExpander {
 
         // Rebuild root
         ObjectNode newRoot = mapper.createObjectNode();
-        newRoot.set("@context", root.get("@context"));
+        newRoot.set("@context", root.path("@context"));
         newRoot.set("@graph", expandedGraph);
         return newRoot;
     }
@@ -69,11 +73,11 @@ public class JsonLdExpander {
             JsonNode value = entry.getValue();
 
             if (value.isObject() && value.has("@id")) {
-                String refId = value.get("@id").asText();
+                String refId = value.path("@id").asText();
                 if (!visited.contains(refId) && idMap.containsKey(refId)) {
                     visited.add(refId);
                     expandedIds.add(refId);
-                    result.set(key, expandNode(idMap.get(refId), idMap, expandedIds, mapper, new HashSet<>(visited)));
+                    result.set(key, expandNode(idMap.getOrDefault(refId, NullNode.getInstance()), idMap, expandedIds, mapper, new HashSet<>(visited)));
                 } else {
                     result.set(key, value);
                 }
@@ -81,11 +85,11 @@ public class JsonLdExpander {
                 ArrayNode newArray = mapper.createArrayNode();
                 for (JsonNode element : value) {
                     if (element.isObject() && element.has("@id")) {
-                        String refId = element.get("@id").asText();
+                        String refId = element.path("@id").asText();
                         if (!visited.contains(refId) && idMap.containsKey(refId)) {
                             visited.add(refId);
                             expandedIds.add(refId);
-                            newArray.add(expandNode(idMap.get(refId), idMap, expandedIds, mapper, new HashSet<>(visited)));
+                            newArray.add(expandNode(idMap.getOrDefault(refId, NullNode.getInstance()), idMap, expandedIds, mapper, new HashSet<>(visited)));
                         } else {
                             newArray.add(element);
                         }
