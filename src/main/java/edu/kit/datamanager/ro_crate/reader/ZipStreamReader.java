@@ -76,7 +76,7 @@ public class ZipStreamReader implements StreamReaderStrategy {
         return isExtracted;
     }
 
-    /**Read the create metadata and content from the provided input stream.
+    /**Read the crate metadata and content from the provided input stream.
      * 
      * @param stream The input stream.
      */
