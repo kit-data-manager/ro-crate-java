@@ -62,7 +62,7 @@ public class PreviewCrateTest {
     void testStaticPreviewOnlyHtmlFile(@TempDir Path temp) throws IOException {
         Path location = temp.resolve("ro_crate3");
         Path previewFile = temp.resolve("random.html");
-        FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
+        FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid", Charset.defaultCharset());
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new StaticPreview(previewFile.toFile()))
                 .build();
@@ -75,10 +75,10 @@ public class PreviewCrateTest {
     void testStaticPreviewHtmlFileWithOtherFiles(@TempDir Path temp) throws IOException {
         Path location = temp.resolve("ro_crate4");
         Path previewFile = temp.resolve("random.html");
-        FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
+        FileUtils.writeStringToFile(previewFile.toFile(), "random html it is not important that it is valid", Charset.defaultCharset());
         Path dirHtml = temp.resolve("html_dir");
         Path css_file = dirHtml.resolve("test.css");
-        FileUtils.writeStringToFile(css_file.toFile(), "random css it is not important that it is valid for know", Charset.defaultCharset());
+        FileUtils.writeStringToFile(css_file.toFile(), "random css it is not important that it is valid", Charset.defaultCharset());
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new StaticPreview(previewFile.toFile(), dirHtml.toFile()))
                 .build();
