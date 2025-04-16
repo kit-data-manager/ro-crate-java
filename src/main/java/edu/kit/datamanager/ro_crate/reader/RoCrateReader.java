@@ -10,7 +10,6 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
-import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel.ROCrate;
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 
