@@ -12,8 +12,8 @@ import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.personprovider.OrcidProvider;
-import edu.kit.datamanager.ro_crate.reader.FolderReader;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
+import edu.kit.datamanager.ro_crate.reader.CrateReader;
+import edu.kit.datamanager.ro_crate.reader.Readers;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class RealTest {
     @Test
     void testWithIDRCProject(@TempDir Path temp) throws IOException {
 
-        RoCrateReader reader = new RoCrateReader(new FolderReader());
+        CrateReader<String> reader = Readers.newFolderReader();
         final String locationMetadataFile = "/crates/other/idrc_project/ro-crate-metadata.json";
         Crate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
 

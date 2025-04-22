@@ -10,13 +10,12 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import edu.kit.datamanager.ro_crate.reader.Readers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.reader.FolderReader;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
 
 class RoCrateWriterSpec12Test {
 
@@ -27,7 +26,7 @@ class RoCrateWriterSpec12Test {
         URL internalOriginalCrateURL = this.getClass().getResource("/" + internalOriginalCratePath);
         assertNotNull(internalOriginalCrateURL);
 
-        Crate crate = new RoCrateReader(new FolderReader()).readCrate(internalOriginalCrateURL.getPath());
+        Crate crate = Readers.newFolderReader().readCrate(internalOriginalCrateURL.getPath());
         Path targetDir = tempDir.resolve("spec12writeUnmodified");
 
         {
@@ -51,7 +50,7 @@ class RoCrateWriterSpec12Test {
                 // original metadata file
                 new File(srcDir.resolve("ro-crate-metadata.json").toString()));
         // Compare loaded crate object with crate object made of export
-        Crate crate2 = new RoCrateReader(new FolderReader()).readCrate(targetDir.toString());
+        Crate crate2 = Readers.newFolderReader().readCrate(targetDir.toString());
         HelpFunctions.compareTwoCrateJson(crate, crate2);
     }
 }

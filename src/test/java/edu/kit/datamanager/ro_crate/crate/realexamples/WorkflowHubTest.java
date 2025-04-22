@@ -2,8 +2,8 @@ package edu.kit.datamanager.ro_crate.crate.realexamples;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
-import edu.kit.datamanager.ro_crate.reader.ZipReader;
+import edu.kit.datamanager.ro_crate.reader.CrateReader;
+import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
@@ -18,7 +18,7 @@ public class WorkflowHubTest {
 
   @Test
   void testImportZip(@TempDir Path temp) throws IOException {
-    RoCrateReader reader = new RoCrateReader(new ZipReader());
+    CrateReader<String> reader = Readers.newZipPathReader();
     Crate crate = reader.readCrate(WorkflowHubTest.class.getResource("/crates/workflowhub/workflow-109-5.crate.zip").getPath());
 
     HelpFunctions.compareCrateJsonToFileInResources(crate, "/crates/workflowhub/workflow1/ro-crate-metadata.json");

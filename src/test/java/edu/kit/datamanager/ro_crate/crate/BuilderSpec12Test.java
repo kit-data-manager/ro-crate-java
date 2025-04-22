@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 
+import edu.kit.datamanager.ro_crate.reader.Readers;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,8 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
-import edu.kit.datamanager.ro_crate.reader.FolderReader;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
@@ -40,7 +39,7 @@ class BuilderSpec12Test {
     @Test
     void testModificationOfDraftCrate() throws URISyntaxException {
         String path = this.getClass().getResource("/crates/spec-1.2-DRAFT/minimal-with-conformsTo-Array").getPath();
-        RoCrate crate = new RoCrateReader(new FolderReader()).readCrate(path);
+        RoCrate crate = Readers.newFolderReader().readCrate(path);
         Collection<String> existingProfiles = crate.getProfiles();
         profile1 = new URI("https://example.com/myprofile/1.0");
         profile2 = new URI("https://example.com/myprofile/2.0");

@@ -35,8 +35,8 @@ class ZipReaderTest {
         File zipFile = zipPath.toFile();
         assertTrue(zipFile.isFile());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-        Crate res = roCrateFolderReader.readCrate(zipFile.getAbsolutePath());
+        CrateReader<String> reader = Readers.newZipPathReader();
+        Crate res = reader.readCrate(zipFile.getAbsolutePath());
         HelpFunctions.compareTwoCrateJson(roCrate, res);
     }
 
@@ -65,8 +65,8 @@ class ZipReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toFile().getAbsolutePath());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-        Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+        CrateReader<String> reader = Readers.newZipPathReader();
+        Crate res = reader.readCrate(zipPath.toFile().getAbsolutePath());
 
         HelpFunctions.compareTwoCrateJson(roCrate, res);
     }
@@ -94,8 +94,8 @@ class ZipReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toString());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-        Crate res = roCrateFolderReader.readCrate(zipPath.toString());
+        CrateReader<String> reader = Readers.newZipPathReader();
+        Crate res = reader.readCrate(zipPath.toString());
 
         Path locationSource = temp.resolve("expected");
         RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
@@ -132,8 +132,8 @@ class ZipReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toString());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipReader());
-        Crate res = roCrateFolderReader.readCrate(zipPath.toFile().getAbsolutePath());
+        CrateReader<String> reader = Readers.newZipPathReader();
+        Crate res = reader.readCrate(zipPath.toFile().getAbsolutePath());
 
         Path locationSource = temp.resolve("expected");
         RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
@@ -174,24 +174,24 @@ class ZipReaderTest {
         assertTrue(zipFile.isFile());
 
         Path differentFolder = temp.resolve("differentFolder");
-        ZipReader readerType = new ZipReader(differentFolder, true);
+        ZipStrategy readerType = new ZipStrategy(differentFolder, true);
         assertFalse(readerType.isExtracted());
         assertEquals(readerType.getTemporaryFolder().getFileName().toString(), readerType.getID());
         assertTrue(readerType.getTemporaryFolder().startsWith(differentFolder));
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(readerType);
+        CrateReader<String> roCrateFolderReader = new CrateReader<>(readerType);
         Crate crate = roCrateFolderReader.readCrate(zipFile.getAbsolutePath());
         assertTrue(readerType.isExtracted());
         HelpFunctions.compareTwoCrateJson(roCrate, crate);
 
         {
             // try it again without the UUID subfolder and test if the directory is being cleaned up (using coverage).
-            ZipReader newReaderType = new ZipReader(differentFolder, false);
+            ZipStrategy newReaderType = new ZipStrategy(differentFolder, false);
             assertFalse(newReaderType.isExtracted());
             assertNotEquals(newReaderType.getTemporaryFolder().getFileName().toString(), newReaderType.getID());
             assertTrue(newReaderType.getTemporaryFolder().startsWith(differentFolder));
 
-            RoCrateReader newRoCrateFolderReader = new RoCrateReader(newReaderType);
+            CrateReader<String> newRoCrateFolderReader = new CrateReader<>(newReaderType);
             Crate crate2 = newRoCrateFolderReader.readCrate(zipFile.getAbsolutePath());
             assertTrue(newReaderType.isExtracted());
             HelpFunctions.compareTwoCrateJson(roCrate, crate2);

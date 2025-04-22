@@ -40,8 +40,8 @@ class FolderReaderTest {
         .build();
     Path f = writeMetadataToFile(temp, roCrate);
     // Read from written file
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    RoCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    CrateReader<String> reader = Readers.newFolderReader();
+    RoCrate res = reader.readCrate(temp.toFile().toString());
     // Write metadata again
     Path r = temp.resolve("output.txt");
     FileUtils.touch(r.toFile());
@@ -71,9 +71,9 @@ class FolderReaderTest {
     assertEquals(0, c1.getAllContextualEntities().size());
     assertEquals(1, c2.getAllContextualEntities().size());
     // read both with the same reader
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    RoCrate c1_read = roCrateFolderReader.readCrate(temp1.toFile().toString());
-    RoCrate c2_read = roCrateFolderReader.readCrate(temp2.toFile().toString());
+    CrateReader<String> reader = Readers.newFolderReader();
+    RoCrate c1_read = reader.readCrate(temp1.toFile().toString());
+    RoCrate c2_read = reader.readCrate(temp2.toFile().toString());
     // check that the reference is not the same
     assertNotEquals(c1, c1_read);
     assertNotEquals(c2, c2_read);
@@ -105,8 +105,8 @@ class FolderReaderTest {
 
     writeMetadataToFile(temp, roCrate);
 
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    RoCrate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    CrateReader<String> reader = Readers.newFolderReader();
+    RoCrate res = reader.readCrate(temp.toFile().toString());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
   }
 
@@ -136,8 +136,8 @@ class FolderReaderTest {
 
     writeMetadataToFile(temp, roCrate);
 
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
-    Crate res = roCrateFolderReader.readCrate(temp.toFile().toString());
+    CrateReader<String> reader = Readers.newFolderReader();
+    Crate res = reader.readCrate(temp.toFile().toString());
     HelpFunctions.compareTwoCrateJson(roCrate, res);
 
     // Make sure we did not print any errors
@@ -169,9 +169,9 @@ class FolderReaderTest {
 
     writeMetadataToFile(temp, roCrate);
 
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    CrateReader<String> reader = Readers.newFolderReader();
 
-    Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
+    Crate res = reader.readCrate(locationSource.toFile().toString());
 
     Path destinationDir = temp.resolve("result");
     FileUtils.forceMkdir(destinationDir.toFile());
@@ -207,12 +207,12 @@ class FolderReaderTest {
 
     writeMetadataToFile(temp, roCrate);
 
-    RoCrateReader roCrateFolderReader = new RoCrateReader(new FolderReader());
+    CrateReader<String> reader = Readers.newFolderReader();
 
     Path newFile = temp.resolve("new_file");
     FileUtils.writeStringToFile(newFile.toFile(), "fkladjsl;fjasd;lfjda;lkf", Charset.defaultCharset());
 
-    Crate res = roCrateFolderReader.readCrate(locationSource.toFile().toString());
+    Crate res = reader.readCrate(locationSource.toFile().toString());
     res.addDataEntity(new FileEntity.FileEntityBuilder()
         .setEncodingFormat("setnew")
         .setLocationWithExceptions(newFile)
