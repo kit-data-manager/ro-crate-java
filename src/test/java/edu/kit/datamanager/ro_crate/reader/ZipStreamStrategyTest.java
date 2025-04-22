@@ -15,12 +15,13 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ZipStreamReaderTest {
+class ZipStreamStrategyTest {
 
     @Test
     void testReadingBasicCrate(@TempDir Path temp) throws IOException {
@@ -36,7 +37,7 @@ class ZipStreamReaderTest {
         File zipFile = zipPath.toFile();
         assertTrue(zipFile.isFile());
 
-        RoCrateReader roCrateReader = new RoCrateReader(new ZipStreamReader());
+        CrateReader<InputStream> roCrateReader = Readers.newZipStreamReader();
         Crate res = roCrateReader.readCrate(new FileInputStream(zipFile));
         HelpFunctions.compareTwoCrateJson(roCrate, res);
     }
@@ -66,7 +67,7 @@ class ZipStreamReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toFile().getAbsolutePath());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipStreamReader());
+        CrateReader<InputStream> roCrateFolderReader = Readers.newZipStreamReader();
         Crate res = roCrateFolderReader.readCrate(new FileInputStream(zipPath.toFile()));
 
         HelpFunctions.compareTwoCrateJson(roCrate, res);
@@ -95,7 +96,7 @@ class ZipStreamReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toString());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipStreamReader());
+        CrateReader<InputStream> roCrateFolderReader = Readers.newZipStreamReader();
         Crate res = roCrateFolderReader.readCrate(new FileInputStream(zipPath.toFile()));
 
         Path locationSource = temp.resolve("expected");
@@ -133,7 +134,7 @@ class ZipStreamReaderTest {
         // save the content of the roCrate to the dest zip
         roCrateZipWriter.save(roCrate, zipPath.toString());
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(new ZipStreamReader());
+        CrateReader<InputStream> roCrateFolderReader = Readers.newZipStreamReader();
         Crate res = roCrateFolderReader.readCrate(new FileInputStream(zipPath.toFile()));
 
         Path locationSource = temp.resolve("expected");
@@ -175,24 +176,24 @@ class ZipStreamReaderTest {
         assertTrue(zipFile.isFile());
 
         Path differentFolder = temp.resolve("differentFolder");
-        ZipStreamReader readerType = new ZipStreamReader(differentFolder, true);
+        ZipStreamStrategy readerType = new ZipStreamStrategy(differentFolder, true);
         assertFalse(readerType.isExtracted());
         assertEquals(readerType.getTemporaryFolder().getFileName().toString(), readerType.getID());
         assertTrue(readerType.getTemporaryFolder().startsWith(differentFolder));
 
-        RoCrateReader roCrateFolderReader = new RoCrateReader(readerType);
+        CrateReader<InputStream> roCrateFolderReader = new CrateReader<>(readerType);
         Crate crate = roCrateFolderReader.readCrate(new FileInputStream(zipFile));
         assertTrue(readerType.isExtracted());
         HelpFunctions.compareTwoCrateJson(roCrate, crate);
 
         {
             // try it again without the UUID subfolder and test if the directory is being cleaned up (using coverage).
-            ZipStreamReader newReaderType = new ZipStreamReader(differentFolder, false);
+            ZipStreamStrategy newReaderType = new ZipStreamStrategy(differentFolder, false);
             assertFalse(newReaderType.isExtracted());
             assertNotEquals(newReaderType.getTemporaryFolder().getFileName().toString(), newReaderType.getID());
             assertTrue(newReaderType.getTemporaryFolder().startsWith(differentFolder));
 
-            RoCrateReader newRoCrateFolderReader = new RoCrateReader(newReaderType);
+            CrateReader<InputStream> newRoCrateFolderReader = new CrateReader<>(newReaderType);
             Crate crate2 = newRoCrateFolderReader.readCrate(new FileInputStream(zipFile));
             assertTrue(newReaderType.isExtracted());
             HelpFunctions.compareTwoCrateJson(roCrate, crate2);
