@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
  * Implementation of the writing strategy to provide a way of writing crates to
  * a zip archive.
  */
-public class ZipStreamWriter implements StreamWriterStrategy {
+public class ZipStreamWriter implements GenericWriterStrategy<OutputStream> {
 
-    private static Logger logger = LoggerFactory.getLogger(ZipStreamWriter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZipStreamWriter.class);
 
     @Override
     public void save(Crate crate, OutputStream destination) {

@@ -3,8 +3,7 @@ package edu.kit.datamanager.ro_crate.writer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
@@ -78,16 +77,16 @@ class ZipStreamWriterTest {
         .setPreview(new AutomaticPreview())
         .build();
 
-    // safe the crate in the test.zip file
-    Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipStreamWriter());
-    
-    
-    // save the content of the roCrate to the dest zip
-    roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
+    CrateWriter<OutputStream> writer = Writers.newZipStreamWriter();
+    // write into destination path
+    Path destination_path = tempDir.resolve("test.zip");
+    OutputStream destination = new FileOutputStream(destination_path.toFile());
+    writer.save(roCrate, destination);
+
+    // extract and compare
     Path res = tempDir.resolve("dest");
-    try (ZipFile zf = new ZipFile(test.toFile())) {
+    try (ZipFile zf = new ZipFile(destination_path.toFile())) {
         zf.extractAll(res.toFile().getAbsolutePath());
     }
     assertTrue(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
@@ -154,14 +153,16 @@ class ZipStreamWriterTest {
         .setPreview(new AutomaticPreview())
         .build();
 
-    // safe the crate in the test.zip file
-    Path test = tempDir.resolve("test.zip");
     // create a Writer for writing RoCrates to zip
-    RoCrateWriter roCrateZipWriter = new RoCrateWriter(new ZipStreamWriter());
-    // save the content of the roCrate to the dest zip
-    roCrateZipWriter.save(roCrate, test.toFile().getAbsolutePath());
+    CrateWriter<OutputStream> writer = Writers.newZipStreamWriter();
+    // write into destination path
+    Path destination_path = tempDir.resolve("test.zip");
+    OutputStream destination = new FileOutputStream(destination_path.toFile());
+    writer.save(roCrate, destination);
+
+    // extract and compare
     Path res = tempDir.resolve("dest");
-    try (ZipFile zf = new ZipFile(test.toFile())) {
+    try (ZipFile zf = new ZipFile(destination_path.toFile())) {
         zf.extractAll(res.toFile().getAbsolutePath());
     }
     assertFalse(HelpFunctions.compareTwoDir(roDir.toFile(), res.toFile()));
