@@ -68,8 +68,8 @@ class BuilderSpec12Test {
         Collection<String> newProfileState = modifiedCrate.getProfiles();
         assertEquals(existingProfiles.size() + 2, newProfileState.size());
         // new profiles are present
-        newProfileState.contains(profile1.toString());
-        newProfileState.contains(profile2.toString());
+        assertTrue(newProfileState.contains(profile1.toString()));
+        assertTrue(newProfileState.contains(profile2.toString()));
         // old profiles are present
         assertEquals(
             0,
