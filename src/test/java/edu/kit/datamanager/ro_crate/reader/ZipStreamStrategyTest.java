@@ -181,8 +181,8 @@ class ZipStreamStrategyTest {
         assertEquals(readerType.getTemporaryFolder().getFileName().toString(), readerType.getID());
         assertTrue(readerType.getTemporaryFolder().startsWith(differentFolder));
 
-        CrateReader<InputStream> roCrateFolderReader = new CrateReader<>(readerType);
-        Crate crate = roCrateFolderReader.readCrate(new FileInputStream(zipFile));
+        CrateReader<InputStream> reader = new CrateReader<>(readerType);
+        Crate crate = reader.readCrate(new FileInputStream(zipFile));
         assertTrue(readerType.isExtracted());
         HelpFunctions.compareTwoCrateJson(roCrate, crate);
 
@@ -193,9 +193,16 @@ class ZipStreamStrategyTest {
             assertNotEquals(newReaderType.getTemporaryFolder().getFileName().toString(), newReaderType.getID());
             assertTrue(newReaderType.getTemporaryFolder().startsWith(differentFolder));
 
-            CrateReader<InputStream> newRoCrateFolderReader = new CrateReader<>(newReaderType);
-            Crate crate2 = newRoCrateFolderReader.readCrate(new FileInputStream(zipFile));
+            CrateReader<InputStream> reader2 = new CrateReader<>(newReaderType);
+            Crate crate2 = reader2.readCrate(new FileInputStream(zipFile));
             assertTrue(newReaderType.isExtracted());
+            HelpFunctions.compareTwoCrateJson(roCrate, crate2);
+        }
+
+        {
+            // show we can also do it with the convenience API
+            CrateReader<InputStream> reader2 = Readers.newZipStreamReader(differentFolder, false);
+            Crate crate2 = reader2.readCrate(new FileInputStream(zipFile));
             HelpFunctions.compareTwoCrateJson(roCrate, crate2);
         }
     }
