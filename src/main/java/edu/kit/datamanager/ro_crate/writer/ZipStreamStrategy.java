@@ -41,7 +41,7 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
             try {
                 dataEntity.saveToStream(zipStream);
             } catch (IOException e) {
-                logger.error("Could not save " + dataEntity.getId() + " to zip stream!", e);
+                logger.error("Could not save {} to zip stream!", dataEntity.getId(), e);
             }
         }
     }

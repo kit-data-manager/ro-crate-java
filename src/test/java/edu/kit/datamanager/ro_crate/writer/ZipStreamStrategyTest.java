@@ -15,6 +15,7 @@ import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
 import edu.kit.datamanager.ro_crate.preview.PreviewGenerator;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -32,6 +33,7 @@ class ZipStreamStrategyTest {
     // the .json of our crate
     InputStream fileJson=
         ZipStreamStrategyTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+    Assertions.assertNotNull(fileJson);
 
     // fill the expected directory with files and dirs
 
@@ -105,6 +107,7 @@ class ZipStreamStrategyTest {
     // the .json of our crate
     InputStream fileJson=
         ZipStreamStrategyTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+    Assertions.assertNotNull(fileJson);
 
     // fill the expected directory with files and dirs
 

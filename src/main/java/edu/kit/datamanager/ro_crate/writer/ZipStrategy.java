@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class ZipStrategy implements GenericWriterStrategy<String> {
 
-    private static Logger logger = LoggerFactory.getLogger(ZipStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZipStrategy.class);
 
     @Override
     public void save(Crate crate, String destination) {

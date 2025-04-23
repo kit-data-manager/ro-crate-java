@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class FolderStrategy implements GenericWriterStrategy<String> {
 
-    private static Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
 
     @Override
     public void save(Crate crate, String destination) {
