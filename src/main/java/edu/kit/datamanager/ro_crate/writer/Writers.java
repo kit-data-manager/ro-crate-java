@@ -13,7 +13,30 @@ public class Writers {
      */
     private Writers() {}
 
+    /**
+     * Creates a new instance of a crate writer that writes to a folder.
+     *
+     * @return a new instance of {@link CrateWriter} for writing to a folder
+     */
+    public static CrateWriter<String> newFolderWriter() {
+        return new CrateWriter<>(new FolderStrategy());
+    }
+
+    /**
+     * Creates a new instance of a crate writer that writes to a zip stream.
+     *
+     * @return a new instance of {@link CrateWriter} for writing to a zip stream
+     */
     public static CrateWriter<OutputStream> newZipStreamWriter() {
         return new CrateWriter<>(new ZipStreamStrategy());
+    }
+
+    /**
+     * Creates a new instance of a crate writer that writes to a zip file.
+     *
+     * @return a new instance of {@link CrateWriter} for writing to a zip file
+     */
+    public static CrateWriter<String> newZipFileWriter() {
+        return new CrateWriter<>(new ZipStrategy());
     }
 }
