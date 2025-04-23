@@ -21,7 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * @author jejkal
  */
-class ZipStreamWriterTest {
+class ZipStreamStrategyTest {
 
   @Test
   void testWritingToZipStream(@TempDir Path tempDir) throws IOException {
@@ -31,7 +31,7 @@ class ZipStreamWriterTest {
 
     // the .json of our crate
     InputStream fileJson=
-        ZipStreamWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+        ZipStreamStrategyTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
 
     // fill the expected directory with files and dirs
 
@@ -104,7 +104,7 @@ class ZipStreamWriterTest {
 
     // the .json of our crate
     InputStream fileJson=
-        ZipStreamWriterTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
+        ZipStreamStrategyTest.class.getResourceAsStream("/json/crate/fileAndDir.json");
 
     // fill the expected directory with files and dirs
 

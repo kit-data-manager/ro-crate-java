@@ -14,6 +14,6 @@ public class Writers {
     private Writers() {}
 
     public static CrateWriter<OutputStream> newZipStreamWriter() {
-        return new CrateWriter<>(new ZipStreamWriter());
+        return new CrateWriter<>(new ZipStreamStrategy());
     }
 }
