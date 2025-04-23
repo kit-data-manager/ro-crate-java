@@ -8,9 +8,7 @@ import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;

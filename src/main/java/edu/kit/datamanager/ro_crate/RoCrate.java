@@ -10,9 +10,13 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
+import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataEntity.DataEntityBuilder;
+import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
+import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;
 import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
@@ -22,9 +26,12 @@ import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
+import edu.kit.datamanager.ro_crate.writer.FolderWriter;
+import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -58,22 +65,27 @@ public class RoCrate implements Crate {
         this.roCratePreview = preview;
     }
 
+    @Override
     public void setMetadataContext(CrateMetadataContext metadataContext) {
         this.metadataContext = metadataContext;
     }
 
+    @Override
     public ContextualEntity getJsonDescriptor() {
         return jsonDescriptor;
     }
 
+    @Override
     public void setJsonDescriptor(ContextualEntity jsonDescriptor) {
         this.jsonDescriptor = jsonDescriptor;
     }
-
+    
+    @Override
     public RootDataEntity getRootDataEntity() {
         return rootDataEntity;
     }
-
+    
+    @Override
     public void setRootDataEntity(RootDataEntity rootDataEntity) {
         this.rootDataEntity = rootDataEntity;
     }

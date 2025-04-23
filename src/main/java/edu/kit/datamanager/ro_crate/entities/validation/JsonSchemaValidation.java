@@ -68,7 +68,7 @@ public class JsonSchemaValidation implements EntityValidationStrategy {
   @Override
   public boolean validateFieldOfEntity(JsonNode field) {
     Set<ValidationMessage> errors = this.entityFieldSchema.validate(field);
-    if (errors.size() != 0) {
+    if (!errors.isEmpty()) {
       ObjectMapper objectMapper = MyObjectMapper.getMapper();
       System.err.println("The property: ");
       try {
