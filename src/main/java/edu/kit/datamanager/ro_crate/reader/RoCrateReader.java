@@ -10,7 +10,6 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
-import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel.ROCrate;
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 
@@ -96,7 +95,7 @@ public class RoCrateReader {
             usedFiles.add(content.toPath().resolve(FILE_PREVIEW_FILES).toFile().getPath());
             result = rebuildCrate(metadata, content, usedFiles);
         } else {
-            logger.error("Provided writer does not implement StreamWriterStrategy. Please use 'save(Crate crate, String destination)'.");
+            logger.error("Provided writer does not implement StreamReaderStrategy. Please use 'readCrate(String location)'.");
         }
         return result;
     }
@@ -123,6 +122,14 @@ public class RoCrateReader {
     }
 
     private RoCrate rebuildCrate(ObjectNode metadataJson, File files, HashSet<String> usedFiles) {
+        if (metadataJson == null) {
+            logger.error("Metadata JSON is null, cannot rebuild crate");
+            return null;
+        }
+        if (files == null) {
+            logger.error("Content files directory is null, cannot rebuild crate");
+            return null;
+        }
         JsonNode context = metadataJson.get(PROP_CONTEXT);
 
         CrateMetadataContext crateContext = new RoCrateMetadataContext(context);

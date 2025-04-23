@@ -2,7 +2,6 @@ package edu.kit.datamanager.ro_crate.preview;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.datamanager.ro_crate.preview.model.ROCratePreviewModel;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -53,62 +52,54 @@ public class CustomPreview implements CratePreview {
         }
     }
 
-    private ROCratePreviewModel mapFromJson(String metadata) throws IOException {
+    private CustomPreviewModel mapFromJson(String metadata) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = (JsonNode) mapper.readValue(metadata, JsonNode.class);
         JsonNode graph = root.get("@graph");
-        ROCratePreviewModel.ROCrate crate = new ROCratePreviewModel.ROCrate();
-        List<ROCratePreviewModel.Dataset> datasets = new ArrayList<>();
-        List<ROCratePreviewModel.File> files = new ArrayList<>();
+        CustomPreviewModel.ROCrate crate = new CustomPreviewModel.ROCrate();
+        List<CustomPreviewModel.Dataset> datasets = new ArrayList<>();
+        List<CustomPreviewModel.File> files = new ArrayList<>();
 
         if (graph.isArray()) {
 
             for (JsonNode node : graph) {
-                String id = node.get("@id").asText();
+                String id = node.path("@id").asText();
                 List<String> types = new LinkedList<>();
-                if (node.get("@type").isArray()) {
+                if (node.path("@type").isArray()) {
 
-                    Collections.addAll(types, (String[]) mapper.convertValue(node.get("@type"), String[].class));
+                    Collections.addAll(types, mapper.convertValue(node.path("@type"), String[].class));
                 } else {
-                    types.add(node.get("@type").asText());
+                    types.add(node.path("@type").asText());
                 }
 
                 if (types.contains("Dataset") && "./".equals(id)) {
-                    crate.name = node.get("name").asText();
-                    crate.description = node.get("description") == null ? null : node.get("description").asText();
+                    crate.name = node.path("name").asText();
+                    crate.description = node.path("description").asText(null);
                     crate.type = "Dataset";
-                    if (node.get("license") != null) {
-                        crate.license = node.get("license").isObject() ? node.get("license").get("@id").asText() : node.get("license").asText();
-                    }
-                    crate.datePublished = node.get("datePublished") == null ? null : node.get("datePublished").asText();
+                    crate.license = node.path("license").path("@id").asText(node.path("license").asText(null));
+                    crate.datePublished = node.path("datePublished").asText(null);
                     crate.hasPart = new ArrayList<>();
 
-                    if (node.has("hasPart")) {
-                        for (JsonNode part : node.get("hasPart")) {
-                            ROCratePreviewModel.Part p = new ROCratePreviewModel.Part();
-                            if (part.isObject()) {
-                                p.id = part.get("@id").asText();
-                                p.name = part.get("@id").asText(); // Name will be replaced later
-                            } else {
-                                p.id = part.asText();
-                            }
-                            
-                            crate.hasPart.add(p);
-                        }
+                    for (JsonNode part : node.path("hasPart")) {
+                        CustomPreviewModel.Part p = new CustomPreviewModel.Part();
+                        String tmpId = part.path("@id").asText(part.asText());
+                        p.id = tmpId;
+                        p.name = tmpId; // Name will be replaced later
+                        crate.hasPart.add(p);
                     }
                 } else if (types.contains("Dataset")) {
-                    ROCratePreviewModel.Dataset dataset = new ROCratePreviewModel.Dataset();
+                    CustomPreviewModel.Dataset dataset = new CustomPreviewModel.Dataset();
                     dataset.id = id;
-                    dataset.name = node.get("name").asText();
-                    dataset.description = node.get("description").asText();
+                    dataset.name = node.path("name").asText();
+                    dataset.description = node.path("description").asText();
                     datasets.add(dataset);
                 } else if (types.contains("File")) {
-                    ROCratePreviewModel.File file = new ROCratePreviewModel.File();
+                    CustomPreviewModel.File file = new CustomPreviewModel.File();
                     file.id = id;
-                    file.name = node.get("name") == null ? null : node.get("name").asText();
-                    file.description = node.get("description") == null ? null : node.get("description").asText();
-                    file.contentSize = node.get("contentSize") == null ? null : node.get("contentSize").asText();
-                    file.encodingFormat = node.get("encodingFormat") == null ? null : node.get("encodingFormat").asText();
+                    file.name = node.path("name").asText(null);
+                    file.description = node.path("description").asText(null);
+                    file.contentSize = node.path("contentSize").asText(null);
+                    file.encodingFormat = node.path("encodingFormat").asText(null);
                     files.add(file);
                 }
             }
@@ -116,13 +107,13 @@ public class CustomPreview implements CratePreview {
 
         // Update Part names using dataset and file lists
         if (crate.hasPart != null) {
-            for (ROCratePreviewModel.Part part : crate.hasPart) {
-                for (ROCratePreviewModel.Dataset dataset : datasets) {
+            for (CustomPreviewModel.Part part : crate.hasPart) {
+                for (CustomPreviewModel.Dataset dataset : datasets) {
                     if (dataset.id.equals(part.id) && dataset.name != null) {
                         part.name = dataset.name;
                     }
                 }
-                for (ROCratePreviewModel.File file : files) {
+                for (CustomPreviewModel.File file : files) {
                     if (file.id.equals(part.id) && file.name != null) {
                         part.name = file.name;
                     }
@@ -130,7 +121,7 @@ public class CustomPreview implements CratePreview {
             }
         }
 
-        ROCratePreviewModel model = new ROCratePreviewModel();
+        CustomPreviewModel model = new CustomPreviewModel();
         model.crate = crate;
         model.datasets = datasets;
         model.files = files;

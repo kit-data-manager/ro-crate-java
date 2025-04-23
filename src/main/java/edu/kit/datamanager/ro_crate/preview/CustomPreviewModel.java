@@ -1,4 +1,4 @@
-package edu.kit.datamanager.ro_crate.preview.model;
+package edu.kit.datamanager.ro_crate.preview;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import java.util.List;
  *
  * @author jejkal
  */
-public class ROCratePreviewModel {
+public class CustomPreviewModel {
 
-    public ROCrate crate;
-    public List<Dataset> datasets;
-    public List<File> files;
+    protected ROCrate crate;
+    protected List<Dataset> datasets;
+    protected List<File> files;
 
     public ROCrate getCrate() {
         return crate;
@@ -26,12 +26,12 @@ public class ROCratePreviewModel {
 
     public static class ROCrate {
 
-        public String name;
-        public String description;
-        public String type;
-        public String license;
-        public String datePublished;
-        public List<Part> hasPart;
+        protected String name;
+        protected String description;
+        protected String type;
+        protected String license;
+        protected String datePublished;
+        protected List<Part> hasPart;
 
         public String getName() {
             return name;
@@ -61,8 +61,8 @@ public class ROCratePreviewModel {
 
     public static class Part {
 
-        public String id;
-        public String name;
+        protected String id;
+        protected String name;
 
         public String getId() {
             return id;
@@ -76,9 +76,9 @@ public class ROCratePreviewModel {
 
     public static class Dataset {
 
-        public String id;
-        public String name;
-        public String description;
+        protected String id;
+        protected String name;
+        protected String description;
 
         public String getId() {
             return id;
@@ -96,11 +96,11 @@ public class ROCratePreviewModel {
 
     public static class File {
 
-        public String id;
-        public String name;
-        public String description;
-        public String contentSize;
-        public String encodingFormat;
+        protected String id;
+        protected String name;
+        protected String description;
+        protected String contentSize;
+        protected String encodingFormat;
 
         public String getId() {
             return id;

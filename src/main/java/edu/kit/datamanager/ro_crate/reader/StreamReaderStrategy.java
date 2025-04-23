@@ -9,12 +9,13 @@ import java.io.InputStream;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Interface for reading RO-Crate metadata and content from input streams.
  *
  * @author jejkal
  */
 public interface StreamReaderStrategy extends ReaderStrategy {
 
-    static org.slf4j.Logger logger = LoggerFactory.getLogger(StreamWriterStrategy.class);
+    org.slf4j.Logger logger = LoggerFactory.getLogger(StreamReaderStrategy.class);
 
     /**
      * Default override of readMetadataJson interface from ReaderStrategy. The

@@ -15,6 +15,9 @@ import net.lingala.zip4j.model.LocalFileHeader;
 import org.apache.commons.io.FileUtils;
 
 /**
+ * A ZIP file reader implementation of the StreamReaderStrategy interface.
+ * This class handles reading and extraction of RO-Crate content from ZIP archives
+ * into a temporary directory structure, which allows for accessing the contained files.
  *
  * @author jejkal
  */
@@ -73,7 +76,7 @@ public class ZipStreamReader implements StreamReaderStrategy {
         return isExtracted;
     }
 
-    /**Read the create metadata and content from the provided input stream.
+    /**Read the crate metadata and content from the provided input stream.
      * 
      * @param stream The input stream.
      */
@@ -97,7 +100,11 @@ public class ZipStreamReader implements StreamReaderStrategy {
 
             try (ZipInputStream zipInputStream = new ZipInputStream(stream)) {
                 while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-                    File extractedFile = new File(folder, localFileHeader.getFileName());
+                    String fileName = localFileHeader.getFileName();
+                    File extractedFile = new File(folder, fileName).getCanonicalFile();
+                    if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
+                        throw new IOException("Entry is outside of target directory: " + fileName);
+                    }
                     try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
                         while ((readLen = zipInputStream.read(readBuffer)) != -1) {
                             outputStream.write(readBuffer, 0, readLen);

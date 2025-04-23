@@ -1,6 +1,6 @@
 package edu.kit.datamanager.ro_crate.context;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,18 +14,26 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ContextTest {
 
   RoCrateMetadataContext context;
+  RoCrateMetadataContext complexContext;
 
   @BeforeEach
-  void initContext() {
+  void initContext() throws IOException {
     // this will load the default context
     this.context = new RoCrateMetadataContext();
+
+    final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
+    this.complexContext = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 
   @Test
@@ -137,12 +145,12 @@ public class ContextTest {
   }
 
   @Test
-  void doubledContextUrlsTest() throws JsonProcessingException {
+  void doubledContextUrlsTest() {
     String url = "www.example.com";
     RoCrateMetadataContext context = new RoCrateMetadataContext();
-    assertFalse(context.url.contains(url));
+    assertFalse(context.urls.contains(url));
     context.addToContextFromUrl(url);
-    assertTrue(context.url.contains(url));
+    assertTrue(context.urls.contains(url));
 
     RoCrateMetadataContext contextDoubled = new RoCrateMetadataContext();
     contextDoubled.addToContextFromUrl(url);
@@ -223,5 +231,51 @@ public class ContextTest {
             .addProperty("http://example.org/Thing", "Some thing")
             .build();
     assertTrue(this.context.checkEntity(validEntity));
+  }
+
+  @Test
+  void testSetDeleteGetPair() {
+    String key = "key";
+    String value = "value";
+    context.addToContext(key, value);
+    assertEquals(value, context.getValueOf(key));
+    context.deleteValuePairFromContext(key);
+    assertNull(context.getValueOf(key));
+  }
+
+  @Test
+  void testReadDeleteGetPair() {
+    String key = "custom";
+    String value = "_:";
+    assertEquals(value, this.complexContext.getValueOf(key));
+    this.complexContext.deleteValuePairFromContext(key);
+    assertNull(this.complexContext.getValueOf(key));
+    this.complexContext.addToContext(key, value);
+    assertEquals(value, this.complexContext.getValueOf(key));
+  }
+
+  @Test
+  void testReadKeys() {
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = this.complexContext.getKeys();
+    for (String key : expected) {
+      assertTrue(given.contains(key), "Key " + key + " not found in the context");
+    }
+    // prove immutability
+    assertThrows(UnsupportedOperationException.class, () -> given.add("newKey"));
+  }
+
+  @Test
+  void testReadPairs() {
+    var expected = Set.of("custom", "owl", "datacite", "xsd", "rdfs");
+    var given = this.complexContext.getPairs();
+    var keys = given.keySet();
+    var values = given.values();
+    for (String key : expected) {
+      assertTrue(keys.contains(key), "Key " + key + " not found in the context");
+      values.forEach(s -> assertFalse(s.isEmpty(), "Value for key " + key + " is empty"));
+    }
+    // prove immutability
+    assertThrows(UnsupportedOperationException.class, () -> given.put("newKey", "newValue"));
   }
 }

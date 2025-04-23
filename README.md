@@ -182,7 +182,7 @@ For StaticPreview, the constuctor is a bit different, such that it looks as foll
 File pathToMainPreviewHtml = new File("localPath");
 File pathToAdditionalFiles = new File("localFolder");
 RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier")
-    .setPreview(new StaticPreview(pathToMainPreviewHtml, pathToAdditionalFiles)
+    .setPreview(new StaticPreview(pathToMainPreviewHtml, pathToAdditionalFiles))
     .build();
 ```
 

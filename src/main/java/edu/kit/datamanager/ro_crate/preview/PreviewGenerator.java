@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class responsible for the generation of the human-readable representation of
  * the metadata. For this to work the nodejs library rochtml has to be
@@ -12,6 +15,7 @@ import java.io.InputStreamReader;
  */
 public class PreviewGenerator {
 
+    private static Logger LOG = LoggerFactory.getLogger(PreviewGenerator.class);
     private static final String command = "rochtml";
 
     public static boolean isRochtmlAvailable() {
@@ -41,6 +45,10 @@ public class PreviewGenerator {
      * @param location the location of the crate in the filesystem.
      */
     public static void generatePreview(String location) {
+        if (!isRochtmlAvailable()) {
+            LOG.error("rochtml is not available. Please install rochtml using npm install -g ro-crate-html-js");
+            return;
+        }
         ProcessBuilder builder = new ProcessBuilder();
         // this is the equivalent of "rochtml dir/ro-crate-metadata.json"
         // check if we are running on windows or unix
@@ -71,7 +79,7 @@ public class PreviewGenerator {
                 throw new Exception("failed command");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error while generating preview: {}", e.getMessage());
         }
     }
 }
