@@ -36,7 +36,7 @@ public class Writers {
      *
      * @return a new instance of {@link CrateWriter} for writing to a zip file
      */
-    public static CrateWriter<String> newZipFileWriter() {
+    public static CrateWriter<String> newZipPathWriter() {
         return new CrateWriter<>(new ZipStrategy());
     }
 }
