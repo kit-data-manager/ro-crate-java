@@ -29,11 +29,8 @@ class RoCrateWriterSpec12Test {
         Crate crate = Readers.newFolderReader().readCrate(internalOriginalCrateURL.getPath());
         Path targetDir = tempDir.resolve("spec12writeUnmodified");
 
-        {
-            // save to disk
-            RoCrateWriter folderRoCrateWriter = new RoCrateWriter(new FolderWriter());
-            folderRoCrateWriter.save(crate, targetDir.toFile().getPath());
-        }
+        Writers.newFolderWriter()
+                .save(crate, targetDir.toAbsolutePath().toString());
 
         // compare directories
         Path srcDir = Paths.get(internalOriginalCrateURL.toURI());
