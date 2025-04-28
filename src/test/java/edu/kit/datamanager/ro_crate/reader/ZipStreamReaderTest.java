@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class ZipStreamStrategyTest extends CrateReaderTest<InputStream, ZipStreamStrategy> {
+class ZipStreamReaderTest extends CrateReaderTest<InputStream, ZipStreamStrategy> {
     @Override
     protected void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newZipStreamWriter().save(crate, new FileOutputStream(target.toFile()));
