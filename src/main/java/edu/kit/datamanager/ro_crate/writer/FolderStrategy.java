@@ -37,7 +37,7 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
 
             File json = new File(destination, "ro-crate-metadata.json");
             FileUtils.copyInputStreamToFile(inputStream, json);
-            inputStream.close();            
+            inputStream.close();
             // save also the preview files to the crate destination
             if (crate.getPreview() != null) {
                 crate.getPreview().saveAllToFolder(file);
