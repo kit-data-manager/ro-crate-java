@@ -11,6 +11,7 @@ import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import org.apache.commons.io.FileUtils;
 import io.json.compare.JSONCompare;
 import io.json.compare.JsonComparator;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelpFunctions {
 
@@ -89,6 +91,16 @@ public class HelpFunctions {
         compare(node1, node2, true);
     }
 
+    /**
+     * Compare two directories. The method will compare the content of the two and return true if they are equal.
+     * 
+     * @param dir1 the first directory
+     * @param dir2 the second directory
+     * @return true if the two directories are equal, false otherwise.
+     * @throws IOException If something goes wrong with the file system.
+     * 
+     */
+    //@Deprecated(since = "2.1.0", forRemoval = true)
     public static boolean compareTwoDir(File dir1, File dir2) throws IOException {
         // compare the content of the two directories
         Map<String, File> result_map = FileUtils.listFiles(dir1, null, true)
@@ -116,5 +128,54 @@ public class HelpFunctions {
             }
         }
         return true;
+    }
+
+    /**
+     * Asserts that the two directories are equal. Throws an exception otherwise.
+     *
+     * @param originalDirectory the original directory to compare to
+     * @param testingDirectory the testing directory to test
+     * @throws IOException If something goes wrong with the file system.
+     */
+    public static void assertEqualDirectories(File originalDirectory, File testingDirectory) throws IOException, AssertionFailedError {
+        assertTrue(originalDirectory.isDirectory(), "The original directory is not a directory.");
+        assertTrue(testingDirectory.isDirectory(), "The testing directory is not a directory.");
+        // compare the content of the two directories
+        Map<String, File> referenceFiles = FileUtils.listFiles(originalDirectory, null, true)
+                .stream()
+                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));
+
+        Map<String, java.io.File> compareThoseFiles = FileUtils.listFiles(testingDirectory, null, true)
+                .stream()
+                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));;
+
+        for (String filename : compareThoseFiles.keySet()) {
+            // we do that because the ro-crate-metadata.json can be differently formatted,
+            // or the order of the entities may be different
+            // the same holds for the html file
+            if (filename.equals("ro-crate-preview.html") || filename.equals("ro-crate-metadata.json")) {
+                if (!referenceFiles.containsKey(filename)) {
+                    throw new AssertionFailedError("The file %s is not present in the reference directory.".formatted(filename));
+                }
+            } else if (!FileUtils.contentEqualsIgnoreEOL(compareThoseFiles.get(filename), referenceFiles.get(filename), null)) {
+                throw new AssertionFailedError("The content of the file %s is not equal.".formatted(filename));
+            }
+        }
+
+        referenceFiles.keySet().forEach(filename -> {
+                    if (!compareThoseFiles.containsKey(filename)) {
+                        throw new AssertionFailedError("The file %s is not present in the testing directory.".formatted(filename));
+                    }
+                });
+
+        compareThoseFiles.keySet().forEach(filename -> {
+                    if (!referenceFiles.containsKey(filename)) {
+                        throw new AssertionFailedError("The file %s is not present in the reference directory.".formatted(filename));
+                    }
+                });
+
+        if (referenceFiles.size() != compareThoseFiles.size()) {
+            throw new AssertionFailedError("The number of files in the two directories is not equal.");
+        }
     }
 }

@@ -65,6 +65,7 @@ public class DataEntity extends AbstractEntity {
      * @throws ZipException when something goes wrong with the writing to the
      * zip file.
      */
+    @Deprecated(since = "2.1.0", forRemoval = true)
     public void saveToZip(ZipFile zipFile) throws ZipException {
         if (this.path != null) {
             ZipParameters zipParameters = new ZipParameters();
@@ -82,6 +83,7 @@ public class DataEntity extends AbstractEntity {
      * zip file.
      * @throws IOException If opening the file input stream fails.
      */
+    @Deprecated(since = "2.1.0", forRemoval = true)
     public void saveToStream(ZipOutputStream zipStream) throws ZipException, IOException {
         if (this.path != null) {
             ZipUtil.addFileToZipStream(zipStream, this.path.toFile(), this.getId());
@@ -95,6 +97,7 @@ public class DataEntity extends AbstractEntity {
      * @param file the folder location where the entity should be written.
      * @throws IOException if something goes wrong with the writing.
      */
+    @Deprecated(since = "2.1.0", forRemoval = true)
     public void savetoFile(File file) throws IOException {
         if (this.getPath() != null) {
             if (this.getPath().toFile().isDirectory()) {

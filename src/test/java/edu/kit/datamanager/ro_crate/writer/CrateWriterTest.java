@@ -123,9 +123,9 @@ abstract class CrateWriterTest {
         Path extractionPath = tempDir.resolve("extracted_for_testing");
         this.ensureCrateIsExtractedIn(pathToZip, extractionPath);
         // compare the extracted directory with the correct one
-        assertTrue(HelpFunctions.compareTwoDir(
+        HelpFunctions.assertEqualDirectories(
                 correctCrate.toFile(),
-                extractionPath.toFile()));
+                extractionPath.toFile());
         HelpFunctions.compareCrateJsonToFileInResources(
                 builtCrate,
                 "/json/crate/fileAndDir.json");

@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+
+import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.slf4j.Logger;
@@ -36,17 +40,24 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipOutputStream zipStream) {
+    protected void saveDataEntities(Crate crate, ZipOutputStream zipStream) {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
             try {
-                dataEntity.saveToStream(zipStream);
+                this.saveDataEntity(dataEntity, zipStream);
             } catch (IOException e) {
                 logger.error("Could not save {} to zip stream!", dataEntity.getId(), e);
             }
         }
     }
 
-    private void saveMetadataJson(Crate crate, ZipOutputStream zipStream) {
+    protected void saveDataEntity(DataEntity dataEntity, ZipOutputStream zipStream) throws ZipException, IOException {
+        Path path = dataEntity.getPath();
+        if (path != null) {
+            ZipUtil.addFileToZipStream(zipStream, path.toFile(), dataEntity.getId());
+        }
+    }
+
+    protected void saveMetadataJson(Crate crate, ZipOutputStream zipStream) {
         try {
             // write the metadata.json file
             ZipParameters zipParameters = new ZipParameters();

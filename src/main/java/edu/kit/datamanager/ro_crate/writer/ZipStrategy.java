@@ -35,17 +35,25 @@ public class ZipStrategy implements GenericWriterStrategy<String> {
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipFile zipFile) {
+    protected void saveDataEntities(Crate crate, ZipFile zipFile) {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
             try {
-                dataEntity.saveToZip(zipFile);
+                this.saveDataEntity(dataEntity, zipFile);
             } catch (ZipException e) {
                 logger.error("Could not save " + dataEntity.getId() + " to zip file!", e);
             }
         }
     }
 
-    private void saveMetadataJson(Crate crate, ZipFile zipFile) {
+    protected void saveDataEntity(DataEntity dataEntity, ZipFile zipFile) throws ZipException {
+        if (dataEntity.getPath() != null) {
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip(dataEntity.getId());
+            zipFile.addFile(dataEntity.getPath().toFile(), zipParameters);
+        }
+    }
+
+    protected void saveMetadataJson(Crate crate, ZipFile zipFile) {
         try {
             // write the metadata.json file
             ZipParameters zipParameters = new ZipParameters();

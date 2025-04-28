@@ -25,6 +25,16 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
 
+    protected void saveDataEntity(DataEntity dataEntity, File file) throws IOException {
+        if (dataEntity.getPath() != null) {
+            if (dataEntity.getPath().toFile().isDirectory()) {
+                FileUtils.copyDirectory(dataEntity.getPath().toFile(), file.toPath().resolve(dataEntity.getId()).toFile());
+            } else {
+                FileUtils.copyFile(dataEntity.getPath().toFile(), file.toPath().resolve(dataEntity.getId()).toFile());
+            }
+        }
+    }
+
     @Override
     public void save(Crate crate, String destination) {
         File file = new File(destination);
@@ -54,7 +64,7 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
         }
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
             try {
-                dataEntity.savetoFile(file);
+                this.saveDataEntity(dataEntity, file);
             } catch (IOException e) {
                 logger.error("Cannot save " + dataEntity.getId() + " to destination folder!", e);
             }
