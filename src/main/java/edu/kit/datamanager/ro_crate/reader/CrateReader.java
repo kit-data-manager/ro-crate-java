@@ -98,14 +98,10 @@ public class CrateReader<T> {
     }
 
     private RoCrate rebuildCrate(ObjectNode metadataJson, File files, HashSet<String> usedFiles) {
-        if (metadataJson == null) {
-            logger.error("Metadata JSON is null, cannot rebuild crate");
-            return null;
-        }
-        if (files == null) {
-            logger.error("Content files directory is null, cannot rebuild crate");
-            return null;
-        }
+        Objects.requireNonNull(metadataJson,
+                "metadataJson must not be null – did the strategy fail to locate 'ro-crate-metadata.json'?");
+        Objects.requireNonNull(files,
+                "files directory must not be null – check GenericReaderStrategy.readContent()");
         JsonNode context = metadataJson.get(PROP_CONTEXT);
 
         CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
