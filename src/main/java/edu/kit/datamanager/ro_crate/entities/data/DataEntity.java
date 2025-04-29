@@ -8,9 +8,7 @@ import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 import edu.kit.datamanager.ro_crate.util.ZipUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,11 +46,12 @@ public class DataEntity extends AbstractEntity {
 
     /**
      * Adds an author ID to the entity.
-     *
+     * <p>
      * Calling this multiple times will add multiple author IDs.
      *
      * @param id the identifier of the author.
      */
+    @SuppressWarnings("unused")
     public void addAuthorId(String id) {
         this.addIdProperty("author", id);
     }
@@ -125,7 +124,7 @@ public class DataEntity extends AbstractEntity {
          * <p>
          * If the ID has not been set manually in beforehand, it will be derived
          * from the path. Use {@link #setId(String)} to override it or set it in
-         * beforehand. Note that another call of {@link #setLocation(Path)} will
+         * beforehand. Note that another call of this method will
          * not override the ID as it has been set by the previous call!
          *
          * @param path the location of the data. May be null, in which case
@@ -159,7 +158,7 @@ public class DataEntity extends AbstractEntity {
         /**
          * Same as {@link #setLocation(Path)} but instead of associating this
          * entity with a file, it will point to some place on the internet.
-         *
+         * <p>
          * Via the specification, this means the uri will be set as the ID. This
          * call is therefore equivalent to {@link #setId(String)}.
          *
@@ -214,7 +213,7 @@ public class DataEntity extends AbstractEntity {
 
     /**
      * Data Entity builder class that allows for easier data entity creation.
-     *
+     * <p>
      * If not explicitly mentioned, all methods avoid Exceptions and will
      * silently ignore null-parameters, in which case nothing will happen. Use
      * the available *WithExceptions-methods in case you need them.
