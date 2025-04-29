@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RorProvider {
 
-    private static Logger logger = LoggerFactory.getLogger(RorProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(RorProvider.class);
 
     private RorProvider() {
     }
@@ -42,7 +42,7 @@ public class RorProvider {
         HttpGet request = new HttpGet(newUrl);
 
         try (
-                CloseableHttpClient httpClient = HttpClients.createDefault(); CloseableHttpResponse response = httpClient.execute(request);) {
+                CloseableHttpClient httpClient = HttpClients.createDefault(); CloseableHttpResponse response = httpClient.execute(request)) {
             boolean isError = response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
             if (isError) {
                 String errorMessage = String.format("Identifier not found: %s", response.getStatusLine().toString());
@@ -69,7 +69,7 @@ public class RorProvider {
         if (node.isArray()) {
             for (JsonNode n : node) {
                 if (n.has("types") && n.path("types").isArray()) {
-                    ArrayList l = new ObjectMapper().convertValue(n.path("types"), ArrayList.class);
+                    ArrayList<?> l = new ObjectMapper().convertValue(n.path("types"), ArrayList.class);
                     if (l.contains("ror_display")) {
                         return n.path("value").asText();
                     }
