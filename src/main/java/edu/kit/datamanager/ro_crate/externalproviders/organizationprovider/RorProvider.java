@@ -53,10 +53,10 @@ public class RorProvider {
                     ObjectNode.class);
 
             return new OrganizationEntity.OrganizationEntityBuilder()
-                    .setId(jsonNode.get("id").asText())
-                    .addProperty("name", getOrganizationNameV2(jsonNode.get("names")))
-                    .addProperty("email", jsonNode.get("email_address"))
-                    .addProperty("url", jsonNode.get("id").asText())
+                    .setId(jsonNode.path("id").asText())
+                    .addProperty("name", getOrganizationNameV2(jsonNode.path("names")))
+                    .addProperty("email", jsonNode.path("email_address"))
+                    .addProperty("url", jsonNode.path("id").asText())
                     .build();
         } catch (IOException e) {
             String errorMessage = String.format("IO error: %s", e.getMessage());
@@ -68,15 +68,15 @@ public class RorProvider {
     private static String getOrganizationNameV2(JsonNode node) {
         if (node.isArray()) {
             for (JsonNode n : node) {
-                if (n.has("types") && n.get("types").isArray()) {
-                    ArrayList l = new ObjectMapper().convertValue(n.get("types"), ArrayList.class);
+                if (n.has("types") && n.path("types").isArray()) {
+                    ArrayList l = new ObjectMapper().convertValue(n.path("types"), ArrayList.class);
                     if (l.contains("ror_display")) {
-                        return n.get("value").asText();
+                        return n.path("value").asText();
                     }
                 }
             }
             //fallback
-            return node.get(0).get("value").asText();
+            return node.path(0).path("value").asText();
         } else {
             return node.asText();
         }
