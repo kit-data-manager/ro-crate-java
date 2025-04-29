@@ -80,6 +80,10 @@ abstract class CrateWriterTest {
                 Files.isDirectory(extractionPath.resolve("lots_of_little_files/")),
                 "The directory 'lots_of_little_files' should be present"
         );
+        assertTrue(
+                Files.isDirectory(extractionPath.resolve("lots_of_little_files/").resolve("subdir")),
+                "The directory 'lots_of_little_files/subdir' should be present"
+        );
     }
 
     /**
