@@ -50,7 +50,15 @@ abstract class CrateWriterTest {
         Path writtenCrate = tempDir.resolve("written-crate");
         Path extractionPath = tempDir.resolve("checkMe");
         {
-            RoCrate builtCrate = getCrateWithFileAndDir(pathToFile, pathToDir).build();
+            RoCrate builtCrate = getCrateWithFileAndDir(pathToFile, pathToDir)
+                    .addDataEntity(new DataSetEntity.DataSetBuilder()
+                            .addProperty("name", "Subdir")
+                            .addProperty("description", "Some subdir")
+                            .setLocationWithExceptions(pathToDir.resolve("subdir"))
+                            .setId("lots_of_little_files/subdir-renamed/")
+                            .build()
+                    )
+                    .build();
             this.saveCrate(builtCrate, writtenCrate);
             this.ensureCrateIsExtractedIn(writtenCrate, extractionPath);
         }
@@ -79,6 +87,20 @@ abstract class CrateWriterTest {
         assertTrue(
                 Files.isDirectory(extractionPath.resolve("lots_of_little_files/")),
                 "The directory 'lots_of_little_files' should be present"
+        );
+        assertTrue(
+                Files.isDirectory(extractionPath.resolve("lots_of_little_files/").resolve("subdir")),
+                "The directory 'lots_of_little_files/subdir' should be present"
+        );
+
+        /*
+         * As we added another DataSetEntity with location, the subdir should have a renamed copy as well
+         * Note: If this behavior is to be changed later on, we possibly need to change the documentation
+         *  of {@link AbstractDataEntityBuilder#setLocation(Path)}.
+         */
+        assertTrue(
+                Files.isDirectory(extractionPath.resolve("lots_of_little_files/").resolve("subdir-renamed")),
+                "The directory 'lots_of_little_files/subdir' should be present"
         );
     }
 
