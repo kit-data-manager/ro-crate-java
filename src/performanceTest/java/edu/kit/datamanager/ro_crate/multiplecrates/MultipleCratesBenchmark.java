@@ -39,7 +39,7 @@ public class MultipleCratesBenchmark {
    * @param numCrates the amount of crates.
    * @param numEntitiesProCrate the number of entities pro crate.
    * @param baseLocation the base location of the data entities.
-   * @throws IOException if the writting of the result ot a file fails.
+   * @throws IOException if the writing of the result of a file fails.
    */
   public static void multipleCratesCreation(
       int numCrates, int numEntitiesProCrate, String baseLocation) throws IOException {
@@ -59,7 +59,7 @@ public class MultipleCratesBenchmark {
             .addIdProperty("author", person)
             .build();
         crate.addContextualEntity(person);
-        crate.addDataEntity(file, true);
+        crate.addDataEntity(file);
       }
     }
     Instant end = Instant.now();

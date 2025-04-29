@@ -10,20 +10,28 @@ import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
+import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataEntity.DataEntityBuilder;
+import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
+import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;
 import edu.kit.datamanager.ro_crate.payload.RoCratePayload;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.preview.CustomPreview;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
+import edu.kit.datamanager.ro_crate.writer.FolderWriter;
+import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -57,22 +65,41 @@ public class RoCrate implements Crate {
         this.roCratePreview = preview;
     }
 
+    @Override
     public void setMetadataContext(CrateMetadataContext metadataContext) {
         this.metadataContext = metadataContext;
+    }
+
+    @Override
+    public String getMetadataContextValueOf(String key) {
+        return this.metadataContext.getValueOf(key);
+    }
+
+    @Override
+    public Set<String> getMetadataContextKeys() {
+        return this.metadataContext.getKeys();
+    }
+
+    @Override
+    public Map<String, String> getMetadataContextPairs() {
+        return this.metadataContext.getPairs();
     }
 
     public ContextualEntity getJsonDescriptor() {
         return jsonDescriptor;
     }
 
+    @Override
     public void setJsonDescriptor(ContextualEntity jsonDescriptor) {
         this.jsonDescriptor = jsonDescriptor;
     }
-
+    
+    @Override
     public RootDataEntity getRootDataEntity() {
         return rootDataEntity;
     }
-
+    
+    @Override
     public void setRootDataEntity(RootDataEntity rootDataEntity) {
         this.rootDataEntity = rootDataEntity;
     }
@@ -184,8 +211,8 @@ public class RoCrate implements Crate {
     /**
      * {@inheritDoc}
      * <p>
-     * Note: This will also link the DataEntity to the root node
-     * using the root nodes hasPart property.
+     * Note: This will also link the DataEntity to the root node using the root
+     * nodes hasPart property.
      *
      * @param entity the DataEntity to add to this crate.
      */
@@ -251,7 +278,7 @@ public class RoCrate implements Crate {
         private static final String PROPERTY_DESCRIPTION = "description";
 
         CratePayload payload;
-        CratePreview preview;
+        CratePreview preview = new CustomPreview();
         CrateMetadataContext metadataContext;
         ContextualEntity license;
         RootDataEntity rootDataEntity;
@@ -335,8 +362,8 @@ public class RoCrate implements Crate {
         /**
          * Adds a data entity to the crate.
          * <p>
-         * Note: This will also link the DataEntity to the root node
-         * using the root nodes hasPart property.
+         * Note: This will also link the DataEntity to the root node using the
+         * root nodes hasPart property.
          *
          * @param dataEntity the DataEntity to add to this crate.
          * @return returns the builder for further usage.
@@ -372,21 +399,22 @@ public class RoCrate implements Crate {
         /**
          * Setting the license of the crate using only a license identifier.
          *
-         * @param licenseId the licenses identifier. Should be a resolveable URI.
+         * @param licenseId the licenses identifier. Should be a resolveable
+         * URI.
          * @return the builder
          */
         public RoCrateBuilder setLicense(String licenseId) {
             ContextualEntity licenseEntity = new ContextualEntity.ContextualEntityBuilder()
-                .setId(licenseId)
-                .build();
+                    .setId(licenseId)
+                    .build();
             this.setLicense(licenseEntity);
             return this;
         }
 
         /**
-         * Adds a property with date time format. The property should match the ISO 8601
-         * date format.
-         * 
+         * Adds a property with date time format. The property should match the
+         * ISO 8601 date format.
+         *
          * @param dateValue time string in ISO 8601 format
          * @return this builder
          * @throws IllegalArgumentException if format is not ISO 8601
@@ -458,7 +486,8 @@ public class RoCrate implements Crate {
         }
 
         /**
-         * @see RoCrateBuilder#RoCrateBuilder(String, String, String, ContextualEntity)
+         * @see RoCrateBuilder#RoCrateBuilder(String, String, String,
+         * ContextualEntity)
          */
         public BuilderWithDraftFeatures(String name, String description, String datePublished, ContextualEntity licenseId) {
             super(name, description, datePublished, licenseId);

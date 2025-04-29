@@ -2,9 +2,8 @@ package edu.kit.datamanager.ro_crate.crate;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
-import edu.kit.datamanager.ro_crate.writer.FolderWriter;
-import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
+import edu.kit.datamanager.ro_crate.writer.Writers;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,8 +40,8 @@ class OtherFilesTest {
     HelpFunctions.compareCrateJsonToFileInResources(roCrate, "/json/crate/simple.json");
 
     // write the crate in the temp dir
-    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-    writer.save(roCrate, crate.toFile().getAbsolutePath());
+    Writers.newFolderWriter()
+            .save(roCrate, crate.toFile().getAbsolutePath());
 
     HelpFunctions.compareCrateJsonToFileInResources(new File(Objects.requireNonNull(OtherFilesTest.class.getResource("/json/crate/simple.json")).toURI()), crate.resolve("ro-crate-metadata.json").toFile());
 

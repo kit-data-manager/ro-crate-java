@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'jvm-test-suite'
-
+    id 'application'
     id 'jacoco'
     // Adds coveralls task for CI to send results to the coveralls service.
     id "com.github.kt3k.coveralls" version "2.12.2"
@@ -13,7 +13,7 @@ plugins {
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id "io.freefair.maven-publish-java" version "8.13"
+    id "io.freefair.maven-publish-java" version "8.13.1"
 }
 
 group 'edu.kit.datamanager'
@@ -23,6 +23,9 @@ println "Running gradle version: $gradle.gradleVersion"
 println "Building ${name} version: ${version}"
 println "JDK version: ${JavaVersion.current()}"
 println "Profile (system property): ${System.getProperty('profile')}"
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 if (JavaVersion.current() == JavaVersion.VERSION_17) {
     println "Setting encoding to UTF-8 manually"
@@ -40,7 +43,7 @@ ext {
 
 dependencies {
     // JUnit setup for testing
-    testImplementation(platform("org.junit:junit-bom:5.12.1"))
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation('org.junit.jupiter:junit-jupiter')
     testRuntimeOnly('org.junit.platform:junit-platform-launcher')
     // JSON object mapping / (de-)serialization
@@ -49,11 +52,11 @@ dependencies {
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.19.0'
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:6.18'
+    implementation 'com.github.fslev:json-compare:7.0'
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // logging
@@ -63,7 +66,12 @@ dependencies {
     // metadata validation, profiles based on JSON schema
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.6"
     implementation 'org.glassfish:jakarta.json:2.0.1'
+    //JTE for template processing
+    implementation('gg.jte:jte:3.2.0')
+    implementation("org.freemarker:freemarker:2.3.34")
 }
+
+logging.captureStandardOutput LogLevel.INFO
 
 def signingTasks = tasks.withType(Sign)
 tasks.withType(AbstractPublishToMaven).configureEach{
@@ -155,7 +163,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 
 // maxParallelForks(2)

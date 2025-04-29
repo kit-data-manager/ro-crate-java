@@ -29,7 +29,7 @@ public class RoCrateReaderSpec12Test {
     @Test
     void testReadingCrateWithConformsToArray() {
         String path = this.getClass().getResource("/crates/spec-1.2-DRAFT/minimal-with-conformsTo-Array").getPath();
-        Crate crate = new RoCrateReader(new FolderReader()).readCrate(path);
+        Crate crate = Readers.newFolderReader().readCrate(path);
         JsonNode conformsTo = crate.getJsonDescriptor().getProperty("conformsTo");
         assertTrue(conformsTo.isArray());
         assertEquals(2, conformsTo.size());
