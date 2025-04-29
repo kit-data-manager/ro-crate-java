@@ -1,5 +1,7 @@
 package edu.kit.datamanager.ro_crate.crate.preview;
 
+import edu.kit.datamanager.ro_crate.writer.CrateWriter;
+import edu.kit.datamanager.ro_crate.writer.Writers;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -8,8 +10,6 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.preview.AutomaticPreview;
 import edu.kit.datamanager.ro_crate.preview.CustomPreview;
 import edu.kit.datamanager.ro_crate.preview.StaticPreview;
-import edu.kit.datamanager.ro_crate.writer.FolderWriter;
-import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,8 +27,8 @@ public class PreviewCrateTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new AutomaticPreview())
                 .build();
-        RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-        writer.save(crate, location.toFile().getAbsolutePath());
+        Writers.newFolderWriter()
+                .save(crate, location.toFile().getAbsolutePath());
         assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
     }
 
@@ -38,7 +38,7 @@ public class PreviewCrateTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(null)//disable preview to allow to compare folders before and after
                 .build();
-        RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
+        CrateWriter<String> writer = Writers.newFolderWriter();
         writer.save(crate, location.toFile().toString());
         assertFalse(location.resolve("ro-crate-preview.html").toFile().exists());
         crate.setRoCratePreview(new AutomaticPreview());
@@ -52,8 +52,8 @@ public class PreviewCrateTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new CustomPreview())
                 .build();
-        RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-        writer.save(crate, location.toFile().getAbsolutePath());
+        Writers.newFolderWriter()
+                .save(crate, location.toFile().getAbsolutePath());
         assertTrue(Files.isRegularFile(location.resolve("ro-crate-preview.html")));
     }
 
@@ -65,8 +65,8 @@ public class PreviewCrateTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new StaticPreview(previewFile.toFile()))
                 .build();
-        RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-        writer.save(crate, location.toFile().toString());
+        Writers.newFolderWriter()
+                .save(crate, location.toFile().getAbsolutePath());
         assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
     }
 
@@ -81,8 +81,8 @@ public class PreviewCrateTest {
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new StaticPreview(previewFile.toFile(), dirHtml.toFile()))
                 .build();
-        RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-        writer.save(crate, location.toFile().toString());
+        Writers.newFolderWriter()
+                .save(crate, location.toFile().getAbsolutePath());
         assertTrue(location.resolve("ro-crate-preview.html").toFile().exists());
         assertTrue(location.resolve("ro-crate-preview_files").toFile().exists());
         assertTrue(location.resolve("ro-crate-preview_files").resolve("test.css").toFile().exists());

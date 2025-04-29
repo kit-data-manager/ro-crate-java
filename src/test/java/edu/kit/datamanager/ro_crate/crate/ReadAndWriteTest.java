@@ -6,9 +6,8 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.preview.StaticPreview;
 import edu.kit.datamanager.ro_crate.reader.CrateReader;
 import edu.kit.datamanager.ro_crate.reader.Readers;
-import edu.kit.datamanager.ro_crate.writer.FolderWriter;
-import edu.kit.datamanager.ro_crate.writer.RoCrateWriter;
 
+import edu.kit.datamanager.ro_crate.writer.Writers;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,8 +35,8 @@ class ReadAndWriteTest {
 
     Path writeDir = path.resolve("crate");
 
-    RoCrateWriter writer = new RoCrateWriter(new FolderWriter());
-    writer.save(crate, writeDir.toAbsolutePath().toString());
+    Writers.newFolderWriter()
+            .save(crate, writeDir.toAbsolutePath().toString());
 
     CrateReader<String> reader = Readers.newFolderReader();
     Crate newCrate = reader.readCrate(writeDir.toAbsolutePath().toString());
@@ -48,6 +47,7 @@ class ReadAndWriteTest {
     HelpFunctions.compareTwoCrateJson(newCrate, crate);
   }
 
+  @SuppressWarnings("DataFlowIssue")
   @Test
   void testReadCrateWithHasPartHierarchy() {
     CrateReader<String> reader = Readers.newFolderReader();
