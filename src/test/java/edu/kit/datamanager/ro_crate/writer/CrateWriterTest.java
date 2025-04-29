@@ -42,74 +42,43 @@ abstract class CrateWriterTest {
      */
     @Test
     void testFilesBeingAdjusted(@TempDir Path tempDir) throws IOException {
-        Path file1 = tempDir.resolve("input.txt");
-        FileUtils.writeStringToFile(file1.toFile(), "content of Local File", Charset.defaultCharset());
-        Path dirInCrate = tempDir.resolve("dir");
-        FileUtils.forceMkdir(dirInCrate.toFile());
-        Path dirInDirInCrate = dirInCrate.resolve("last_dir");
-        FileUtils.writeStringToFile(
-                dirInCrate.resolve("first.txt").toFile(),
-                "content of first file in dir",
-                Charset.defaultCharset());
-        FileUtils.writeStringToFile(
-                dirInDirInCrate.resolve("second.txt").toFile(),
-                "content of second file in dir",
-                Charset.defaultCharset());
-        FileUtils.writeStringToFile(
-                dirInCrate.resolve("third.txt").toFile(),
-                "content of third file in dir",
-                Charset.defaultCharset());
-
-        // create the RO_Crate including the files that should be present in it
-        RoCrate roCrate = new RoCrate.RoCrateBuilder(
-                "Example RO-Crate",
-                "The RO-Crate Root Data Entity",
-                "2024",
-                "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"
-        )
-                .addDataEntity(
-                        new FileEntity.FileEntityBuilder()
-                                .addProperty("name", "Diagram showing trend to increase")
-                                .addProperty("contentSize", "383766")
-                                .addProperty("description", "Illustrator file for Glop Pot")
-                                .setEncodingFormat("application/pdf")
-                                .setLocationWithExceptions(file1)
-                                .setId("cp7glop.ai")
-                                .build()
-                )
-                .addDataEntity(
-                        new DataSetEntity.DataSetBuilder()
-                                .addProperty("name", "Many files")
-                                .addProperty("description",
-                                        "This directory contains many small files, that we're not going to describe in detail.")
-                                .setLocationWithExceptions(dirInCrate)
-                                .setId("lots_of_little_files/")
-                                .build()
-                )
-                .setPreview(new AutomaticPreview())
-                .build();
+        Path correctCrate = tempDir.resolve("compare_with_me");
+        Path pathToFile = correctCrate.resolve("you-will-need-to-rename-this-file.ai");
+        Path pathToDir = correctCrate.resolve("you-will-need-to-rename-this-dir");
+        this.createManualCrateStructure(correctCrate, pathToFile, pathToDir);
 
         Path writtenCrate = tempDir.resolve("written-crate");
-        this.saveCrate(roCrate, writtenCrate);
-
         Path extractionPath = tempDir.resolve("checkMe");
-        this.ensureCrateIsExtractedIn(writtenCrate, extractionPath);
+        {
+            RoCrate builtCrate = getCrateWithFileAndDir(pathToFile, pathToDir).build();
+            this.saveCrate(builtCrate, writtenCrate);
+            this.ensureCrateIsExtractedIn(writtenCrate, extractionPath);
+        }
 
+        printFileTree(correctCrate);
         printFileTree(extractionPath);
 
-        // test if the names of the files in the crate are correct,
-        // when there is an ID the file should be called the same as the entity.
+        // The actual file name should **not** appear in the crate
+        String fileName = pathToFile.getFileName().toString();
+        assertFalse(
+                Files.isRegularFile(extractionPath.resolve(fileName)),
+                "The directory should not be present, because '%s' is a file in the crate".formatted(fileName)
+        );
+        // Instead, the file should be present with the name of the ID
         assertTrue(
                 Files.isRegularFile(extractionPath.resolve("cp7glop.ai")),
-                "The file should be present and have the name adjusted to the ID"
+                "The file 'cp7glop.ai' should be present and have the name adjusted to the ID"
         );
+        // The actual directory name should **not** appear in the crate
+        String dirName = pathToDir.getFileName().toString();
         assertFalse(
-                Files.isDirectory(extractionPath.resolve("dir")),
-                "The directory should not be present, because 'dir' is a file in the crate"
+                Files.isDirectory(extractionPath.resolve(dirName)),
+                "The directory should not be present, because '%s' is a file in the crate".formatted(dirName)
         );
+        // Instead, the directory should be present with the name of the ID
         assertTrue(
                 Files.isDirectory(extractionPath.resolve("lots_of_little_files/")),
-                "The directory 'lots_of_little_files' should be present and have the name adjusted to the ID"
+                "The directory 'lots_of_little_files' should be present"
         );
     }
 
@@ -252,7 +221,13 @@ abstract class CrateWriterTest {
         PreviewGenerator.generatePreview(correctCrate.toFile().getAbsolutePath());
         // create the files and directories
         FileUtils.writeStringToFile(pathToFile.toFile(), "content of Local File", Charset.defaultCharset());
-        FileUtils.forceMkdir(pathToDir.toFile());
+        // creates the directory and a subdirectory
+        Path subdir = pathToDir.resolve("subdir");
+        FileUtils.forceMkdir(subdir.toFile());
+        FileUtils.writeStringToFile(
+                subdir.resolve("subsubfirst.txt").toFile(),
+                "content of subsub file in subsubdir",
+                Charset.defaultCharset());
         FileUtils.writeStringToFile(
                 pathToDir.resolve("first.txt").toFile(),
                 "content of first file in dir",
