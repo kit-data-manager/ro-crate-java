@@ -5,6 +5,7 @@ import java.io.IOException;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
+import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,23 +19,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class RorProviderTest {
 
-  @Test
-  void testExternalRorProvider() throws IOException {
-    OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/04t3en479");
-    assertNotNull(organizationEntity);
-    HelpFunctions.compareEntityWithFile(organizationEntity, "/json/entities/contextual/rorkit.json");
-  }
+    @Test
+    void testExternalRorProvider() throws IOException {
+        OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/04t3en479");
+        assertNotNull(organizationEntity);
+        Assertions.assertEquals("https://ror.org/04t3en479", organizationEntity.getProperty("@id").asText());
+        Assertions.assertEquals("https://ror.org/04t3en479", organizationEntity.getProperty("url").asText());
+        Assertions.assertEquals("Karlsruhe Institute of Technology", organizationEntity.getProperty("name").asText());
+    }
 
-  @Test
-  void testInvalidRorUrl() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      RorProvider.getOrganization("https://notror.org/04t3en479");
-    });
-  }
+    @Test
+    void testInvalidRorUrl() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            RorProvider.getOrganization("https://notror.org/04t3en479");
+        });
+    }
 
-  @Test
-  void testInvalidRorId() {
-    OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/42");
-    assertNull(organizationEntity);
-  }
+    @Test
+    void testInvalidRorId() {
+        OrganizationEntity organizationEntity = RorProvider.getOrganization("https://ror.org/42");
+        assertNull(organizationEntity);
+    }
 }

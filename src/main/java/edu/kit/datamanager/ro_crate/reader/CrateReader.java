@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -97,14 +98,10 @@ public class CrateReader<T> {
     }
 
     private RoCrate rebuildCrate(ObjectNode metadataJson, File files, HashSet<String> usedFiles) {
-        if (metadataJson == null) {
-            logger.error("Metadata JSON is null, cannot rebuild crate");
-            return null;
-        }
-        if (files == null) {
-            logger.error("Content files directory is null, cannot rebuild crate");
-            return null;
-        }
+        Objects.requireNonNull(metadataJson,
+                "metadataJson must not be null – did the strategy fail to locate 'ro-crate-metadata.json'?");
+        Objects.requireNonNull(files,
+                "files directory must not be null – check GenericReaderStrategy.readContent()");
         JsonNode context = metadataJson.get(PROP_CONTEXT);
 
         CrateMetadataContext crateContext = new RoCrateMetadataContext(context);
@@ -224,7 +221,10 @@ public class CrateReader<T> {
             return Optional.empty();
         }
         return IdentifierUtils.decode(filepathOrId)
-                .map(decoded -> folder.toPath().resolve(decoded).toFile())
+                .map(decoded -> folder.toPath().resolve(decoded).normalize())
+                // defence-in-depth: ensure we are still inside the crate folder
+                .filter(resolved -> resolved.startsWith(folder.toPath()))
+                .map(Path::toFile)
                 .filter(File::exists);
     }
 
