@@ -117,8 +117,12 @@ public class DataEntity extends AbstractEntity {
         private List<String> authors = new ArrayList<>();
 
         /**
-         * Sets the location of the data entity.
-         *
+         * Sets the location of the data entity to make a copy from when writing the crate.
+         * <p>
+         * Use this if you want to copy the associated file to the crate.
+         * Do not use it if the file should already be considered (e.g.
+         * as part of a DataSetEntity).
+         * <p>
          * If the ID has not been set manually in beforehand, it will be derived
          * from the path. Use {@link #setId(String)} to override it or set it in
          * beforehand. Note that another call of {@link #setLocation(Path)} will
