@@ -33,6 +33,13 @@ abstract class CrateWriterTest {
      */
     abstract protected void saveCrate(Crate crate, Path target) throws IOException;
 
+    /**
+     * Test where the writer needs to rename files or folders in order to make a valid crate.
+     * The content will therefore not be equal to its source!
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
     @Test
     void testFilesBeingAdjusted(@TempDir Path tempDir) throws IOException {
         Path file1 = tempDir.resolve("input.txt");
@@ -85,27 +92,38 @@ abstract class CrateWriterTest {
         Path writtenCrate = tempDir.resolve("written-crate");
         this.saveCrate(roCrate, writtenCrate);
 
-        Path folderToMakeAssertionsOn = tempDir.resolve("checkMe");
-        this.ensureCrateIsExtractedIn(writtenCrate, folderToMakeAssertionsOn);
+        Path extractionPath = tempDir.resolve("checkMe");
+        this.ensureCrateIsExtractedIn(writtenCrate, extractionPath);
+
+        printFileTree(extractionPath);
 
         // test if the names of the files in the crate are correct,
         // when there is an ID the file should be called the same as the entity.
         assertTrue(
-                Files.isRegularFile(folderToMakeAssertionsOn.resolve("cp7glop.ai")),
+                Files.isRegularFile(extractionPath.resolve("cp7glop.ai")),
                 "The file should be present and have the name adjusted to the ID"
         );
+        assertFalse(
+                Files.isDirectory(extractionPath.resolve("dir")),
+                "The directory should not be present, because 'dir' is a file in the crate"
+        );
         assertTrue(
-                Files.isDirectory(folderToMakeAssertionsOn.resolve("lots_of_little_files/")),
-                "The directory should be present and have the name adjusted to the ID"
+                Files.isDirectory(extractionPath.resolve("lots_of_little_files/")),
+                "The directory 'lots_of_little_files' should be present and have the name adjusted to the ID"
         );
     }
 
+    /**
+     * Test where the writer should make an exact copy of our defined folder.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
     @Test
-    void testWriting(@TempDir Path tempDir) throws IOException {
+    void testWritingMakesCopy(@TempDir Path tempDir) throws IOException {
         // We need a correct directory to compare with.
         // It is built manually to ensure we meet our expectations.
         // Reader-writer-consistency is tested at {@link CrateReaderTest}
-        // TODO test javadoc
         Path correctCrate = tempDir.resolve("compare_with_me");
         Path pathToFile = correctCrate.resolve("cp7glop.ai");
         Path pathToDir = correctCrate.resolve("lots_of_little_files");
@@ -122,6 +140,9 @@ abstract class CrateWriterTest {
         // extract the zip file to a temporary directory
         Path extractionPath = tempDir.resolve("extracted_for_testing");
         this.ensureCrateIsExtractedIn(pathToZip, extractionPath);
+        printFileTree(correctCrate);
+        printFileTree(extractionPath);
+
         // compare the extracted directory with the correct one
         assertTrue(HelpFunctions.compareTwoDir(
                 correctCrate.toFile(),
@@ -129,6 +150,72 @@ abstract class CrateWriterTest {
         HelpFunctions.compareCrateJsonToFileInResources(
                 builtCrate,
                 "/json/crate/fileAndDir.json");
+    }
+
+    /**
+     * Test where the writer should only consider the files that are added to the metadata json.
+     * The crate should not contain any files that are not part of it.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    void testWritingOnlyConsidersAddedFiles(@TempDir Path tempDir) throws IOException {
+        Path correctCrate = tempDir.resolve("compare_with_me");
+        Path pathToFile = correctCrate.resolve("cp7glop.ai");
+        Path pathToDir = correctCrate.resolve("lots_of_little_files");
+
+        this.createManualCrateStructure(correctCrate, pathToFile, pathToDir);
+        {
+            // This file is not part of the crate, and should therefore not be present
+            Path falseFile = correctCrate.resolve("new");
+            FileUtils.writeStringToFile(
+                    falseFile.toFile(),
+                    "this file contains something else",
+                    Charset.defaultCharset());
+        }
+
+        // create the RO_Crate including the files that should be present in it
+        RoCrate roCrate = getCrateWithFileAndDir(pathToFile, pathToDir).build();
+
+        Path pathToZip = tempDir.resolve("writing-needs_testing.zip");
+        this.saveCrate(roCrate, pathToZip);
+
+
+        // extract and compare
+        Path extractionPath = tempDir.resolve("extracted_for_testing");
+        ensureCrateIsExtractedIn(pathToZip, extractionPath);
+        printFileTree(correctCrate);
+        printFileTree(extractionPath);
+
+        assertFalse(HelpFunctions.compareTwoDir(
+                correctCrate.toFile(),
+                extractionPath.toFile()),
+                "The crate should not contain the file that was not part of the metadata");
+        HelpFunctions.compareCrateJsonToFileInResources(
+                roCrate,
+                "/json/crate/fileAndDir.json");
+    }
+
+    /**
+     * Prints the file tree of the given directory for debugging and understanding
+     * a test more quickly.
+     *
+     * @param directoryToPrint the directory to print
+     * @throws IOException if an error occurs while printing the file tree
+     */
+    @SuppressWarnings("resource")
+    protected static void printFileTree(Path directoryToPrint) throws IOException {
+        // Print all files recursively in a tree structure for debugging
+        System.out.printf("Files in %s:%n", directoryToPrint.getFileName().toString());
+        Files.walk(directoryToPrint)
+                .forEach(path -> {
+                    if (!path.toAbsolutePath().equals(directoryToPrint.toAbsolutePath())) {
+                        int depth = path.relativize(directoryToPrint).getNameCount();
+                        String prefix = "  ".repeat(depth);
+                        System.out.printf("%s%s%s%n", prefix, "└── ", path.getFileName());
+                    }
+                });
     }
 
     /**
@@ -214,38 +301,5 @@ abstract class CrateWriterTest {
                                 .build()
                 )
                 .setPreview(new AutomaticPreview());
-    }
-
-    @Test
-    void testWritingFail(@TempDir Path tempDir) throws IOException {
-        Path correctCrate = tempDir.resolve("compare_with_me");
-        Path pathToFile = correctCrate.resolve("input.txt");
-        Path pathToDir = correctCrate.resolve("dir");
-
-        this.createManualCrateStructure(correctCrate, pathToFile, pathToDir);
-        {
-            // another file, which we will forget in our definition
-            Path falseFile = tempDir.resolve("new");
-            FileUtils.writeStringToFile(
-                    falseFile.toFile(),
-                    "this file contains something else",
-                    Charset.defaultCharset());
-        }
-
-        // create the RO_Crate including the files that should be present in it
-        RoCrate roCrate = getCrateWithFileAndDir(pathToFile, pathToDir).build();
-
-        Path pathToZip = tempDir.resolve("writing-needs_testing.zip");
-        this.saveCrate(roCrate, pathToZip);
-
-        // extract and compare
-        Path extractionPath = tempDir.resolve("extracted_for_testing");
-        ensureCrateIsExtractedIn(pathToZip, extractionPath);
-        assertFalse(HelpFunctions.compareTwoDir(
-                correctCrate.toFile(),
-                extractionPath.toFile()));
-        HelpFunctions.compareCrateJsonToFileInResources(
-                roCrate,
-                "/json/crate/fileAndDir.json");
     }
 }

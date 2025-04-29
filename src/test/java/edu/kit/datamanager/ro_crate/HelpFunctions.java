@@ -91,27 +91,27 @@ public class HelpFunctions {
 
     public static boolean compareTwoDir(File dir1, File dir2) throws IOException {
         // compare the content of the two directories
-        Map<String, File> result_map = FileUtils.listFiles(dir1, null, true)
+        Map<String, File> compareWithMe = FileUtils.listFiles(dir1, null, true)
                 .stream()
                 .collect(Collectors.toMap(java.io.File::getName, Function.identity()));
 
-        Map<String, java.io.File> input_map = FileUtils.listFiles(dir2, null, true)
+        Map<String, java.io.File> testMe = FileUtils.listFiles(dir2, null, true)
                 .stream()
-                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));;
+                .collect(Collectors.toMap(java.io.File::getName, Function.identity()));
 
 
-        if (result_map.size() != input_map.size()) {
+        if (compareWithMe.size() != testMe.size()) {
             return false;
         }
-        for (String s : input_map.keySet()) {
+        for (String filename : testMe.keySet()) {
             // we do that because the ro-crate-metadata.json can be differently formatted,
             // or the order of the entities may be different
             // the same holds for the html file
-            if (s.equals("ro-crate-preview.html") || s.equals("ro-crate-metadata.json")) {
-                if (!result_map.containsKey(s)) {
+            if (filename.equals("ro-crate-preview.html") || filename.equals("ro-crate-metadata.json")) {
+                if (!compareWithMe.containsKey(filename)) {
                     return false;
                 }
-            } else if (!FileUtils.contentEqualsIgnoreEOL(input_map.get(s), result_map.get(s), null)) {
+            } else if (!FileUtils.contentEqualsIgnoreEOL(testMe.get(filename), compareWithMe.get(filename), null)) {
                 return false;
             }
         }
