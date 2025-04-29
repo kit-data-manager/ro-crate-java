@@ -21,7 +21,7 @@ public class PreviewTest {
     @Test
     void staticPreviewSaveToFolderTest(@TempDir Path dir) throws IOException {
         var file1 = dir.resolve("file.html");
-        FileUtils.writeStringToFile(file1.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
+        FileUtils.writeStringToFile(file1.toFile(), "random html, does not need to be valid for this test", Charset.defaultCharset());
 
         var file2 = dir.resolve("directory");
         var fileInDir = file2.resolve("fileInDir.html");
@@ -49,7 +49,7 @@ public class PreviewTest {
     @Test
     void staticPreviewSaveToZip(@TempDir Path dir) throws IOException {
         var file1 = dir.resolve("file.html");
-        FileUtils.writeStringToFile(file1.toFile(), "random html it is not important that it is valid for know", Charset.defaultCharset());
+        FileUtils.writeStringToFile(file1.toFile(), "random html, does not need to be valid for this test", Charset.defaultCharset());
 
         var file2 = dir.resolve("directory");
         var fileInDir = file2.resolve("fileInDir.html");
@@ -79,7 +79,7 @@ public class PreviewTest {
     void testAutomaticPreviewAddToFolder(@TempDir Path dir) throws IOException {
         AutomaticPreview automaticPreview = new AutomaticPreview();
 
-        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/simple_crate/ro-crate-metadata.json");
+        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/other/idrc_project/ro-crate-metadata.json");
         Path crate = dir.resolve("crate");
         // this crate will not have a json file
         FileUtils.forceMkdir(crate.toFile());
@@ -93,7 +93,7 @@ public class PreviewTest {
     @Test
     void testAutomaticPreviewZip(@TempDir Path dir) throws IOException {
         AutomaticPreview automaticPreview = new AutomaticPreview();
-        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/simple_crate/ro-crate-metadata.json");
+        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/other/idrc_project/ro-crate-metadata.json");
         Path crate = dir.resolve("crate");
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip("ro-crate-metadata.json");
@@ -120,7 +120,7 @@ public class PreviewTest {
     void testCustomPreviewAddToFolder(@TempDir Path dir) throws IOException {
         CustomPreview customPreview = new CustomPreview();
 
-        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/simple_crate/ro-crate-metadata.json");
+        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/other/idrc_project/ro-crate-metadata.json");
         Path crate = dir.resolve("crate");
         // this crate will not have a json file
         Path fakeCrate = dir.resolve("fakeCrate");
@@ -142,14 +142,14 @@ public class PreviewTest {
     }
 
     @Test
-    void testCustomPreviewZip(@TempDir Path dir) throws IOException {
+    void testCustomPreviewZip(@TempDir Path tmp) throws IOException {
         CustomPreview customPreview = new CustomPreview();
-        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/simple_crate/ro-crate-metadata.json");
-        Path crate = dir.resolve("crate");
+        InputStream crateJson = PreviewTest.class.getResourceAsStream("/crates/other/idrc_project/ro-crate-metadata.json");
+        Path crate = tmp.resolve("crate");
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip("ro-crate-metadata.json");
 
-        ZipFile zipFile = new ZipFile(dir.resolve("test.zip").toFile());
+        ZipFile zipFile = new ZipFile(tmp.resolve("test.zip").toFile());
         zipFile.addStream(crateJson, zipParameters);
         crateJson.close();
 
@@ -157,7 +157,7 @@ public class PreviewTest {
 
         try {
             // this should trow an exception but not stop the execution
-            ZipFile randomZipFile = new ZipFile(dir.resolve("dddd.zip").toFile());
+            ZipFile randomZipFile = new ZipFile(tmp.resolve("dddd.zip").toFile());
             customPreview.saveAllToZip(randomZipFile);
             Assertions.fail("Expected IOException when providing invalid input to preview.");
         } catch (IOException ex) {
