@@ -37,11 +37,10 @@ public class CustomPreview implements CratePreview {
 
     private final static Logger logger = LoggerFactory.getLogger(CustomPreview.class);
 
-    private final Configuration cfg;
     private Template template = null;
 
     public CustomPreview() {
-        cfg = new Configuration(Configuration.VERSION_2_3_34);
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
         cfg.setClassForTemplateLoading(CustomPreview.class, "/");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
