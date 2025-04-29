@@ -12,6 +12,7 @@ import java.util.Set;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
 
 /**
  * A helping class for the creating of Data entities of type Dataset.
@@ -45,14 +46,20 @@ public class DataSetEntity extends DataEntity {
     @Override
     public void saveToZip(ZipFile zipFile) throws ZipException {
         if (this.getPath() != null) {
-            zipFile.addFolder(this.getPath().toFile());
+            ZipParameters parameters = new ZipParameters();
+            parameters.setRootFolderNameInZip(this.getId());
+            parameters.setIncludeRootFolder(false);
+            zipFile.addFolder(this.getPath().toFile(), parameters);
         }
     }
 
     @Override
-    public void saveToStream(ZipOutputStream zipOutputStream) throws ZipException, IOException {
+    public void saveToStream(ZipOutputStream zipOutputStream) throws IOException {
         if (this.getPath() != null) {
-            ZipUtil.addFolderToZipStream(zipOutputStream, this.getPath().toAbsolutePath().toString(), this.getPath().getFileName().toString());
+            ZipUtil.addFolderToZipStream(
+                    zipOutputStream,
+                    this.getPath().toAbsolutePath().toString(),
+                    this.getId());
         }
     }
 
