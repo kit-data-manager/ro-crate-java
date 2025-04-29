@@ -54,10 +54,10 @@ public class ZipStrategy implements GenericWriterStrategy<String> {
             // we create an JsonNode only to have the file written pretty
             JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
             String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-            InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
-            // write the ro-crate-metadata
-            zipFile.addStream(inputStream, zipParameters);
-            inputStream.close();
+            try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
+                // write the ro-crate-metadata
+                zipFile.addStream(inputStream, zipParameters);
+            }
             if (crate.getPreview() != null) {
                 crate.getPreview().saveAllToZip(zipFile);
             }

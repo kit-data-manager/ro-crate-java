@@ -12,7 +12,8 @@ class ZipStreamStrategyTest extends CrateWriterTest {
 
   @Override
   protected void saveCrate(Crate crate, Path target) throws IOException {
-    FileOutputStream stream = new FileOutputStream(target.toFile());
-    Writers.newZipStreamWriter().save(crate, stream);
+    try (FileOutputStream stream = new FileOutputStream(target.toFile())) {
+      Writers.newZipStreamWriter().save(crate, stream);
+    }
   }
 }
