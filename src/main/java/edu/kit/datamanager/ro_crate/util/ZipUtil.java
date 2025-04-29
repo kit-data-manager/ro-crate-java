@@ -13,9 +13,24 @@ import net.lingala.zip4j.model.ZipParameters;
  */
 public class ZipUtil {
 
-    public static void addFolderToZipStream(ZipOutputStream zipOutputStream, File folder, String parentPath) throws IOException {
+    /**
+     * Adds a folder and its contents to a ZipOutputStream.
+     *
+     * @param zipOutputStream The ZipOutputStream to which the folder will be added.
+     * @param folder The folder to be added.
+     * @param parentPath The path in the zip file where the folder will be added.
+     * @throws IOException If an I/O error occurs.
+     */
+    public static void addFolderToZipStream(
+            ZipOutputStream zipOutputStream,
+            File folder,
+            String parentPath
+    ) throws IOException {
         if (!folder.exists() || !folder.isDirectory()) {
-            throw new IllegalArgumentException("The provided folder path is not a valid directory: " + folder.getAbsolutePath());
+            throw new IllegalArgumentException(
+                    "The provided folder path is not a valid directory: %s"
+                            .formatted(folder.getAbsolutePath())
+            );
         }
 
         File[] files = folder.listFiles();
@@ -33,11 +48,34 @@ public class ZipUtil {
         }
     }
 
-    public static void addFolderToZipStream(ZipOutputStream zipOutputStream, String folderPath, String parentPath) throws IOException {
+    /**
+     * Adds a folder and its contents to a ZipOutputStream.
+     * @param zipOutputStream The ZipOutputStream to which the folder will be added.
+     * @param folderPath The path of the folder to be added.
+     * @param parentPath The path in the zip file where the folder will be added.
+     * @throws IOException If an I/O error occurs.
+     */
+    public static void addFolderToZipStream(
+            ZipOutputStream zipOutputStream,
+            String folderPath,
+            String parentPath
+    ) throws IOException {
         addFolderToZipStream(zipOutputStream, new File(folderPath), parentPath);
     }
 
-    public static void addFileToZipStream(ZipOutputStream zipOutputStream, File file, String zipEntryPath) throws IOException {
+    /**
+     * Adds a file to a ZipOutputStream.
+     *
+     * @param zipOutputStream The ZipOutputStream to which the file will be added.
+     * @param file The file to be added.
+     * @param zipEntryPath The path in the zip file where the file will be added.
+     * @throws IOException If an I/O error occurs.
+     */
+    public static void addFileToZipStream(
+            ZipOutputStream zipOutputStream,
+            File file,
+            String zipEntryPath
+    ) throws IOException {
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip(zipEntryPath);
         zipOutputStream.putNextEntry(zipParameters);
