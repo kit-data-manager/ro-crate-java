@@ -13,6 +13,8 @@ import java.util.UUID;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A ZIP file reader implementation of the StreamReaderStrategy interface.
@@ -21,8 +23,9 @@ import org.apache.commons.io.FileUtils;
  *
  * @author jejkal
  */
-public class ZipStreamReader implements StreamReaderStrategy {
+public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZipStreamStrategy.class);
     protected final String ID = UUID.randomUUID().toString();
     protected Path temporaryFolder = Path.of(String.format("./.tmp/ro-crate-java/zipStreamReader/%s/", ID));
     protected boolean isExtracted = false;
@@ -31,7 +34,7 @@ public class ZipStreamReader implements StreamReaderStrategy {
      * Crates a ZipStreamReader with the default configuration as described in
      * the class documentation.
      */
-    public ZipStreamReader() {
+    public ZipStreamStrategy() {
     }
 
     /**
@@ -44,7 +47,7 @@ public class ZipStreamReader implements StreamReaderStrategy {
      * subdirectories of the given directory. These subdirectories will have
      * UUIDs as their names.
      */
-    public ZipStreamReader(Path folderPath, boolean shallAddUuidSubfolder) {
+    public ZipStreamStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
         if (shallAddUuidSubfolder) {
             this.temporaryFolder = folderPath.resolve(ID);
         } else {

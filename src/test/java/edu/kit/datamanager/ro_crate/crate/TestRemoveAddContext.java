@@ -1,7 +1,6 @@
 package edu.kit.datamanager.ro_crate.crate;
 
-import edu.kit.datamanager.ro_crate.reader.FolderReader;
-import edu.kit.datamanager.ro_crate.reader.RoCrateReader;
+import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
@@ -21,7 +20,7 @@ public class TestRemoveAddContext {
   void setup() {
     String crateManifestPath = "/crates/extendedContextExample/";
     crateManifestPath = Objects.requireNonNull(TestRemoveAddContext.class.getResource(crateManifestPath)).getPath();
-    this.crateWithComplexContext = new RoCrateReader(new FolderReader()).readCrate(crateManifestPath);
+    this.crateWithComplexContext = Readers.newFolderReader().readCrate(crateManifestPath);
   }
 
   @Test
