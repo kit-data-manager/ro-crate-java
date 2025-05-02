@@ -213,86 +213,10 @@ see unit test
 
 ### [Example with file, author, location](https://www.researchobject.org/ro-crate/1.1/appendix/jsonld.html)
 
-```json
-{ "@context": "https://w3id.org/ro/crate/1.1/context",
-  "@graph": [
-
-    {
-      "@type": "CreativeWork",
-      "@id": "ro-crate-metadata.json",
-      "conformsTo": {"@id": "https://w3id.org/ro/crate/1.1"},
-      "about": {"@id": "./"},
-      "description": "RO-Crate Metadata File Descriptor (this file)"
-    },
-    {
-      "@id": "./",
-      "@type": "Dataset",
-      "name": "Example RO-Crate",
-      "description": "The RO-Crate Root Data Entity",
-      "datePublished": "2020",
-      "license": {"@id": "https://spdx.org/licenses/CC-BY-NC-SA-4.0"},
-      "hasPart": [
-        {"@id": "data1.txt"},
-        {"@id": "data2.txt"}
-      ]
-    },
-    {
-      "@id": "data1.txt",
-      "@type": "File",
-      "description": "One of hopefully many Data Entities",
-      "author": {"@id": "#alice"},
-      "contentLocation":  {"@id": "http://sws.geonames.org/8152662/"}
-    },
-    {
-      "@id": "data2.txt",
-      "@type": "File"
-    },
-
-    {
-      "@id": "#alice",
-      "@type": "Person",
-      "name": "Alice",
-      "description": "One of hopefully many Contextual Entities"
-    },
-    {
-      "@id": "http://sws.geonames.org/8152662/",
-      "@type": "Place",
-      "name": "Catalina Park"
-    }
- ]
-}
-```
-
 If there is no special method for including relative entities (ID properties) one can use `.addIdProperty("key","value")`.
 
 ```java
- PersonEntity alice = new PersonEntity.PersonEntityBuilder()
-        .setId("#alice")
-        .addProperty("name", "Alice")
-        .addProperty("description", "One of hopefully many Contextual Entities")
-        .build();
-    PlaceEntity park = new PlaceEntity.PlaceEntityBuilder()
-        .addContent(URI.create("http://sws.geonames.org/8152662/"))
-        .addProperty("name", "Catalina Park")
-        .build();
 
-    RoCrate crate = new RoCrate.RoCrateBuilder("Example RO-Crate", "The RO-Crate Root Data Entity", "2020", "https://spdx.org/licenses/CC-BY-NC-SA-4.0")
-        .addContextualEntity(park)
-        .addContextualEntity(alice)
-        .addDataEntity(
-            new FileEntity.FileEntityBuilder()
-                .addContent(Paths.get("......."), "data2.txt")
-                .build()
-        )
-        .addDataEntity(
-            new FileEntity.FileEntityBuilder()
-                .addContent(Paths.get("......."), "data1.txt")
-                .addProperty("description", "One of hopefully many Data Entities")
-                .addAuthor(alice.getId())
-                .addIdProperty("contentLocation", park)
-                .build()
-        )
-        .build();
 
 ```
 ### [Example with computational workflow](https://www.researchobject.org/ro-crate/1.1/workflows.html#complete-workflow-example)

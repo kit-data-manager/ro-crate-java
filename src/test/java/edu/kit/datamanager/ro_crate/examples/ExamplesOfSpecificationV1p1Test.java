@@ -2,6 +2,8 @@ package edu.kit.datamanager.ro_crate.examples;
 
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
+import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
@@ -181,5 +183,50 @@ public class ExamplesOfSpecificationV1p1Test {
                 .build();
 
         printAndAssertEquals(crate, "/spec-v1.1-example-json-files/web-based-data-entities.json");
+    }
+
+    /**
+     * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/appendix/jsonld.html">
+     *     Example with file, author, and location
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/file-author-location.json">location in repo</a>)
+     */
+    @Test
+    void testWithFileAuthorLocation() {
+        PersonEntity alice = new PersonEntity.PersonEntityBuilder()
+                .setId("#alice")
+                .addProperty("name", "Alice")
+                .addProperty("description", "One of hopefully many Contextual Entities")
+                .build();
+        PlaceEntity park = new PlaceEntity.PlaceEntityBuilder()
+                .setId(URI.create("http://sws.geonames.org/8152662/").toString())
+                .addProperty("name", "Catalina Park")
+                .build();
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Example RO-Crate",
+                "The RO-Crate Root Data Entity",
+                "2020",
+                "https://spdx.org/licenses/CC-BY-NC-SA-4.0"
+        )
+                .addContextualEntity(park)
+                .addContextualEntity(alice)
+                .addDataEntity(
+                        new FileEntity.FileEntityBuilder()
+                                .setLocation(Paths.get("......."))
+                                .setId("data2.txt")
+                                .build()
+                )
+                .addDataEntity(
+                        new FileEntity.FileEntityBuilder()
+                                .setLocation(Paths.get("......."))
+                                .setId("data1.txt")
+                                .addProperty("description", "One of hopefully many Data Entities")
+                                .addAuthor(alice.getId())
+                                .addIdProperty("contentLocation", park)
+                                .build()
+                )
+                .build();
+
+        printAndAssertEquals(crate, "/spec-v1.1-example-json-files/file-author-location.json");
     }
 }
