@@ -3,12 +3,10 @@ package edu.kit.datamanager.ro_crate.examples;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.entities.contextual.OrganizationEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
-import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
-import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
-import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.*;
 
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
 import org.junit.jupiter.api.Test;
@@ -261,5 +259,149 @@ public class ExamplesOfSpecificationV1p1Test {
         crate.getRootDataEntity().removeProperty("datePublished");
 
         printAndAssertEquals(crate, "/spec-v1.1-example-json-files/file-author-location.json");
+    }
+
+    /**
+     * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/workflows.html#complete-workflow-example">
+     *     Example with complete workflow
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/complete-workflow-example.json">location in repo</a>)
+     * <p>
+     * This example shows how to connect entities. If there is no specific method like
+     * {@link DataEntity.DataEntityBuilder#addAuthor(String)} for referencing other
+     * entities, one can use the more generic
+     * {@link AbstractEntity.AbstractEntityBuilder#addIdProperty(String, AbstractEntity)}
+     * or {@link AbstractEntity.AbstractEntityBuilder#addIdProperty(String, String)}.
+     * <p>
+     * <b>Important Note!</b> If you connect entities, make sure all entities are being
+     * added to the crate. We currently can't enforce this properly yet.
+     */
+    @Test
+    void testCompleteWorkflowExample() {
+        final String licenseId = "https://spdx.org/licenses/CC-BY-NC-SA-4.0";
+        ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
+                .addType("CreativeWork")
+                .setId(licenseId)
+                .addProperty("name", "Creative Commons Attribution Non Commercial Share Alike 4.0 International")
+                .addProperty("alternateName", "CC-BY-NC-SA-4.0")
+                .build();
+        ContextualEntity knime = new ContextualEntity.ContextualEntityBuilder()
+                .setId("#knime")
+                .addType("ComputerLanguage")
+                .addProperty("name", "KNIME Analytics Platform")
+                .addProperty("alternateName", "KNIME")
+                .addProperty("url", "https://www.knime.com/whats-new-in-knime-41")
+                .addProperty("version", "4.1.3")
+                .build();
+        OrganizationEntity workflowHub = new OrganizationEntity.OrganizationEntityBuilder()
+                .setId("#workflow-hub")
+                .addProperty("name", "Example Workflow Hub")
+                .addProperty("url", "http://example.com/workflows/")
+                .build();
+        ContextualEntity fasta = new ContextualEntity.ContextualEntityBuilder()
+                .setId("http://edamontology.org/format_1929")
+                .addType("Thing")
+                .addProperty("name", "FASTA sequence format")
+                .build();
+        ContextualEntity clustalW = new ContextualEntity.ContextualEntityBuilder()
+                .setId("http://edamontology.org/format_1982")
+                .addType("Thing")
+                .addProperty("name", "ClustalW alignment format")
+                .build();
+        ContextualEntity ban = new ContextualEntity.ContextualEntityBuilder()
+                .setId("http://edamontology.org/format_2572")
+                .addType("Thing")
+                .addProperty("name", "BAM format")
+                .build();
+        ContextualEntity nucSec = new ContextualEntity.ContextualEntityBuilder()
+                .setId("http://edamontology.org/data_2977")
+                .addType("Thing")
+                .addProperty("name", "Nucleic acid sequence")
+                .build();
+        ContextualEntity nucAlign = new ContextualEntity.ContextualEntityBuilder()
+                .setId("http://edamontology.org/data_1383")
+                .addType("Thing")
+                .addProperty("name", "Nucleic acid sequence alignment")
+                .build();
+        PersonEntity alice = new PersonEntity.PersonEntityBuilder()
+                .setId("#alice")
+                .addProperty("name", "Alice Brown")
+                .build();
+        ContextualEntity requiredParam = new ContextualEntity.ContextualEntityBuilder()
+                .addType("FormalParameter")
+                .setId("#36aadbd4-4a2d-4e33-83b4-0cbf6a6a8c5b")
+                .addProperty("name", "genome_sequence")
+                .addProperty("valueRequired", true)
+                .addIdProperty("conformsTo", "https://bioschemas.org/profiles/FormalParameter/0.1-DRAFT-2020_07_21/")
+                .addIdProperty("additionalType", nucSec)
+                .addIdProperty("format", fasta)
+                .build();
+        ContextualEntity clnParam = new ContextualEntity.ContextualEntityBuilder()
+                .addType("FormalParameter")
+                .setId("#6c703fee-6af7-4fdb-a57d-9e8bc4486044")
+                .addProperty("name", "cleaned_sequence")
+                .addIdProperty("conformsTo", "https://bioschemas.org/profiles/FormalParameter/0.1-DRAFT-2020_07_21/")
+                .addIdProperty("additionalType", nucSec)
+                .addIdProperty("encodingFormat", ban)
+                .build();
+        ContextualEntity alignParam = new ContextualEntity.ContextualEntityBuilder()
+                .addType("FormalParameter")
+                .setId("#2f32b861-e43c-401f-8c42-04fd84273bdf")
+                .addProperty("name", "sequence_alignment")
+                .addIdProperty("conformsTo", "https://bioschemas.org/profiles/FormalParameter/0.1-DRAFT-2020_07_21/")
+                .addIdProperty("additionalType", nucAlign)
+                .addIdProperty("encodingFormat", clustalW)
+                .build();
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Example RO-Crate",
+                "The RO-Crate Root Data Entity",
+                "2020",
+                licenseId
+        )
+                .setLicense(license)
+                .addContextualEntity(knime)
+                .addContextualEntity(workflowHub)
+                .addContextualEntity(fasta)
+                .addContextualEntity(clustalW)
+                .addContextualEntity(ban)
+                .addContextualEntity(nucSec)
+                .addContextualEntity(nucAlign)
+                .addContextualEntity(alice)
+                .addContextualEntity(requiredParam)
+                .addContextualEntity(clnParam)
+                .addContextualEntity(alignParam)
+                .addDataEntity(
+                        new WorkflowEntity.WorkflowEntityBuilder()
+                                .setId("workflow/alignment.knime")
+                                .setLocation(Paths.get("src"))
+                                .addIdProperty("conformsTo", "https://bioschemas.org/profiles/ComputationalWorkflow/0.5-DRAFT-2020_07_21/")
+                                .addProperty("name", "Sequence alignment workflow")
+                                .addIdProperty("programmingLanguage", "#knime")
+                                // This example does not use the term "author"...
+                                //.addAuthor("#alice")
+                                // instead, it uses "creator":
+                                .addIdProperty("creator", "#alice")
+                                .addProperty("dateCreated", "2020-05-23")
+                                .setLicense(licenseId)
+                                .addInput("#36aadbd4-4a2d-4e33-83b4-0cbf6a6a8c5b")
+                                .addOutput("#6c703fee-6af7-4fdb-a57d-9e8bc4486044")
+                                .addOutput("#2f32b861-e43c-401f-8c42-04fd84273bdf")
+                                .addProperty("url", "http://example.com/workflows/alignment")
+                                .addProperty("version", "0.5.0")
+                                .addIdProperty("sdPublisher", "#workflow-hub")
+                                .build()
+                )
+                .build();
+
+        // Similar to the previous example, this example from the specification
+        // spared out some details we now need to remove.
+        // Here we do not want to remove the license, only the reference to our root data entity.
+        // This is because (the way we constructed the crate) other entities use the license as well.
+        crate.getRootDataEntity().removeProperty("license");
+        crate.getRootDataEntity().removeProperty("datePublished");
+        crate.getRootDataEntity().removeProperty("name");
+        crate.getRootDataEntity().removeProperty("description");
+
+        printAndAssertEquals(crate, "/spec-v1.1-example-json-files/complete-workflow-example.json");
     }
 }
