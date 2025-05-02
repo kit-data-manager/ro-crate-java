@@ -2,9 +2,13 @@ package edu.kit.datamanager.ro_crate.examples;
 
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
+import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Paths;
 
 import static edu.kit.datamanager.ro_crate.HelpFunctions.printAndAssertEquals;
 
@@ -88,5 +92,46 @@ public class ExamplesOfSpecificationV1p1Test {
         minimal.addContextualEntity(license);
 
         printAndAssertEquals(minimal, "/spec-v1.1-example-json-files/minimal.json");
+    }
+
+    // https://www.researchobject.org/ro-crate/specification/1.1/data-entities.html#example-linking-to-a-file-and-folders
+
+    /**
+     * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/data-entities.html#example-linking-to-a-file-and-folders">
+     *     "Example linking to a file and folders"
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/files-and-folders.json.json">location in repo</a>)
+     * <p>
+     * Here we use the inner builder classes for the construction of the crate.
+     * Doing so, the Metadata File Descriptor and the Root Data Entity entities are added automatically.
+     * `setSource()` is used to provide the actual location of these Data Entities (if they are not remote).
+     * The Data Entity file in the crate will have the name of the entity's ID.
+     */
+    @Test
+    void testLinkingToFileAndFolders() {
+        RoCrate crate = new RoCrate.RoCrateBuilder()
+                .addDataEntity(
+                        new FileEntity.FileEntityBuilder()
+                                // This will tell us where the file is located. It will be copied to the crate.
+                                .setLocation(Paths.get("path to file"))
+                                // If no ID is given explicitly, the ID will be set to the filename.
+                                // Changing the ID means also to set the file name within the crate!
+                                .setId("cp7glop.ai")
+                                .addProperty("name", "Diagram showing trend to increase")
+                                .addProperty("contentSize", "383766")
+                                .addProperty("description", "Illustrator file for Glop Pot")
+                                .setEncodingFormat("application/pdf")
+                                .build()
+                )
+                .addDataEntity(
+                        new DataSetEntity.DataSetBuilder()
+                                .setLocation(Paths.get("path_to_files"))
+                                .setId("lots_of_little_files/")
+                                .addProperty("name", "Too many files")
+                                .addProperty("description", "This directory contains many small files, that we're not going to describe in detail.")
+                                .build()
+                )
+                .build();
+
+        printAndAssertEquals(crate, "/spec-v1.1-example-json-files/files-and-folders.json");
     }
 }

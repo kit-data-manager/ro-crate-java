@@ -205,72 +205,7 @@ see unit test
 
 ### [Example with files](https://www.researchobject.org/ro-crate/1.1/data-entities.html#example-linking-to-a-file-and-folders)
 
-```json
-{ "@context": "https://w3id.org/ro/crate/1.1/context",
-  "@graph": [
-    {
-      "@type": "CreativeWork",
-      "@id": "ro-crate-metadata.json",
-      "conformsTo": {"@id": "https://w3id.org/ro/crate/1.1"},
-      "about": {"@id": "./"}
-    },  
-    {
-      "@id": "./",
-      "@type": [
-        "Dataset"
-      ],
-      "hasPart": [
-        {
-          "@id": "cp7glop.ai"
-        },
-        {
-          "@id": "lots_of_little_files/"
-        }
-      ]
-    },
-    {
-      "@id": "cp7glop.ai",
-      "@type": "File",
-      "name": "Diagram showing trend to increase",
-      "contentSize": "383766",
-      "description": "Illustrator file for Glop Pot",
-      "encodingFormat": "application/pdf"
-    },
-    {
-      "@id": "lots_of_little_files/",
-      "@type": "Dataset",
-      "name": "Too many files",
-      "description": "This directory contains many small files, that we're not going to describe in detail."
-    }
-  ]
-}
-```
-
-Here we use the inner builder classes for the construction of the crate.
-Doing so, the Metadata File Descriptor and the Root Data Entity entities are added automatically.
-`setSource()` is used to provide the actual location of these Data Entities (if they are not remote).
-The Data Entity file in the crate will have the name of the entity's ID.
-
-```java
-  RoCrate crate = new RoCrate.RoCrateBuilder()
-        .addDataEntity(
-            new FileEntity.FileEntityBuilder()
-                .addContent (Paths.get("path to file"), "cp7glop.ai")
-                .addProperty("name", "Diagram showing trend to increase")
-                .addProperty("contentSize", "383766")
-                .addProperty("description", "Illustrator file for Glop Pot")
-                .setEncodingFormat("application/pdf")
-                .build()
-        )
-        .addDataEntity(
-            new DataSetEntity.DataSetBuilder()
-                .addContent (Paths.get("path_to_files"), "lots_of_little_files/")
-                .addProperty("name", "Too many files")
-                .addProperty("description", "This directory contains many small files, that we're not going to describe in detail.")
-                .build()
-        )
-        .build();
-```
+see unit test
 
 ### [Example with web resources](https://www.researchobject.org/ro-crate/1.1/data-entities.html#web-based-data-entities)
 
