@@ -348,6 +348,13 @@ public class RoCrate implements Crate {
             return this;
         }
 
+        /**
+         * Adds an "identifier" property to the root data entity.
+         * <p>
+         * This is useful e.g. to assign e.g. a DOI to this crate.
+         * @param identifier the identifier to add.
+         * @return this builder.
+         */
         public RoCrateBuilder addIdentifier(String identifier) {
             this.rootDataEntity.addProperty("identifier", identifier.strip());
             return this;
