@@ -23,8 +23,45 @@ public class ExamplesOfSpecificationV1p1Test {
      *     Minimal Example
      * </a>
      * <p>
+     * This is equivalent to {@link #testMinimalCrateWithoutCrateBuilder()}, but using more convenient APIs.
+     */
+    @Test
+    void testMinimalCrateConvenient() {
+        // Example 1: Basic RO-Crate
+        RoCrate minimal = new RoCrate.RoCrateBuilder(
+                "Data files associated with the manuscript:Effects of facilitated family case conferencing for ...",
+                "Palliative care planning for nursing home residents with advanced dementia ...",
+                "2017",
+                "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"
+        )
+                .setLicense( new ContextualEntity.ContextualEntityBuilder()
+                        .addType("CreativeWork")
+                        .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                        .addProperty("description", "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
+                        .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                        .addProperty("name", "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)")
+                        .build()
+                )
+                .addIdentifier("https://doi.org/10.4225/59/59672c09f4a4b")
+                .build();
+
+        // So you get something to see
+        prettyPrintJsonString(minimal.getJsonMetadata());
+        // Compare with the example from the specification
+        try {
+            HelpFunctions.compareCrateJsonToFileInResources(minimal, "/spec-v1.1-example-json-files/minimal.json");
+        } catch (IOException e) {
+            throw new AssertionFailedError("Missing resources file!", e);
+        }
+    }
+
+    /**
+     * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/root-data-entity.html#minimal-example-of-ro-crate">
+     *     Minimal Example
+     * </a>
+     * <p>
      * In this example, the crate is created without the builder.
-     * For the following examples, more convenient methods are used.
+     * Otherwise, the example is the same as {@link #testMinimalCrateConvenient()}.
      */
     @Test
     void testMinimalCrateWithoutCrateBuilder() {
