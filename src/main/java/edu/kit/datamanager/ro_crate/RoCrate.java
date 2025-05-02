@@ -354,6 +354,11 @@ public class RoCrate implements Crate {
             return this;
         }
 
+        public RoCrateBuilder addIdentifier(String identifier) {
+            this.rootDataEntity.addProperty("identifier", identifier.strip());
+            return this;
+        }
+
         public RoCrateBuilder addDescription(String description) {
             this.rootDataEntity.addProperty(PROPERTY_DESCRIPTION, description);
             return this;
