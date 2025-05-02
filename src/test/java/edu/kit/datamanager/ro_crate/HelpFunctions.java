@@ -34,8 +34,7 @@ public class HelpFunctions {
     
     public static void compare(JsonNode node1, JsonNode node2, Boolean equals) {
         var comparator = new JsonComparator() {
-        public boolean compareValues(Object expected, Object actual) {
-
+            public boolean compareValues(Object expected, Object actual) {
                 return expected.equals(actual);
             }
 
@@ -43,6 +42,7 @@ public class HelpFunctions {
                 return expected.equals(actual);
             }
         };
+
         if (equals) {
             JSONCompare.assertMatches(node1, node2, comparator);
         } else {
