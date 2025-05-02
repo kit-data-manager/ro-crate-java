@@ -13,7 +13,6 @@ and avoiding crates which do not fully comply to the specification, at the same 
 
 - [Instructions for your build manager (e.g., Gradle, Maven, etc.)](https://central.sonatype.com/artifact/edu.kit.datamanager/ro-crate-java)
 - [Quick-Start](#quick-start)
-- [Adapting Specification Examples](#adapting-the-specification-examples)
 - [Related Publications](https://publikationen.bibliothek.kit.edu/publikationslisten/get.php?referencing=all&external_publications=kit&lang=de&format=html&style=kit-3lines-title_b-authors-other&consider_suborganizations=true&order=desc%20year&contributors=%5B%5B%5B%5D%2C%5B%22p20751.105%22%5D%5D%5D&title_contains=crate)
 
 ## Build the library / documentation
@@ -31,12 +30,16 @@ On Windows, replace `./gradlew` with `gradlew.bat`.
 
 ## RO-Crate Specification Compatibility
 
-- ✅ Version 1.1
+- ✅ [Version 1.1](https://www.researchobject.org/ro-crate/1.1/) ([Extracted examples as well-described unit tests/guide](src/test/java/edu/kit/datamanager/ro_crate/examples/ExamplesOfSpecificationV1p1Test.java))
 - 🛠️ Version 1.2-DRAFT
   - ✅ Reading and writing crates with additional profiles or specifications ([examples for reading](src/test/java/edu/kit/datamanager/ro_crate/reader/RoCrateReaderSpec12Test.java), [examples for writing](src/test/java/edu/kit/datamanager/ro_crate/writer/RoCrateWriterSpec12Test.java))
   - ✅ Adding profiles or other specifications to a crate ([examples](src/test/java/edu/kit/datamanager/ro_crate/crate/BuilderSpec12Test.java))
 
 ## Quick-start
+
+> Note: We have a [module with well-described unit tests to guide you](src/test/java/edu/kit/datamanager/ro_crate/examples/), describing how to generate official examples extracted from the specification.
+> Specifically, the examples for the [specification in version 1.1](https://www.researchobject.org/ro-crate/1.1/) are available in [ExamplesOfSpecificationV1p1Test.java](src/test/java/edu/kit/datamanager/ro_crate/examples/ExamplesOfSpecificationV1p1Test.java).
+
 ### Example for a basic crate from [RO-Crate website](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor)
 ```java
 RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "licenseIdentifier").build();
@@ -176,7 +179,7 @@ RoCrate roCrate = new RoCrateBuilder("name", "description", "datePublished", "li
 
 Keep in mind that, if you want to use AutomaticPreview, you have to install ro-crate-html-js via `npm install --global ro-crate-html-js` first. 
 
-For StaticPreview, the constuctor is a bit different, such that it looks as follows: 
+For StaticPreview, the constructor is a bit different, such that it looks as follows: 
 
 ```java
 File pathToMainPreviewHtml = new File("localPath");
@@ -193,8 +196,3 @@ Right now, the only implemented way of validating a RO-crate is to use a [JSON-S
 Validator validator = new Validator(new JsonSchemaValidation("./schema.json"));
 boolean valid = validator.validate(crate);
 ```
-
-## Adapting the specification examples
-
-We have an [example module with unit tests](src/test/java/edu/kit/datamanager/ro_crate/example/), describing how to generate the official [examples from the specification](https://www.researchobject.org/ro-crate/1.1/).
-Specifically, the examples for the specification in version 1.1 are available in [ExamplesOfSpecificationV1p1Test.java](src/test/java/edu/kit/datamanager/ro_crate/examples/ExamplesOfSpecificationV1p1Test.java).
