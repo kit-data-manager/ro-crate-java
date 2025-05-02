@@ -1,17 +1,12 @@
 package edu.kit.datamanager.ro_crate.examples;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
-import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 
-import java.io.IOException;
+import org.junit.jupiter.api.Test;
+
+import static edu.kit.datamanager.ro_crate.HelpFunctions.printAndAssertEquals;
 
 /**
  * This class contains examples of the RO-Crate specification version 1.1.
@@ -45,14 +40,7 @@ public class ExamplesOfSpecificationV1p1Test {
                 .addIdentifier("https://doi.org/10.4225/59/59672c09f4a4b")
                 .build();
 
-        // So you get something to see
-        prettyPrintJsonString(minimal.getJsonMetadata());
-        // Compare with the example from the specification
-        try {
-            HelpFunctions.compareCrateJsonToFileInResources(minimal, "/spec-v1.1-example-json-files/minimal.json");
-        } catch (IOException e) {
-            throw new AssertionFailedError("Missing resources file!", e);
-        }
+        printAndAssertEquals(minimal, "/spec-v1.1-example-json-files/minimal.json");
     }
 
     /**
@@ -92,28 +80,6 @@ public class ExamplesOfSpecificationV1p1Test {
         );
         minimal.addContextualEntity(license);
 
-        // Print resulting json to console
-        prettyPrintJsonString(minimal.getJsonMetadata());
-        // Compare with the example from the specification
-        try {
-            HelpFunctions.compareCrateJsonToFileInResources(minimal, "/spec-v1.1-example-json-files/minimal.json");
-        } catch (IOException e) {
-            throw new AssertionFailedError("Missing resources file!", e);
-        }
-    }
-
-    protected static void prettyPrintJsonString(String minimalJsonMetadata) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(minimalJsonMetadata);
-            // Enable pretty printing
-            String prettyJson = objectMapper
-                    .enable(SerializationFeature.INDENT_OUTPUT)
-                    .writeValueAsString(jsonNode);
-            // Print the pretty JSON
-            System.out.println(prettyJson);
-        } catch (JsonProcessingException e) {
-            throw new AssertionFailedError("Not able to process string as JSON!", e);
-        }
+        printAndAssertEquals(minimal, "/spec-v1.1-example-json-files/minimal.json");
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
@@ -11,6 +12,7 @@ import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import org.apache.commons.io.FileUtils;
 import io.json.compare.JSONCompare;
 import io.json.compare.JsonComparator;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +73,32 @@ public class HelpFunctions {
         JsonNode node1 = objectMapper.readTree(crate1.getJsonMetadata());
         JsonNode node2 = objectMapper.readTree(crate2.getJsonMetadata());
         compare(node1, node2, true);
+    }
+
+    public static void prettyPrintJsonString(String minimalJsonMetadata) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(minimalJsonMetadata);
+            // Enable pretty printing
+            String prettyJson = objectMapper
+                    .enable(SerializationFeature.INDENT_OUTPUT)
+                    .writeValueAsString(jsonNode);
+            // Print the pretty JSON
+            System.out.println(prettyJson);
+        } catch (JsonProcessingException e) {
+            throw new AssertionFailedError("Not able to process string as JSON!", e);
+        }
+    }
+
+    public static void printAndAssertEquals(RoCrate crate, String pathToResource) {
+        // So you get something to see
+        prettyPrintJsonString(crate.getJsonMetadata());
+        // Compare with the example from the specification
+        try {
+            HelpFunctions.compareCrateJsonToFileInResources(crate, pathToResource);
+        } catch (IOException e) {
+            throw new AssertionFailedError("Missing resources file!", e);
+        }
     }
 
     public static void compareCrateJsonToFileInResources(File file1, File file2) throws IOException {
