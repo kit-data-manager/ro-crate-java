@@ -9,6 +9,7 @@ import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.nio.file.Paths;
 
 import static edu.kit.datamanager.ro_crate.HelpFunctions.printAndAssertEquals;
@@ -145,5 +146,40 @@ public class ExamplesOfSpecificationV1p1Test {
                 .build();
 
         printAndAssertEquals(crate, "/spec-v1.1-example-json-files/files-and-folders.json");
+    }
+
+    /**
+     * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/data-entities.html#web-based-data-entities">
+     *     "Example linking to a file and folders"
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/web-based-data-entities.json">location in repo</a>)
+     * <p>
+     * This example adds twp FileEntities to the crate.
+     * One is a local file, the other one is located in the web
+     * and will not be copied to the crate.
+     */
+    @Test
+    void testWebBasedDataEntities() {
+        RoCrate crate = new RoCrate.RoCrateBuilder()
+                .addDataEntity(
+                        new FileEntity.FileEntityBuilder()
+                                .setLocation(Paths.get("README.md"))
+                                .setId("survey-responses-2019.csv")
+                                .addProperty("name", "Survey responses")
+                                .addProperty("contentSize", "26452")
+                                .setEncodingFormat("text/csv")
+                                .build()
+                )
+                .addDataEntity(
+                        new FileEntity.FileEntityBuilder()
+                                .setLocation(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
+                                .addProperty("name", "RO-Crate specification")
+                                .addProperty("contentSize", "310691")
+                                .addProperty("description", "RO-Crate specification")
+                                .setEncodingFormat("application/pdf")
+                                .build()
+                )
+                .build();
+
+        printAndAssertEquals(crate, "/spec-v1.1-example-json-files/web-based-data-entities.json");
     }
 }

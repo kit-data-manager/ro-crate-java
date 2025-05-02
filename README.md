@@ -209,71 +209,7 @@ see unit test
 
 ### [Example with web resources](https://www.researchobject.org/ro-crate/1.1/data-entities.html#web-based-data-entities)
 
-```json
-{ "@context": "https://w3id.org/ro/crate/1.1/context",
-  "@graph": [
-    {
-        "@type": "CreativeWork",
-        "@id": "ro-crate-metadata.json",
-        "conformsTo": {"@id": "https://w3id.org/ro/crate/1.1"},
-        "about": {"@id": "./"}
-  },  
-  {
-    "@id": "./",
-    "@type": [
-      "Dataset"
-    ],
-    "hasPart": [
-      {
-        "@id": "survey-responses-2019.csv"
-      },
-      {
-        "@id": "https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"
-      },
-      ]
-  },
-  {
-    "@id": "survey-responses-2019.csv",
-    "@type": "File",
-    "name": "Survey responses",
-    "contentSize": "26452",
-    "encodingFormat": "text/csv"
-  },
-  {
-    "@id": "https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf",
-    "@type": "File",
-    "name": "RO-Crate specification",
-    "contentSize": "310691",
-    "description": "RO-Crate specification",
-    "encodingFormat": "application/pdf"
-  }
-]
-}
-```
-
-The web resource does not use `.setSource()`, but uses the ID to indicate the file's location.
-
-```java
- RoCrate crate = new RoCrate.RoCrateBuilder()
-        .addDataEntity(
-            new FileEntity.FileEntityBuilder()
-                .addContent (Paths.get("README.md"), "survey-responses-2019.csv")
-                .addProperty("name", "Survey responses")
-                .addProperty("contentSize", "26452")
-                .setEncodingFormat("text/csv")
-                .build()
-        )
-        .addDataEntity(
-            new FileEntity.FileEntityBuilder()
-                .addContent(URI.create("https://zenodo.org/record/3541888/files/ro-crate-1.0.0.pdf"))
-                .addProperty("name", "RO-Crate specification")
-                .addProperty("contentSize", "310691")
-                .addProperty("description", "RO-Crate specification")
-                .setEncodingFormat("application/pdf")
-                .build()
-        )
-        .build();
-```
+see unit test
 
 ### [Example with file, author, location](https://www.researchobject.org/ro-crate/1.1/appendix/jsonld.html)
 
