@@ -80,6 +80,13 @@ public class HelpFunctions {
         compare(node1, node2, true);
     }
 
+    /**
+     * Compares the JSON metadata of a Crate object with a JSON file in the resources directory.
+     *
+     * @param crate1        The Crate object to compare.
+     * @param jsonFileString The path to the JSON file in the resources directory.
+     * @throws IOException If an error occurs while reading the JSON file.
+     */
     public static void compareCrateJsonToFileInResources(Crate crate1, String jsonFileString) throws IOException {
         InputStream inputStream = HelpFunctions.class.getResourceAsStream(
                 jsonFileString);

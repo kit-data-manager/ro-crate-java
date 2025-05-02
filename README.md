@@ -196,71 +196,12 @@ boolean valid = validator.validate(crate);
 
 ## Adapting the specification examples
 
-This section describes how to generate the [official specifications examples](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#minimal-example-of-ro-crate). Each example first shows the ro-crate-metadata.json and, below that, the required Java code to generate it.
+We have an [example module with unit tests](src/test/java/edu/kit/datamanager/ro_crate/example/), describing how to generate the [official specifications examples](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#minimal-example-of-ro-crate).
+Specifically, the examples for the Specification in version 1.1 are available in [ExamplesOfSpecificationV1p1Test.java](src/test/java/edu/kit/datamanager/ro_crate/examples/ExamplesOfSpecificationV1p1Test.java).
 
 ### [Minimal example](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#minimal-example-of-ro-crate)
 
-```json
-{ "@context": "https://w3id.org/ro/crate/1.1/context", 
-  "@graph": [
-
- {
-    "@type": "CreativeWork",
-    "@id": "ro-crate-metadata.json",
-    "conformsTo": {"@id": "https://w3id.org/ro/crate/1.1"},
-    "about": {"@id": "./"}
- },  
- {
-    "@id": "./",
-    "identifier": "https://doi.org/10.4225/59/59672c09f4a4b",
-    "@type": "Dataset",
-    "datePublished": "2017",
-    "name": "Data files associated with the manuscript:Effects of facilitated family case conferencing for ...",
-    "description": "Palliative care planning for nursing home residents with advanced dementia ...",
-    "license": {"@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"}
- },
- {
-  "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-  "@type": "CreativeWork",
-  "description": "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.",
-  "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-  "name": "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
- }
- ]
-}
-```
-
-Here, everything is created manually.
-For the following examples, more convenient creation methods are used.
-
-```java
-  RoCrate crate = new RoCrate();
-
-    ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
-        .addType("CreativeWork")
-        .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
-        .addProperty("description", "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
-        .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
-        .addProperty("name", "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)")
-        .build();
-
-    crate.setRootDataEntity(new RootDataEntity.RootDataEntityBuilder()
-        .addProperty("identifier", "https://doi.org/10.4225/59/59672c09f4a4b")
-        .addProperty("datePublished", "2017")
-        .addProperty("name", "Data files associated with the manuscript:Effects of facilitated family case conferencing for ...")
-        .addProperty("description", "Palliative care planning for nursing home residents with advanced dementia ...")
-        .setLicense(license)
-        .build());
-
-    crate.setJsonDescriptor(new ContextualEntity.ContextualEntityBuilder()
-        .setId("ro-crate-metadata.json")
-        .addType("CreativeWork")
-        .addIdProperty("about", "./")
-        .addIdProperty("conformsTo", "https://w3id.org/ro/crate/1.1")
-        .build()
-    );
-    crate.addContextualEntity(license);
-```
+see unit test
 
 ### [Example with files](https://www.researchobject.org/ro-crate/1.1/data-entities.html#example-linking-to-a-file-and-folders)
 
