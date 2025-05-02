@@ -150,7 +150,7 @@ public class ExamplesOfSpecificationV1p1Test {
 
     /**
      * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/data-entities.html#web-based-data-entities">
-     *     "Example linking to a file and folders"
+     *     Example with web-based data entities
      * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/web-based-data-entities.json">location in repo</a>)
      * <p>
      * This example adds twp FileEntities to the crate.
