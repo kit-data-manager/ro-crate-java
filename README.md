@@ -213,12 +213,8 @@ see unit test
 
 ### [Example with file, author, location](https://www.researchobject.org/ro-crate/1.1/appendix/jsonld.html)
 
-If there is no special method for including relative entities (ID properties) one can use `.addIdProperty("key","value")`.
+see unit test
 
-```java
-
-
-```
 ### [Example with computational workflow](https://www.researchobject.org/ro-crate/1.1/workflows.html#complete-workflow-example)
 
 ```json

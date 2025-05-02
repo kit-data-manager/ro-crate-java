@@ -1,9 +1,11 @@
 package edu.kit.datamanager.ro_crate.examples;
 
 import edu.kit.datamanager.ro_crate.RoCrate;
+import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
@@ -189,24 +191,37 @@ public class ExamplesOfSpecificationV1p1Test {
      * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/appendix/jsonld.html">
      *     Example with file, author, and location
      * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/file-author-location.json">location in repo</a>)
+     * <p>
+     * This example shows how to connect entities. If there is no specific method like
+     * {@link DataEntity.DataEntityBuilder#addAuthor(String)} for referencing other
+     * entities, one can use the more generic
+     * {@link AbstractEntity.AbstractEntityBuilder#addIdProperty(String, AbstractEntity)}
+     * or {@link AbstractEntity.AbstractEntityBuilder#addIdProperty(String, String)}.
+     * <p>
+     * <b>Important Note!</b> If you connect entities, make sure all entities are being
+     * added to the crate. We currently can't enforce this properly yet.
      */
     @Test
     void testWithFileAuthorLocation() {
-        PersonEntity alice = new PersonEntity.PersonEntityBuilder()
+        // These two entities will be connected to others later on. Therefore, we make
+        // them easier referencable. Referencing can be done using the whole entity or
+        // its ID.
+        final PersonEntity alice = new PersonEntity.PersonEntityBuilder()
                 .setId("#alice")
                 .addProperty("name", "Alice")
                 .addProperty("description", "One of hopefully many Contextual Entities")
                 .build();
-        PlaceEntity park = new PlaceEntity.PlaceEntityBuilder()
+        final PlaceEntity park = new PlaceEntity.PlaceEntityBuilder()
                 .setId(URI.create("http://sws.geonames.org/8152662/").toString())
                 .addProperty("name", "Catalina Park")
                 .build();
+        final String licenseId = "https://spdx.org/licenses/CC-BY-NC-SA-4.0";
 
-        RoCrate crate = new RoCrate.RoCrateBuilder(
+        final RoCrate crate = new RoCrate.RoCrateBuilder(
                 "Example RO-Crate",
                 "The RO-Crate Root Data Entity",
                 "2020",
-                "https://spdx.org/licenses/CC-BY-NC-SA-4.0"
+                licenseId
         )
                 .addContextualEntity(park)
                 .addContextualEntity(alice)
@@ -221,11 +236,29 @@ public class ExamplesOfSpecificationV1p1Test {
                                 .setLocation(Paths.get("......."))
                                 .setId("data1.txt")
                                 .addProperty("description", "One of hopefully many Data Entities")
+                                // ↓ This is the specific way to add an author
                                 .addAuthor(alice.getId())
+                                // ↓ This is the generic way to add a location or other relations
                                 .addIdProperty("contentLocation", park)
                                 .build()
                 )
                 .build();
+
+        /*
+         The builder enforces to provide a license and a publishing date,
+         but the example does not have them. So we have to remove them below:
+         */
+
+        // **Note**: When you add a license, even if only by a string, the crate will
+        // implicitly also get a small ContextEntity for this license. When we remove
+        // this (any) entity, all references to it will be removed as well to ensure
+        // consistency within the crate. Therefore, there will be no trace left of
+        // the license.
+        crate.deleteEntityById(licenseId);
+
+        // The datePublished property is a simple property and simple to remove without
+        // any further internal checks.
+        crate.getRootDataEntity().removeProperty("datePublished");
 
         printAndAssertEquals(crate, "/spec-v1.1-example-json-files/file-author-location.json");
     }
