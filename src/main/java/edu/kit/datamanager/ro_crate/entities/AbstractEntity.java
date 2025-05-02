@@ -396,11 +396,12 @@ public class AbstractEntity {
         /**
          * Setting the id property of the entity, if the given value is not
          * null. If the id is not encoded, the encoding will be done.
-         *
-         * @apiNote <b>IDs are not just names!</b> The ID may have effects
+         * <p>
+         * <b>NOTE: IDs are not just names!</b> The ID may have effects
          * on parts of your crate! For example: If the entity represents a
          * file which will be copied into the crate, writers must use the
          * ID as filename.
+         *
          * @param id the String representing the id.
          * @return the generic builder.
          */
