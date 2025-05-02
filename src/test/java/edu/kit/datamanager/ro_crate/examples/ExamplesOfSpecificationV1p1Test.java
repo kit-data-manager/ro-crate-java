@@ -10,19 +10,20 @@ import static edu.kit.datamanager.ro_crate.HelpFunctions.printAndAssertEquals;
 
 /**
  * This class contains examples of the RO-Crate specification version 1.1.
+ * <p>
+ * This is supposed to serve both as a user guide and as a test for the implementation.
  */
 public class ExamplesOfSpecificationV1p1Test {
 
     /**
      * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/root-data-entity.html#minimal-example-of-ro-crate">
      *     Minimal Example
-     * </a>
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/minimal.json">location in repo</a>)
      * <p>
      * This is equivalent to {@link #testMinimalCrateWithoutCrateBuilder()}, but using more convenient APIs.
      */
     @Test
     void testMinimalCrateConvenient() {
-        // Example 1: Basic RO-Crate
         RoCrate minimal = new RoCrate.RoCrateBuilder(
                 "Data files associated with the manuscript:Effects of facilitated family case conferencing for ...",
                 "Palliative care planning for nursing home residents with advanced dementia ...",
@@ -46,7 +47,7 @@ public class ExamplesOfSpecificationV1p1Test {
     /**
      * From: <a href="https://www.researchobject.org/ro-crate/specification/1.1/root-data-entity.html#minimal-example-of-ro-crate">
      *     Minimal Example
-     * </a>
+     * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/minimal.json">location in repo</a>)
      * <p>
      * In this example, the crate is created without the builder.
      * Otherwise, the example is the same as {@link #testMinimalCrateConvenient()}.
