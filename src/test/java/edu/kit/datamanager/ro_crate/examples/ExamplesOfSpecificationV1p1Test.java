@@ -12,6 +12,7 @@ import static edu.kit.datamanager.ro_crate.HelpFunctions.printAndAssertEquals;
  * This class contains examples of the RO-Crate specification version 1.1.
  * <p>
  * This is supposed to serve both as a user guide and as a test for the implementation.
+ * Executing a test may also print some interesting information to the console.
  */
 public class ExamplesOfSpecificationV1p1Test {
 
@@ -24,17 +25,20 @@ public class ExamplesOfSpecificationV1p1Test {
      */
     @Test
     void testMinimalCrateConvenient() {
+        String licenseID = "https://creativecommons.org/licenses/by-nc-sa/3.0/au/";
         RoCrate minimal = new RoCrate.RoCrateBuilder(
                 "Data files associated with the manuscript:Effects of facilitated family case conferencing for ...",
                 "Palliative care planning for nursing home residents with advanced dementia ...",
                 "2017",
-                "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"
+                licenseID
         )
+                // We already had to set the license ID in the builder,
+                // but we can override it with more details to fit the example:
                 .setLicense( new ContextualEntity.ContextualEntityBuilder()
                         .addType("CreativeWork")
-                        .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                        .setId(licenseID)
                         .addProperty("description", "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.")
-                        .addProperty("identifier", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
+                        .addProperty("identifier", licenseID)
                         .addProperty("name", "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)")
                         .build()
                 )
@@ -72,6 +76,8 @@ public class ExamplesOfSpecificationV1p1Test {
                 .setLicense(license)
                 .build());
 
+        // This is pretty low-level. We are considering hiding/replacing this detailed API in major versions,
+        // so tell us (for example, open an issue) if you have a use case for it!
         minimal.setJsonDescriptor(new ContextualEntity.ContextualEntityBuilder()
                 .setId("ro-crate-metadata.json")
                 .addType("CreativeWork")
