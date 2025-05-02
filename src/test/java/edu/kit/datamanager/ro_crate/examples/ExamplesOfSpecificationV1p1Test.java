@@ -6,6 +6,7 @@ import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 
+import edu.kit.datamanager.ro_crate.writer.CrateWriter;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -25,7 +26,11 @@ public class ExamplesOfSpecificationV1p1Test {
      *     Minimal Example
      * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/minimal.json">location in repo</a>)
      * <p>
-     * This is equivalent to {@link #testMinimalCrateWithoutCrateBuilder()}, but using more convenient APIs.
+     * This example produces a minimal crate with a
+     * name, description, date, license and identifier.
+     * <p>
+     * This example produces the same result as
+     * {@link #testMinimalCrateWithoutCrateBuilder()}, but using more convenient APIs.
      */
     @Test
     void testMinimalCrateConvenient() {
@@ -57,8 +62,9 @@ public class ExamplesOfSpecificationV1p1Test {
      *     Minimal Example
      * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/minimal.json">location in repo</a>)
      * <p>
-     * In this example, the crate is created without the builder.
-     * Otherwise, the example is the same as {@link #testMinimalCrateConvenient()}.
+     * In this example, the minimal crate is created without the builder.
+     * This should only be done if necessary: Use the builder if possible.
+     * This example produces the same result as {@link #testMinimalCrateConvenient()}.
      */
     @Test
     void testMinimalCrateWithoutCrateBuilder() {
@@ -101,10 +107,16 @@ public class ExamplesOfSpecificationV1p1Test {
      *     "Example linking to a file and folders"
      * </a> (<a href="src/test/resources/spec-v1.1-example-json-files/files-and-folders.json.json">location in repo</a>)
      * <p>
-     * Here we use the inner builder classes for the construction of the crate.
-     * Doing so, the Metadata File Descriptor and the Root Data Entity entities are added automatically.
-     * `setSource()` is used to provide the actual location of these Data Entities (if they are not remote).
-     * The Data Entity file in the crate will have the name of the entity's ID.
+     * This example adds a File(Entity) and a DataSet(Entity) to the crate.
+     * The file and the folder are referenced by their location. This way
+     * they will be copied to the crate when writing it using a
+     * {@link CrateWriter}.
+     * The name of the file and the folder will be implicitly set to the
+     * ID of the respective entity in order to conform to the specification.
+     * <p>
+     * Here we use the inner builder classes for the construction of the
+     * crate. In contrast to {@link #testMinimalCrateWithoutCrateBuilder()},
+     * we do not have to care about specification details.
      */
     @Test
     void testLinkingToFileAndFolders() {
