@@ -567,7 +567,7 @@ public class AbstractEntity {
          * @deprecated To enforce the user know what this method does,
          *   we want the user to use one of the more explicitly named
          *   methods {@link #setAllIfValid(ObjectNode)} or
-         *   {@link #setAllUnsafe(ObjectNode)}.
+         *   {@link #setAllIfValid(ObjectNode)}.
          * @see #setAllIfValid(ObjectNode)
          */
         @Deprecated(since = "2.1.0", forRemoval = true)
@@ -582,6 +582,11 @@ public class AbstractEntity {
         /**
          * This sets everything from a json object to the property,
          * <b>if the result is valid</b>. Otherwise, it will do <b>nothing</b>.
+         * <p>
+         * Valid means here that the json object needs to be flat as specified
+         * in the RO-Crate specification. In principle, this means that
+         * primitives and objects referencing an ID are allowed,
+         * as well as arrays of these.
          *
          * @param properties the Json representing all the properties.
          * @return the generic builder, either including all given properties
@@ -600,6 +605,7 @@ public class AbstractEntity {
          * useful when the entity is already available somewhere.
          * <p>
          * Errors on validation are printed, but everything will be added.
+         * For more about validation, see {@link #setAllIfValid(ObjectNode)}.
          *
          * @param properties the Json representing all the properties.
          * @return the generic builder with all properties added.
