@@ -239,33 +239,60 @@ public class AbstractEntity {
      * @param id the "id" of the property.
      */
     public void addIdProperty(String name, String id) {
-        JsonNode jsonNode = addToIdProperty(name, id, this.properties.get(name));
-        if (jsonNode != null) {
-            this.linkedTo.add(id);
-            this.properties.set(name, jsonNode);
-            this.notifyObservers();
-        }
+        mergeIdIntoValue(id, this.properties.get(name))
+                .ifPresent(newValue -> {
+                    this.linkedTo.add(id);
+                    this.properties.set(name, newValue);
+                    this.notifyObservers();
+                });
     }
 
-    private static JsonNode addToIdProperty(String name, String id, JsonNode property) {
-        ObjectMapper objectMapper = MyObjectMapper.getMapper();
-        if (name != null && id != null) {
-            if (property == null) {
-                return objectMapper.createObjectNode().put("@id", id);
-            } else {
-                if (property.isArray()) {
-                    ArrayNode ns = (ArrayNode) property;
-                    ns.add(objectMapper.createObjectNode().put("@id", id));
-                    return ns;
-                } else {
-                    ArrayNode newNodes = objectMapper.createArrayNode();
-                    newNodes.add(property);
-                    newNodes.add(objectMapper.createObjectNode().put("@id", id));
-                    return newNodes;
-                }
-            }
+    /**
+     * Merges the given id into the current value,
+     * using this representation: {"@id" : "id"}.
+     * <p>
+     * The current value can be null without errors.
+     * Only the id will be considered in this case.
+     * <p>
+     * If the id is null-ish, it will not be added, similar to a null-ish value.
+     * If the id is already present, nothing will be done.
+     * If it is not an array and the id is not present, an array will be applied.
+     *
+     * @param id the id to add.
+     * @param currentValue the current value of the property.
+     * @return The updated value of the property.
+     *               Empty if value does not change!
+     */
+    private static Optional<JsonNode> mergeIdIntoValue(String id, JsonNode currentValue) {
+        if (id == null || id.isBlank()) { return Optional.empty(); }
+
+        ObjectMapper jsonBuilder = MyObjectMapper.getMapper();
+        ObjectNode newIdObject = jsonBuilder.createObjectNode().put("@id", id);
+        if (currentValue == null || currentValue.isNull() || currentValue.isMissingNode()) {
+            return Optional.ofNullable(newIdObject);
         }
-        return null;
+
+        boolean isIdAlready = currentValue.asText().equals(id);
+        boolean isIdObjectAlready = currentValue.path("@id").asText().equals(id);
+        boolean isArrayWithIdPresent = currentValue.valueStream()
+                .anyMatch(node -> node
+                        .path("@id")
+                        .asText()
+                        .equals(id));
+        if (isIdAlready || isIdObjectAlready || isArrayWithIdPresent) {
+            return Optional.empty();
+        }
+
+        if (currentValue.isArray() && currentValue instanceof ArrayNode currentValueAsArray) {
+            currentValueAsArray.add(newIdObject);
+            return Optional.of(currentValueAsArray);
+        } else {
+            // property is not an array, so we make it an array
+            ArrayNode newNodes = jsonBuilder.createArrayNode();
+            newNodes.add(currentValue);
+            newNodes.add(newIdObject);
+            return Optional.of(newNodes);
+        }
     }
 
     /**
@@ -369,6 +396,11 @@ public class AbstractEntity {
         /**
          * Setting the id property of the entity, if the given value is not
          * null. If the id is not encoded, the encoding will be done.
+         * <p>
+         * <b>NOTE: IDs are not just names!</b> The ID may have effects
+         * on parts of your crate! For example: If the entity represents a
+         * file which will be copied into the crate, writers must use the
+         * ID as filename.
          *
          * @param id the String representing the id.
          * @return the generic builder.
@@ -486,11 +518,11 @@ public class AbstractEntity {
          * @return the generic builder
          */
         public T addIdProperty(String name, String id) {
-            JsonNode jsonNode = AbstractEntity.addToIdProperty(name, id, this.properties.get(name));
-            if (jsonNode != null) {
-                this.properties.set(name, jsonNode);
-                this.relatedItems.add(id);
-            }
+            AbstractEntity.mergeIdIntoValue(id, this.properties.get(name))
+                    .ifPresent(newValue -> {
+                        this.properties.set(name, newValue);
+                        this.relatedItems.add(id);
+                    });
             return self();
         }
 

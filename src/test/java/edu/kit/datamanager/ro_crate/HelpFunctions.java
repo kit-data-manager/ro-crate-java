@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
@@ -11,6 +12,7 @@ import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import org.apache.commons.io.FileUtils;
 import io.json.compare.JSONCompare;
 import io.json.compare.JsonComparator;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +36,7 @@ public class HelpFunctions {
     
     public static void compare(JsonNode node1, JsonNode node2, Boolean equals) {
         var comparator = new JsonComparator() {
-        public boolean compareValues(Object expected, Object actual) {
-
+            public boolean compareValues(Object expected, Object actual) {
                 return expected.equals(actual);
             }
 
@@ -43,6 +44,7 @@ public class HelpFunctions {
                 return expected.equals(actual);
             }
         };
+
         if (equals) {
             JSONCompare.assertMatches(node1, node2, comparator);
         } else {
@@ -73,6 +75,32 @@ public class HelpFunctions {
         compare(node1, node2, true);
     }
 
+    public static void prettyPrintJsonString(String minimalJsonMetadata) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(minimalJsonMetadata);
+            // Enable pretty printing
+            String prettyJson = objectMapper
+                    .enable(SerializationFeature.INDENT_OUTPUT)
+                    .writeValueAsString(jsonNode);
+            // Print the pretty JSON
+            System.out.println(prettyJson);
+        } catch (JsonProcessingException e) {
+            throw new AssertionFailedError("Not able to process string as JSON!", e);
+        }
+    }
+
+    public static void printAndAssertEquals(RoCrate crate, String pathToResource) {
+        // So you get something to see
+        prettyPrintJsonString(crate.getJsonMetadata());
+        // Compare with the example from the specification
+        try {
+            HelpFunctions.compareCrateJsonToFileInResources(crate, pathToResource);
+        } catch (IOException e) {
+            throw new AssertionFailedError("Missing resources file!", e);
+        }
+    }
+
     public static void compareCrateJsonToFileInResources(File file1, File file2) throws IOException {
         ObjectMapper objectMapper = MyObjectMapper.getMapper();
         JsonNode node1 = JsonUtilFunctions.unwrapSingleArray(objectMapper.readTree(file1));
@@ -80,6 +108,13 @@ public class HelpFunctions {
         compare(node1, node2, true);
     }
 
+    /**
+     * Compares the JSON metadata of a Crate object with a JSON file in the resources directory.
+     *
+     * @param crate1        The Crate object to compare.
+     * @param jsonFileString The path to the JSON file in the resources directory.
+     * @throws IOException If an error occurs while reading the JSON file.
+     */
     public static void compareCrateJsonToFileInResources(Crate crate1, String jsonFileString) throws IOException {
         InputStream inputStream = HelpFunctions.class.getResourceAsStream(
                 jsonFileString);
