@@ -29,7 +29,7 @@ import java.util.stream.StreamSupport;
  * The constructor takes a strategy to support different ways of importing the
  * crates. (from zip, folder, etc.).
  * <p>
- * The reader consideres "hasPart" and "isPartOf" properties and considers all
+ * The reader considers "hasPart" and "isPartOf" properties and considers all
  * entities (in-)directly connected to the root entity ("./") as DataEntities.
  *
  * @param <T> the type of the location parameter

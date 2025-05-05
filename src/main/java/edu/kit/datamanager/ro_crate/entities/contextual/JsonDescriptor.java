@@ -39,7 +39,7 @@ public class JsonDescriptor extends ContextualEntity {
 
     /**
      * Builder for the JsonDescriptor.
-     * 
+     * <p>
      * Defaults to the latest stable crate version and no other conformsTo values.
      */
     public static final class Builder {

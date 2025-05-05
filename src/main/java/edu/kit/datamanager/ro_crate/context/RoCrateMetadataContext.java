@@ -113,9 +113,10 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     node.remove("@id");
     node.remove("@type");
 
-    Set<String> types = objectMapper.convertValue(entity.getProperties().get("@type"),
-        new TypeReference<>() {
-        });
+    Set<String> types = objectMapper.convertValue(
+            entity.getProperties().path("@type"),
+            new TypeReference<>() {}
+    );
     // check if the items in the array of types are present in the context
     for (String s : types) {
       // special cases:
@@ -181,7 +182,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         jsonNode = objectMapper.readValue(response.getEntity().getContent(),
             JsonNode.class);
       } catch (IOException e) {
-        System.err.println(String.format("Cannot get context from url %s", url));
+        System.err.printf("Cannot get context from url %s%n", url);
         return;
       }
       if (url.equals(DEFAULT_CONTEXT)) {
