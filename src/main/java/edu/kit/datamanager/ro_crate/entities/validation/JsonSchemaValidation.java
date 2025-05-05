@@ -60,6 +60,7 @@ public class JsonSchemaValidation implements EntityValidationStrategy {
     Set<ValidationMessage> errors = this.entitySchema.validate(entity);
     if (errors.size() != 0) {
       System.err.println("This entity does not comply to the basic RO-Crate entity structure.");
+      errors.forEach(error -> System.err.println(error.getMessage()));
       return false;
     }
     return true;
