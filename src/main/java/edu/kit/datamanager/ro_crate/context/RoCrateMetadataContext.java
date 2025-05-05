@@ -174,10 +174,9 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
       }
     }
     if (jsonNode == null) {
-      CloseableHttpClient httpclient = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(url);
       CloseableHttpResponse response;
-      try {
+      try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
         response = httpclient.execute(httpGet);
         jsonNode = objectMapper.readValue(response.getEntity().getContent(),
             JsonNode.class);
