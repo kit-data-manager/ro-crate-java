@@ -558,17 +558,57 @@ public class AbstractEntity {
         }
 
         /**
-         * This sets everything from a json object to the property. Can be
-         * useful when the entity is already available somewhere.
+         * Deprecated. Equivalent to {@link #setAllIfValid(ObjectNode)}.
          *
          * @param properties the Json representing all the properties.
-         * @return the generic builder.
+         * @return the generic builder, either including all given properties
+         *          * or unchanged.
+         *
+         * @deprecated To enforce the user know what this method does,
+         *   we want the user to use one of the more explicitly named
+         *   methods {@link #setAllIfValid(ObjectNode)} or
+         *   {@link #setAllUnsafe(ObjectNode)}.
+         * @see #setAllIfValid(ObjectNode)
          */
+        @Deprecated(since = "2.1.0", forRemoval = true)
         public T setAll(ObjectNode properties) {
             if (AbstractEntity.entityValidation.entityValidation(properties)) {
                 this.properties = properties;
                 this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
             }
+            return self();
+        }
+
+        /**
+         * This sets everything from a json object to the property,
+         * <b>if the result is valid</b>. Otherwise, it will do <b>nothing</b>.
+         *
+         * @param properties the Json representing all the properties.
+         * @return the generic builder, either including all given properties
+         * or unchanged.
+         */
+        public T setAllIfValid(ObjectNode properties) {
+            if (AbstractEntity.entityValidation.entityValidation(properties)) {
+                this.properties = properties;
+                this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
+            }
+            return self();
+        }
+
+        /**
+         * This sets everything from a json object to the property. Can be
+         * useful when the entity is already available somewhere.
+         * <p>
+         * Errors on validation are printed, but everything will be added.
+         *
+         * @param properties the Json representing all the properties.
+         * @return the generic builder with all properties added.
+         */
+        public T setAllUnsafe(ObjectNode properties) {
+            // This will currently only print errors.
+            AbstractEntity.entityValidation.entityValidation(properties);
+            this.properties = properties;
+            this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
             return self();
         }
 

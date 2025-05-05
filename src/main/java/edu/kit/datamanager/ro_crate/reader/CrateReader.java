@@ -119,7 +119,7 @@ public class CrateReader<T> {
                     if (dataEntityIds.contains(eId)) {
                         // data entity
                         DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
-                                .setAll(entityJson.deepCopy());
+                                .setAllUnsafe(entityJson.deepCopy());
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
@@ -133,7 +133,7 @@ public class CrateReader<T> {
                         // contextual entity
                         crate.addContextualEntity(
                                 new ContextualEntity.ContextualEntityBuilder()
-                                        .setAll(entityJson.deepCopy())
+                                        .setAllUnsafe(entityJson.deepCopy())
                                         .build());
                     }
                 }
@@ -255,7 +255,7 @@ public class CrateReader<T> {
 
                 crate.setRootDataEntity(
                         new RootDataEntity.RootDataEntityBuilder()
-                                .setAll(root.deepCopy())
+                                .setAllUnsafe(root.deepCopy())
                                 .setHasPart(hasPartIds)
                                 .build());
 
@@ -333,7 +333,7 @@ public class CrateReader<T> {
 
     private void setCrateDescriptor(RoCrate crate, JsonNode descriptor) {
         ContextualEntity descriptorEntity = new ContextualEntity.ContextualEntityBuilder()
-                .setAll(descriptor.deepCopy())
+                .setAllUnsafe(descriptor.deepCopy())
                 .build();
         crate.setJsonDescriptor(descriptorEntity);
     }
