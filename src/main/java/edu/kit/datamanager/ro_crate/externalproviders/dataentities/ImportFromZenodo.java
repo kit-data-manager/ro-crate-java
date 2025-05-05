@@ -112,12 +112,12 @@ public class ImportFromZenodo {
       for (var entity : graph) {
         if (entity.get("@id").asText().equals(mainId)) {
           var dataEntity = new DataEntity.DataEntityBuilder()
-              .setAllUnsafe((ObjectNode) entity).build();
+              .setAllIfValid((ObjectNode) entity).build();
           crate.addDataEntity(dataEntity);
         } else {
           // here we have to think of a way to differentiate between data and contextual entities.
           var contextualEntity = new ContextualEntity.ContextualEntityBuilder()
-              .setAllUnsafe((ObjectNode) entity).build();
+              .setAllIfValid((ObjectNode) entity).build();
           crate.addContextualEntity(contextualEntity);
         }
       }
