@@ -27,9 +27,13 @@ import static org.junit.jupiter.api.Assertions.*;
  *           This parameter is only required to satisfy the generic reader strategy.
  * @param <READER_STRATEGY> the type of the reader strategy
  */
-abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderStrategy<SOURCE_T>> {
-
-    protected static RoCrate.RoCrateBuilder newBaseCrate() {
+interface CommonReaderTest<
+        SOURCE_T,
+        READER_STRATEGY extends GenericReaderStrategy<SOURCE_T>
+        >
+        extends TestableReaderStrategy<SOURCE_T, READER_STRATEGY>
+{
+    static RoCrate.RoCrateBuilder newBaseCrate() {
         return new RoCrate.RoCrateBuilder(
                 "minimal",
                 "minimal RO_crate",
@@ -38,7 +42,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
         );
     }
 
-    protected static FileEntity newDataEntity(Path filePath) throws IllegalArgumentException {
+    static FileEntity newDataEntity(Path filePath) throws IllegalArgumentException {
         return new FileEntity.FileEntityBuilder()
                 .setLocationWithExceptions(filePath)
                 .setId(filePath.toFile().getName())
@@ -48,44 +52,8 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
                 .build();
     }
 
-    /**
-     * Saves the crate with the writer fitting to the reader of {@link #readCrate(Path)}.
-     *
-     * @param crate the crate to save
-     * @param target the target path to the save location
-     * @throws IOException if an error occurs while saving the crate
-     */
-    abstract protected void saveCrate(Crate crate, Path target) throws IOException;
-
-    /**
-     * Reads the crate with the reader fitting to the writer of {@link #saveCrate(Crate, Path)}.
-     * @param source the source path to the crate
-     * @return the read crate
-     * @throws IOException if an error occurs while reading the crate
-     */
-    abstract protected Crate readCrate(Path source) throws IOException;
-
-    /**
-     * Creates a new reader strategy with a non-default temporary directory (if supported, default otherwise).
-     *
-     * @param tmpDirectory the temporary directory to use
-     * @param useUuidSubfolder whether to create a UUID subfolder under the temporary directory
-     * @return a new reader strategy
-     */
-    abstract protected READER_STRATEGY newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder);
-
-    /**
-     * Reads the crate using the provided reader strategy.
-     *
-     * @param strategy the reader strategy to use
-     * @param source the source path to the crate
-     * @return the read crate
-     * @throws IOException if an error occurs while reading the crate
-     */
-    abstract protected Crate readCrate(READER_STRATEGY strategy, Path source) throws IOException;
-
     @Test
-    void testReadingBasicCrate(@TempDir Path temp) throws IOException {
+    default void testReadingBasicCrate(@TempDir Path temp) throws IOException {
 
         RoCrate roCrate = newBaseCrate().build();
         Path zipPath = temp.resolve("result.zip");
@@ -95,7 +63,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
     }
 
     @Test
-    void testWithFile(@TempDir Path temp) throws IOException {
+    default void testWithFile(@TempDir Path temp) throws IOException {
         Path csvPath = temp.resolve("survey-responses-2019.csv");
         FileUtils.touch(csvPath.toFile());
         FileUtils.writeStringToFile(csvPath.toFile(), "Dummy content", Charset.defaultCharset());
@@ -113,7 +81,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
     }
 
     @Test
-    void testWithFileUrlEncoded(@TempDir Path temp) throws IOException {
+    default void testWithFileUrlEncoded(@TempDir Path temp) throws IOException {
         // This URL will be encoded because of whitespaces
         Path csvPath = temp.resolve("survey responses 2019.csv");
         FileUtils.touch(csvPath.toFile());
@@ -140,7 +108,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
     }
 
     @Test
-    void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
+    default void TestWithFileWithLocation(@TempDir Path temp) throws IOException {
         Path csvPath = temp.resolve("survey-responses-2019.csv");
         FileUtils.writeStringToFile(csvPath.toFile(), "Dummy content", Charset.defaultCharset());
         RoCrate rawCrate = newBaseCrate()
@@ -168,7 +136,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
     }
 
     @Test
-    void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
+    default void TestWithFileWithLocationAddEntity(@TempDir Path temp) throws IOException {
         Path csvPath = temp.resolve("file.csv");
         FileUtils.writeStringToFile(csvPath.toFile(), "fakecsv.1", Charset.defaultCharset());
         RoCrate rawCrate = newBaseCrate()
@@ -206,7 +174,7 @@ abstract class CrateReaderTest<SOURCE_T, READER_STRATEGY extends GenericReaderSt
     }
 
     @Test
-    void testReadingBasicCrateWithCustomPath(@TempDir Path temp) throws IOException {
+    default void testReadingBasicCrateWithCustomPath(@TempDir Path temp) throws IOException {
         RoCrate rawCrate = newBaseCrate().build();
 
         // Write to zip file

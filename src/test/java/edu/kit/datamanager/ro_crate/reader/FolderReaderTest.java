@@ -17,21 +17,21 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-class FolderReaderTest extends CrateReaderTest<String, FolderStrategy> {
-
+class FolderReaderTest implements CommonReaderTest<String, FolderStrategy>
+{
   @Override
-  protected void saveCrate(Crate crate, Path target) {
+  public void saveCrate(Crate crate, Path target) {
     Writers.newFolderWriter().save(crate, target.toAbsolutePath().toString());
     assertTrue(target.toFile().isDirectory());
   }
 
   @Override
-  protected Crate readCrate(Path source) throws IOException {
+  public Crate readCrate(Path source) throws IOException {
     return Readers.newFolderReader().readCrate(source.toAbsolutePath().toString());
   }
 
   @Override
-  protected FolderStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
+  public FolderStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
     // This strategy does not support a non-default temporary directory
     // and will always use the default one.
     // It also has no state we could make assertions on.
@@ -39,7 +39,7 @@ class FolderReaderTest extends CrateReaderTest<String, FolderStrategy> {
   }
 
   @Override
-  protected Crate readCrate(FolderStrategy strategy, Path source) throws IOException {
+  public Crate readCrate(FolderStrategy strategy, Path source) throws IOException {
       return new CrateReader<>(strategy)
           .readCrate(source.toAbsolutePath().toString());
   }
