@@ -2,6 +2,7 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
@@ -106,7 +107,17 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
     }
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = temporaryFolder.resolve("ro-crate-metadata.json").toFile();
+    File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
+    if (!jsonMetadata.isFile()) {
+      // Try to find the metadata file in subdirectories
+      File firstSubdir = FileUtils.listFilesAndDirs(temporaryFolder.toFile(), null, null)
+          .stream()
+          .limit(50)
+          .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
+          .findFirst()
+          .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
+      jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
+    }
     
     try {
       return objectMapper.readTree(jsonMetadata).deepCopy();

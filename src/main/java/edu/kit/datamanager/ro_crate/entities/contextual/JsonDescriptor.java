@@ -13,8 +13,8 @@ import edu.kit.datamanager.ro_crate.special.CrateVersion;
 
 public class JsonDescriptor extends ContextualEntity {
 
-    private static final String CONFORMS_TO = "conformsTo";
-    protected static final String ID = "ro-crate-metadata.json";
+    protected static final String CONFORMS_TO = "conformsTo";
+    public static final String ID = "ro-crate-metadata.json";
 
     /**
      * Returns a JsonDescriptor with the conformsTo value set to the latest stable
