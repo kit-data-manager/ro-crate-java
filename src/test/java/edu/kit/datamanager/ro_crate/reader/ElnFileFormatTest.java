@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -40,7 +41,7 @@ public interface ElnFileFormatTest<
     })
     default void testReadElnCrates(String urlStr, @TempDir Path tmp) throws IOException {
         // Download the ELN file
-        URL url = new URL(urlStr);
+        URL url = URI.create(urlStr).toURL();
         Path elnFile = tmp.resolve("downloaded.eln");
         FileUtils.copyURLToFile(url, elnFile.toFile(), 10000, 10000);
         assertTrue(elnFile.toFile().exists());
