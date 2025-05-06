@@ -110,6 +110,11 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
                     if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
                         throw new IOException("Entry is outside of target directory: " + fileName);
                     }
+                    if (localFileHeader.isDirectory()) {
+                        FileUtils.forceMkdir(extractedFile);
+                        continue;
+                    }
+                    FileUtils.forceMkdir(extractedFile.getParentFile());
                     try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
                         while ((readLen = zipInputStream.read(readBuffer)) != -1) {
                             outputStream.write(readBuffer, 0, readLen);
