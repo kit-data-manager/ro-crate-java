@@ -4,15 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Enumeration;
 import java.util.UUID;
-import net.lingala.zip4j.io.inputstream.ZipInputStream;
-import net.lingala.zip4j.model.LocalFileHeader;
+
+import org.apache.commons.compress.archivers.zip.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.Logger;
@@ -99,26 +98,27 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
                 FileUtils.forceMkdir(folder);
             }
 
-            LocalFileHeader localFileHeader;
-            int readLen;
-            byte[] readBuffer = new byte[4096];
 
-            try (ZipInputStream zipInputStream = new ZipInputStream(stream)) {
-                while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-                    String fileName = localFileHeader.getFileName();
+            ZipFile.Builder zipFileBuilder = new ZipFile.Builder()
+                    .setByteArray(stream.readAllBytes())
+                    .setIgnoreLocalFileHeader(true)
+                    .setOpenOptions(StandardOpenOption.READ);
+            try (ZipFile zipFile = zipFileBuilder.get()) {
+                Enumeration<ZipArchiveEntry> filesInZip = zipFile.getEntries();
+                while (filesInZip.hasMoreElements()) {
+                    ZipArchiveEntry entry = filesInZip.nextElement();
+                    String fileName = entry.getName();
                     File extractedFile = new File(folder, fileName).getCanonicalFile();
                     if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
                         throw new IOException("Entry is outside of target directory: " + fileName);
                     }
-                    if (localFileHeader.isDirectory()) {
+                    if (entry.isDirectory()) {
                         FileUtils.forceMkdir(extractedFile);
                         continue;
                     }
                     FileUtils.forceMkdir(extractedFile.getParentFile());
                     try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
-                        while ((readLen = zipInputStream.read(readBuffer)) != -1) {
-                            outputStream.write(readBuffer, 0, readLen);
-                        }
+                        zipFile.getInputStream(entry).transferTo(outputStream);
                     }
                 }
             }
