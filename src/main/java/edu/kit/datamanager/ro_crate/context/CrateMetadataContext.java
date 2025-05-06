@@ -39,10 +39,23 @@ public interface CrateMetadataContext {
   Set<String> getKeys();
 
   /**
+   * Get an immutable collection of the keys in the metadata context that are
+   * explicitly set, not indirectly using a URL.
+   * @return the explicitly set keys in the metadata context
+   */
+  Set<String> getExplicitKeys();
+
+  /**
   * Get an immutable map of the context.
   * @return an immutable map containing the context key-value pairs
   */
   Map<String, String> getPairs();
+
+  /**
+   * Get an immutable collection of the urls in the metadata context.
+   * @return the urls in the metadata context
+   */
+  Set<String> getUrls();
 
   void deleteValuePairFromContext(String key);
 
