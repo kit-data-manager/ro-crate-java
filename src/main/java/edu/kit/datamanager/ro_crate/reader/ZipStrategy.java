@@ -6,6 +6,7 @@ import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,12 +111,16 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
     File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
     if (!jsonMetadata.isFile()) {
       // Try to find the metadata file in subdirectories
-      File firstSubdir = FileUtils.listFilesAndDirs(temporaryFolder.toFile(), null, null)
-          .stream()
-          .limit(50)
-          .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
-          .findFirst()
-          .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
+      File firstSubdir = FileUtils.listFilesAndDirs(
+            temporaryFolder.toFile(),
+            FileFilterUtils.directoryFileFilter(),
+            null // not recursive
+        )
+        .stream()
+        .limit(50)
+        .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
       jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
     }
     
