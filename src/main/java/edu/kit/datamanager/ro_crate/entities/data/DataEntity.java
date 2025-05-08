@@ -12,9 +12,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -52,22 +49,6 @@ public class DataEntity extends AbstractEntity {
     @SuppressWarnings("unused")
     public void addAuthorId(String id) {
         this.addIdProperty("author", id);
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a zip archive.
-     *
-     * @param zipFile the zipFile where it should be written.
-     * @throws ZipException when something goes wrong with the writing to the
-     * zip file.
-     */
-    public void saveToZip(ZipFile zipFile) throws ZipException {
-        if (this.path != null) {
-            ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setFileNameInZip(this.getId());
-            zipFile.addFile(this.path.toFile(), zipParameters);
-        }
     }
 
     /**

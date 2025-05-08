@@ -6,7 +6,6 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +31,9 @@ public class ZipStrategy implements GenericWriterStrategy<String> {
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipFile zipFile) throws ZipException {
+    private void saveDataEntities(Crate crate, ZipFile zipFile) throws IOException {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            dataEntity.saveToZip(zipFile);
+            this.saveToZip(dataEntity, zipFile);
         }
     }
 
@@ -52,6 +51,24 @@ public class ZipStrategy implements GenericWriterStrategy<String> {
         }
         if (crate.getPreview() != null) {
             crate.getPreview().saveAllToZip(zipFile);
+        }
+    }
+
+    private void saveToZip(DataEntity entity, ZipFile zipFile) throws IOException {
+        if (entity == null || entity.getPath() == null) {
+            return;
+        }
+
+        boolean isDirectory = entity.getPath().toFile().isDirectory();
+        if (isDirectory) {
+            ZipParameters parameters = new ZipParameters();
+            parameters.setRootFolderNameInZip(entity.getId());
+            parameters.setIncludeRootFolder(false);
+            zipFile.addFolder(entity.getPath().toFile(), parameters);
+        } else {
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip(entity.getId());
+            zipFile.addFile(entity.getPath().toFile(), zipParameters);
         }
     }
 }

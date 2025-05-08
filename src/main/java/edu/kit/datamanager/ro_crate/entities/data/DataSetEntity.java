@@ -7,9 +7,6 @@ import edu.kit.datamanager.ro_crate.entities.serializers.HasPartSerializer;
 
 import java.util.HashSet;
 import java.util.Set;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
 
 /**
  * A helping class for the creating of Data entities of type Dataset.
@@ -38,16 +35,6 @@ public class DataSetEntity extends DataEntity {
 
     public void removeFromHasPart(String str) {
         this.hasPart.remove(str);
-    }
-
-    @Override
-    public void saveToZip(ZipFile zipFile) throws ZipException {
-        if (this.getPath() != null) {
-            ZipParameters parameters = new ZipParameters();
-            parameters.setRootFolderNameInZip(this.getId());
-            parameters.setIncludeRootFolder(false);
-            zipFile.addFolder(this.getPath().toFile(), parameters);
-        }
     }
 
     public void addToHasPart(String id) {
