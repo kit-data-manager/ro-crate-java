@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import edu.kit.datamanager.ro_crate.entities.serializers.HasPartSerializer;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
-import java.io.IOException;
 
 import java.util.HashSet;
 import java.util.Set;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 
 /**
@@ -50,16 +47,6 @@ public class DataSetEntity extends DataEntity {
             parameters.setRootFolderNameInZip(this.getId());
             parameters.setIncludeRootFolder(false);
             zipFile.addFolder(this.getPath().toFile(), parameters);
-        }
-    }
-
-    @Override
-    public void saveToStream(ZipOutputStream zipOutputStream) throws IOException {
-        if (this.getPath() != null) {
-            ZipUtil.addFolderToZipStream(
-                    zipOutputStream,
-                    this.getPath().toAbsolutePath().toString(),
-                    this.getId());
         }
     }
 

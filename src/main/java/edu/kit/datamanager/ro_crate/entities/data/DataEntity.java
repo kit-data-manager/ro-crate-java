@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 
@@ -69,21 +67,6 @@ public class DataEntity extends AbstractEntity {
             ZipParameters zipParameters = new ZipParameters();
             zipParameters.setFileNameInZip(this.getId());
             zipFile.addFile(this.path.toFile(), zipParameters);
-        }
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a zip archive.
-     *
-     * @param zipStream The zip output stream where it should be written.
-     * @throws ZipException when something goes wrong with the writing to the
-     * zip file.
-     * @throws IOException If opening the file input stream fails.
-     */
-    public void saveToStream(ZipOutputStream zipStream) throws ZipException, IOException {
-        if (this.path != null) {
-            ZipUtil.addFileToZipStream(zipStream, this.path.toFile(), this.getId());
         }
     }
 

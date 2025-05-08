@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+
+import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.slf4j.Logger;
@@ -39,7 +42,7 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
     private void saveDataEntities(Crate crate, ZipOutputStream zipStream) {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
             try {
-                dataEntity.saveToStream(zipStream);
+                saveToStream(dataEntity, zipStream);
             } catch (IOException e) {
                 logger.error("Could not save {} to zip stream!", dataEntity.getId(), e);
             }
@@ -72,6 +75,34 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
             }
         } catch (IOException e) {
             logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
+        }
+    }
+
+    /**
+     * If the data entity contains a physical file. This method will write it
+     * when the crate is being written to a zip archive.
+     *
+     * @param zipStream The zip output stream where it should be written.
+     * @throws ZipException when something goes wrong with the writing to the
+     * zip file.
+     * @throws IOException If opening the file input stream fails.
+     */
+    private void saveToStream(DataEntity entity, ZipOutputStream zipStream) throws ZipException, IOException {
+        if (entity == null) {
+            return;
+        }
+
+        boolean isDirectory = entity.getPath().toFile().isDirectory();
+        if (isDirectory) {
+            ZipUtil.addFolderToZipStream(
+                    zipStream,
+                    entity.getPath().toAbsolutePath().toString(),
+                    entity.getId());
+        } else {
+            ZipUtil.addFileToZipStream(
+                    zipStream,
+                    entity.getPath().toFile(),
+                    entity.getId());
         }
     }
 }
