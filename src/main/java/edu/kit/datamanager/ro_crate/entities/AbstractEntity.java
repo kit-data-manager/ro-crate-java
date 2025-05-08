@@ -572,11 +572,7 @@ public class AbstractEntity {
          */
         @Deprecated(since = "2.1.0", forRemoval = true)
         public T setAll(ObjectNode properties) {
-            if (AbstractEntity.entityValidation.entityValidation(properties)) {
-                this.properties = properties;
-                this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
-            }
-            return self();
+            return setAllIfValid(properties);
         }
 
         /**
