@@ -29,52 +29,41 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
     private static final Logger logger = LoggerFactory.getLogger(ZipStreamStrategy.class);
 
     @Override
-    public void save(Crate crate, OutputStream destination) {
+    public void save(Crate crate, OutputStream destination) throws IOException {
         try (ZipOutputStream zipFile = new ZipOutputStream(destination)) {
             saveMetadataJson(crate, zipFile);
             saveDataEntities(crate, zipFile);
-        } catch (IOException e) {
-            // can not close ZipOutputStream (threw Exception)
-            logger.error("Failed to save ro-crate to zip stream.", e);
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipOutputStream zipStream) {
+    private void saveDataEntities(Crate crate, ZipOutputStream zipStream) throws IOException {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            try {
-                saveToStream(dataEntity, zipStream);
-            } catch (IOException e) {
-                logger.error("Could not save {} to zip stream!", dataEntity.getId(), e);
-            }
+            saveToStream(dataEntity, zipStream);
         }
     }
 
-    private void saveMetadataJson(Crate crate, ZipOutputStream zipStream) {
-        try {
-            // write the metadata.json file
-            ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setFileNameInZip("ro-crate-metadata.json");
-            ObjectMapper objectMapper = MyObjectMapper.getMapper();
-            // we create an JsonNode only to have the file written pretty
-            JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-            String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-            // write the ro-crate-metadata
+    private void saveMetadataJson(Crate crate, ZipOutputStream zipStream) throws IOException {
+        // write the metadata.json file
+        ZipParameters zipParameters = new ZipParameters();
+        zipParameters.setFileNameInZip("ro-crate-metadata.json");
+        ObjectMapper objectMapper = MyObjectMapper.getMapper();
+        // we create an JsonNode only to have the file written pretty
+        JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
+        String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        // write the ro-crate-metadata
 
-            byte[] buff = new byte[4096];
-            int readLen;
-            zipStream.putNextEntry(zipParameters);
-            try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
-                while ((readLen = inputStream.read(buff)) != -1) {
-                    zipStream.write(buff, 0, readLen);
-                }
+        byte[] buff = new byte[4096];
+        int readLen;
+        zipStream.putNextEntry(zipParameters);
+        try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
+            while ((readLen = inputStream.read(buff)) != -1) {
+                zipStream.write(buff, 0, readLen);
             }
-            zipStream.closeEntry();
+        }
+        zipStream.closeEntry();
 
-            if (crate.getPreview() != null) {
-                crate.getPreview().saveAllToStream(str, zipStream);
-            }
-        } catch (IOException e) {
-            logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
+        if (crate.getPreview() != null) {
+            crate.getPreview().saveAllToStream(str, zipStream);
         }
     }
 
@@ -87,7 +76,7 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
      * zip file.
      * @throws IOException If opening the file input stream fails.
      */
-    private void saveToStream(DataEntity entity, ZipOutputStream zipStream) throws ZipException, IOException {
+    private void saveToStream(DataEntity entity, ZipOutputStream zipStream) throws IOException {
         if (entity == null) {
             return;
         }
