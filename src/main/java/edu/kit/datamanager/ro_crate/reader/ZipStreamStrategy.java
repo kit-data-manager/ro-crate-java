@@ -85,53 +85,49 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
      * 
      * @param stream The input stream.
      */
-    private void readCrate(InputStream stream) {
-        try {
-            File folder = temporaryFolder.toFile();
-            // ensure the directory is clean
-            if (folder.exists()) {
-                if (folder.isDirectory()) {
-                    FileUtils.cleanDirectory(folder);
-                } else if (folder.isFile()) {
-                    FileUtils.delete(folder);
-                }
-            } else {
-                FileUtils.forceMkdir(folder);
+    private void readCrate(InputStream stream) throws IOException {
+        File folder = temporaryFolder.toFile();
+        // ensure the directory is clean
+        if (folder.exists()) {
+            if (folder.isDirectory()) {
+                FileUtils.cleanDirectory(folder);
+            } else if (folder.isFile()) {
+                FileUtils.delete(folder);
             }
-
-            LocalFileHeader localFileHeader;
-            int readLen;
-            byte[] readBuffer = new byte[4096];
-
-            try (ZipInputStream zipInputStream = new ZipInputStream(stream)) {
-                while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-                    String fileName = localFileHeader.getFileName();
-                    File extractedFile = new File(folder, fileName).getCanonicalFile();
-                    if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
-                        throw new IOException("Entry is outside of target directory: " + fileName);
-                    }
-                    if (localFileHeader.isDirectory()) {
-                        FileUtils.forceMkdir(extractedFile);
-                        continue;
-                    }
-                    FileUtils.forceMkdir(extractedFile.getParentFile());
-                    try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
-                        while ((readLen = zipInputStream.read(readBuffer)) != -1) {
-                            outputStream.write(readBuffer, 0, readLen);
-                        }
-                    }
-                }
-            }
-            this.isExtracted = true;
-            // register deletion on exit
-            FileUtils.forceDeleteOnExit(folder);
-        } catch (IOException ex) {
-            logger.error("Failed to read crate from input stream.", ex);
+        } else {
+            FileUtils.forceMkdir(folder);
         }
+
+        LocalFileHeader localFileHeader;
+        int readLen;
+        byte[] readBuffer = new byte[4096];
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(stream)) {
+            while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
+                String fileName = localFileHeader.getFileName();
+                File extractedFile = new File(folder, fileName).getCanonicalFile();
+                if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
+                    throw new IOException("Entry is outside of target directory: " + fileName);
+                }
+                if (localFileHeader.isDirectory()) {
+                    FileUtils.forceMkdir(extractedFile);
+                    continue;
+                }
+                FileUtils.forceMkdir(extractedFile.getParentFile());
+                try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
+                    while ((readLen = zipInputStream.read(readBuffer)) != -1) {
+                        outputStream.write(readBuffer, 0, readLen);
+                    }
+                }
+            }
+        }
+        this.isExtracted = true;
+        // register deletion on exit
+        FileUtils.forceDeleteOnExit(folder);
     }
 
     @Override
-    public ObjectNode readMetadataJson(InputStream stream) {
+    public ObjectNode readMetadataJson(InputStream stream) throws IOException {
         if (!isExtracted) {
             this.readCrate(stream);
         }
@@ -152,17 +148,11 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
                     .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
             jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
         }
-
-        try {
-            return objectMapper.readTree(jsonMetadata).deepCopy();
-        } catch (IOException e) {
-            logger.error("Failed to deserialize crate metadata.", e);
-            return null;
-        }
+        return objectMapper.readTree(jsonMetadata).deepCopy();
     }
 
     @Override
-    public File readContent(InputStream stream) {
+    public File readContent(InputStream stream) throws IOException {
         if (!isExtracted) {
             this.readCrate(stream);
         }

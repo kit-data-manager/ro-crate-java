@@ -20,6 +20,20 @@ public interface ElnFileFormatTest<
         extends TestableReaderStrategy<SOURCE_T, READER_STRATEGY>
 {
     /**
+     * Some readers may not be able to read a subset of eln files,
+     * e.g. because a zip file may not be readable in streaming mode.
+     * <p>
+     * An implementation test may use this methode to provide a subset of the
+     * test cases where an IOException is expected.
+     *
+     * @param input the input to test for presence in the blacklist
+     * @return true if the input is in the blacklist, false otherwise
+     */
+    default boolean isInBlacklist(String input) {
+        return false;
+    }
+
+    /**
      * ELN Crates are zip files not fully compatible with the Ro-Crate standard
      * in the sense that they must contain a single subfolder in the zip file
      * which then contain a crate as specified by the Ro-Crate standard.
@@ -46,9 +60,14 @@ public interface ElnFileFormatTest<
         FileUtils.copyURLToFile(url, elnFile.toFile(), 10000, 10000);
         assertTrue(elnFile.toFile().exists());
 
-        // Read the crate from the downloaded file
-        Crate read = this.readCrate(elnFile);
-        assertNotNull(read);
-        assertFalse(read.getAllDataEntities().isEmpty());
+        if (!isInBlacklist(urlStr)) {
+            // Read the crate from the downloaded file
+            Crate read = this.readCrate(elnFile);
+            assertNotNull(read);
+            assertFalse(read.getAllDataEntities().isEmpty());
+        } else {
+            // If the file is in the blacklist, we expect an IOException
+            assertThrows(IOException.class, () -> this.readCrate(elnFile));
+        }
     }
 }
