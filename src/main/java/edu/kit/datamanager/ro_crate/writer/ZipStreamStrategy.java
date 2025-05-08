@@ -67,15 +67,6 @@ public class ZipStreamStrategy implements GenericWriterStrategy<OutputStream> {
         }
     }
 
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a zip archive.
-     *
-     * @param zipStream The zip output stream where it should be written.
-     * @throws ZipException when something goes wrong with the writing to the
-     * zip file.
-     * @throws IOException If opening the file input stream fails.
-     */
     private void saveToStream(DataEntity entity, ZipOutputStream zipStream) throws IOException {
         if (entity == null) {
             return;
