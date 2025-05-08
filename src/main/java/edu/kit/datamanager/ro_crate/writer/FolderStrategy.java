@@ -49,7 +49,17 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
             }
         }
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            dataEntity.savetoFile(file);
+            savetoFile(dataEntity, file);
+        }
+    }
+
+    private void savetoFile(DataEntity entity, File file) throws IOException {
+        if (entity.getPath() != null) {
+            if (entity.getPath().toFile().isDirectory()) {
+                FileUtils.copyDirectory(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+            } else {
+                FileUtils.copyFile(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+            }
         }
     }
 }

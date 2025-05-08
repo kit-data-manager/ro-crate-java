@@ -6,13 +6,10 @@ import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 
 /**
  * The base class of every data entity.
@@ -49,23 +46,6 @@ public class DataEntity extends AbstractEntity {
     @SuppressWarnings("unused")
     public void addAuthorId(String id) {
         this.addIdProperty("author", id);
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a folder.
-     *
-     * @param file the folder location where the entity should be written.
-     * @throws IOException if something goes wrong with the writing.
-     */
-    public void savetoFile(File file) throws IOException {
-        if (this.getPath() != null) {
-            if (this.getPath().toFile().isDirectory()) {
-                FileUtils.copyDirectory(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
-            } else {
-                FileUtils.copyFile(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
-            }
-        }
     }
 
     @JsonIgnore
