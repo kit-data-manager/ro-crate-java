@@ -25,44 +25,33 @@ public class ZipStrategy implements GenericWriterStrategy<String> {
     private static final Logger logger = LoggerFactory.getLogger(ZipStrategy.class);
 
     @Override
-    public void save(Crate crate, String destination) {
+    public void save(Crate crate, String destination) throws IOException {
         try (ZipFile zipFile = new ZipFile(destination)) {
             saveMetadataJson(crate, zipFile);
             saveDataEntities(crate, zipFile);
-        } catch (IOException e) {
-            // can not close ZipFile (threw Exception)
-            logger.error("Failed to write ro-crate to destination " + destination + ".", e);
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipFile zipFile) {
+    private void saveDataEntities(Crate crate, ZipFile zipFile) throws ZipException {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            try {
-                dataEntity.saveToZip(zipFile);
-            } catch (ZipException e) {
-                logger.error("Could not save " + dataEntity.getId() + " to zip file!", e);
-            }
+            dataEntity.saveToZip(zipFile);
         }
     }
 
-    private void saveMetadataJson(Crate crate, ZipFile zipFile) {
+    private void saveMetadataJson(Crate crate, ZipFile zipFile) throws IOException {
         // write the metadata.json file
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip("ro-crate-metadata.json");
         ObjectMapper objectMapper = MyObjectMapper.getMapper();
-        try {
-            // we create an JsonNode only to have the file written pretty
-            JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-            String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-            try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
-                // write the ro-crate-metadata
-                zipFile.addStream(inputStream, zipParameters);
-            }
-            if (crate.getPreview() != null) {
-                crate.getPreview().saveAllToZip(zipFile);
-            }
-        } catch (IOException e) {
-            logger.error("Exception writing ro-crate-metadata.json file to zip.", e);
+        // we create an JsonNode only to have the file written pretty
+        JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
+        String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
+            // write the ro-crate-metadata
+            zipFile.addStream(inputStream, zipParameters);
+        }
+        if (crate.getPreview() != null) {
+            crate.getPreview().saveAllToZip(zipFile);
         }
     }
 }
