@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FolderReaderTest implements CommonReaderTest<String, FolderStrategy>
 {
   @Override
-  public void saveCrate(Crate crate, Path target) {
+  public void saveCrate(Crate crate, Path target) throws IOException {
     Writers.newFolderWriter().save(crate, target.toAbsolutePath().toString());
     assertTrue(target.toFile().isDirectory());
   }

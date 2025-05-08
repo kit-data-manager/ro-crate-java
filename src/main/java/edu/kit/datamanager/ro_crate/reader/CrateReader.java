@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public class CrateReader<T> {
      * @param location the location of the ro-crate to be read
      * @return the read RO-crate
      */
-    public RoCrate readCrate(T location) {
+    public RoCrate readCrate(T location) throws IOException {
         // get the ro-crate-metadata.json
         ObjectNode metadataJson = strategy.readMetadataJson(location);
         // get the content of the crate

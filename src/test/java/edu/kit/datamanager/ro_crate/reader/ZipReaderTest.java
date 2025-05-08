@@ -13,7 +13,7 @@ class ZipReaderTest implements
         ElnFileFormatTest<String, ZipStrategy>
 {
     @Override
-    public void saveCrate(Crate crate, Path target) {
+    public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newZipPathWriter().save(crate, target.toAbsolutePath().toString());
         assertTrue(target.toFile().isFile());
     }
