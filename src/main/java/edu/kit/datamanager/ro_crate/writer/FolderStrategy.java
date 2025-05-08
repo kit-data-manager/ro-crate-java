@@ -26,38 +26,30 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
     private static final Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
 
     @Override
-    public void save(Crate crate, String destination) {
+    public void save(Crate crate, String destination) throws IOException {
         File file = new File(destination);
-        try {
-            FileUtils.forceMkdir(file);
-            ObjectMapper objectMapper = MyObjectMapper.getMapper();
-            JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-            String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-            InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
+        FileUtils.forceMkdir(file);
+        ObjectMapper objectMapper = MyObjectMapper.getMapper();
+        JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
+        String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
 
-            File json = new File(destination, "ro-crate-metadata.json");
-            FileUtils.copyInputStreamToFile(inputStream, json);
-            inputStream.close();
-            // save also the preview files to the crate destination
-            if (crate.getPreview() != null) {
-                crate.getPreview().saveAllToFolder(file);
+        File json = new File(destination, "ro-crate-metadata.json");
+        FileUtils.copyInputStreamToFile(inputStream, json);
+        inputStream.close();
+        // save also the preview files to the crate destination
+        if (crate.getPreview() != null) {
+            crate.getPreview().saveAllToFolder(file);
+        }
+        for (var e : crate.getUntrackedFiles()) {
+            if (e.isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(e, file);
+            } else {
+                FileUtils.copyFileToDirectory(e, file);
             }
-            for (var e : crate.getUntrackedFiles()) {
-                if (e.isDirectory()) {
-                    FileUtils.copyDirectoryToDirectory(e, file);
-                } else {
-                    FileUtils.copyFileToDirectory(e, file);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Error creating destination directory!", e);
         }
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            try {
-                dataEntity.savetoFile(file);
-            } catch (IOException e) {
-                logger.error("Cannot save " + dataEntity.getId() + " to destination folder!", e);
-            }
+            dataEntity.savetoFile(file);
         }
     }
 }
