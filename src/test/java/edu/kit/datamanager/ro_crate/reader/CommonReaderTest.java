@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *           This parameter is only required to satisfy the generic reader strategy.
  * @param <READER_STRATEGY> the type of the reader strategy
  */
-interface CommonReaderTest<
+public interface CommonReaderTest<
         SOURCE_T,
         READER_STRATEGY extends GenericReaderStrategy<SOURCE_T>
         >
