@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.reader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.stream.StreamSupport;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ public class RoCrateReaderSpec12Test {
      * https://www.researchobject.org/ro-crate/1.2-DRAFT/profiles.html#declaring-conformance-of-an-ro-crate-profile
      */
     @Test
-    void testReadingCrateWithConformsToArray() {
+    void testReadingCrateWithConformsToArray() throws IOException {
         String path = this.getClass().getResource("/crates/spec-1.2-DRAFT/minimal-with-conformsTo-Array").getPath();
         Crate crate = Readers.newFolderReader().readCrate(path);
         JsonNode conformsTo = crate.getJsonDescriptor().getProperty("conformsTo");

@@ -2,9 +2,11 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,46 +80,51 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
     return isExtracted;
   }
 
-  private void readCrate(String location) {
-    try {
-      File folder = temporaryFolder.toFile();
-      // ensure the directory is clean
-      if (folder.isDirectory()) {
-        FileUtils.cleanDirectory(folder);
-      } else if (folder.isFile()) {
-        FileUtils.delete(folder);
-      }
-      // extract
-      try (ZipFile zf = new ZipFile(location)) {
-        zf.extractAll(temporaryFolder.toAbsolutePath().toString());
-        this.isExtracted = true;
-      }
-      // register deletion on exit
-      FileUtils.forceDeleteOnExit(folder);
-    } catch (IOException e) {
-      e.printStackTrace();
+  private void readCrate(String location) throws IOException {
+    File folder = temporaryFolder.toFile();
+    // ensure the directory is clean
+    if (folder.isDirectory()) {
+      FileUtils.cleanDirectory(folder);
+    } else if (folder.isFile()) {
+      FileUtils.delete(folder);
     }
+    // extract
+    try (ZipFile zf = new ZipFile(location)) {
+      zf.extractAll(temporaryFolder.toAbsolutePath().toString());
+      this.isExtracted = true;
+    }
+    // register deletion on exit
+    FileUtils.forceDeleteOnExit(folder);
   }
 
   @Override
-  public ObjectNode readMetadataJson(String location) {
+  public ObjectNode readMetadataJson(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = temporaryFolder.resolve("ro-crate-metadata.json").toFile();
-    
-    try {
-      return objectMapper.readTree(jsonMetadata).deepCopy();
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+    File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
+    if (!jsonMetadata.isFile()) {
+      // Try to find the metadata file in subdirectories
+      File firstSubdir = FileUtils.listFilesAndDirs(
+            temporaryFolder.toFile(),
+            FileFilterUtils.directoryFileFilter(),
+            null // not recursive
+        )
+        .stream()
+        .limit(50)
+        .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
+      jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
     }
+
+    return objectMapper.readTree(jsonMetadata).deepCopy();
   }
 
   @Override
-  public File readContent(String location) {
+  public File readContent(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }

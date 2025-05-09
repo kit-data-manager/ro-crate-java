@@ -49,7 +49,7 @@ class ReadAndWriteTest {
 
   @SuppressWarnings("DataFlowIssue")
   @Test
-  void testReadCrateWithHasPartHierarchy() {
+  void testReadCrateWithHasPartHierarchy() throws IOException {
     CrateReader<String> reader = Readers.newFolderReader();
     RoCrate crate = reader.readCrate(ReadAndWriteTest.class.getResource("/crates/hasPartHierarchy").getPath());
     assertEquals(1, crate.getAllContextualEntities().size());

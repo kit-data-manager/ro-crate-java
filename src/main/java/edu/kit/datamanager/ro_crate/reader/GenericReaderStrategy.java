@@ -2,6 +2,7 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Generic interface for the strategy of the reader class.
@@ -16,7 +17,7 @@ public interface GenericReaderStrategy<T> {
      * @param location the location to read from
      * @return the parsed metadata.json as ObjectNode
      */
-    ObjectNode readMetadataJson(T location);
+    ObjectNode readMetadataJson(T location) throws IOException;
 
     /**
      * Read the content from the given location.
@@ -24,5 +25,5 @@ public interface GenericReaderStrategy<T> {
      * @param location the location to read from
      * @return the content as a File
      */
-    File readContent(T location);
+    File readContent(T location) throws IOException;
 }

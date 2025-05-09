@@ -17,15 +17,11 @@ import java.nio.file.Path;
 public class FolderStrategy implements GenericReaderStrategy<String> {
 
   @Override
-  public ObjectNode readMetadataJson(String location) {
+  public ObjectNode readMetadataJson(String location) throws IOException {
     Path metadata = new File(location).toPath().resolve("ro-crate-metadata.json");
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ObjectNode objectNode = objectMapper.createObjectNode();
-    try {
-      objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
     return objectNode;
   }
 

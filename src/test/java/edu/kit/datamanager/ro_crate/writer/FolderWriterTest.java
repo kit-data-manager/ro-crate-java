@@ -11,16 +11,16 @@ import org.apache.commons.io.FileUtils;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-class FolderWriterTest extends CrateWriterTest {
+class FolderWriterTest implements CommonWriterTest {
 
     @Override
-    protected void saveCrate(Crate crate, Path target) throws IOException {
+    public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newFolderWriter()
                 .save(crate, target.toAbsolutePath().toString());
     }
 
     @Override
-    protected void ensureCrateIsExtractedIn(Path pathToCrate, Path expectedPath) throws IOException {
+    public void ensureCrateIsExtractedIn(Path pathToCrate, Path expectedPath) throws IOException {
         FileUtils.copyDirectory(pathToCrate.toFile(), expectedPath.toFile());
     }
 }

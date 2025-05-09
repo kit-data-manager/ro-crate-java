@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PreviewCrateTest {
 
     @Test
-    void testAutomaticPreview(@TempDir Path temp) {
+    void testAutomaticPreview(@TempDir Path temp) throws IOException {
         Path location = temp.resolve("ro_crate1");
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new AutomaticPreview())
@@ -33,7 +33,7 @@ public class PreviewCrateTest {
     }
 
     @Test
-    void testAutomaticPreviewAddingLater(@TempDir Path temp) {
+    void testAutomaticPreviewAddingLater(@TempDir Path temp) throws IOException {
         Path location = temp.resolve("ro_crate2");
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(null)//disable preview to allow to compare folders before and after
@@ -47,7 +47,7 @@ public class PreviewCrateTest {
     }
 
     @Test
-    void testCustomPreview(@TempDir Path temp) {
+    void testCustomPreview(@TempDir Path temp) throws IOException {
         Path location = temp.resolve("ro_crate1");
         RoCrate crate = new RoCrate.RoCrateBuilder("name", "description", "2024", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
                 .setPreview(new CustomPreview())

@@ -17,6 +17,8 @@ import org.opentest4j.AssertionFailedError;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -151,5 +153,26 @@ public class HelpFunctions {
             }
         }
         return true;
+    }
+
+    /**
+     * Prints the file tree of the given directory for debugging and understanding
+     * a test more quickly.
+     *
+     * @param directoryToPrint the directory to print
+     * @throws IOException if an error occurs while printing the file tree
+     */
+    @SuppressWarnings("resource")
+    public static void printFileTree(Path directoryToPrint) throws IOException {
+        // Print all files recursively in a tree structure for debugging
+        System.out.printf("Files in %s:%n", directoryToPrint.getFileName().toString());
+        Files.walk(directoryToPrint)
+                .forEach(path -> {
+                    if (!path.toAbsolutePath().equals(directoryToPrint.toAbsolutePath())) {
+                        int depth = path.relativize(directoryToPrint).getNameCount();
+                        String prefix = "  ".repeat(depth);
+                        System.out.printf("%s%s%s%n", prefix, "└── ", path.getFileName());
+                    }
+                });
     }
 }

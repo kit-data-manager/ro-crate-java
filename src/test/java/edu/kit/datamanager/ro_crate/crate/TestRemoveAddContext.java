@@ -6,6 +6,7 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class TestRemoveAddContext {
   private RoCrate crateWithComplexContext;
 
   @BeforeEach
-  void setup() {
+  void setup() throws IOException {
     String crateManifestPath = "/crates/extendedContextExample/";
     crateManifestPath = Objects.requireNonNull(TestRemoveAddContext.class.getResource(crateManifestPath)).getPath();
     this.crateWithComplexContext = Readers.newFolderReader().readCrate(crateManifestPath);

@@ -71,6 +71,11 @@ dependencies {
     implementation("org.freemarker:freemarker:2.3.34")
 }
 
+// enable -Xlint:deprecation
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
 logging.captureStandardOutput LogLevel.INFO
 
 def signingTasks = tasks.withType(Sign)
