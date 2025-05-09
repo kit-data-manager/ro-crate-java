@@ -25,6 +25,21 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
 
+    protected boolean writePreview = true;
+
+    /**
+     * For internal use. Skips the preview generation when writing the crate.
+     *
+     * @return this instance of FolderStrategy
+     *
+     * @deprecated May be removed in future versions. Not intended for public use.
+     */
+    @Deprecated(since = "2.1.0", forRemoval = true)
+    public FolderStrategy disablePreview() {
+        this.writePreview = false;
+        return this;
+    }
+
     @Override
     public void save(Crate crate, String destination) throws IOException {
         File file = new File(destination);
@@ -38,7 +53,7 @@ public class FolderStrategy implements GenericWriterStrategy<String> {
         FileUtils.copyInputStreamToFile(inputStream, json);
         inputStream.close();
         // save also the preview files to the crate destination
-        if (crate.getPreview() != null) {
+        if (crate.getPreview() != null && this.writePreview) {
             crate.getPreview().saveAllToFolder(file);
         }
         for (var e : crate.getUntrackedFiles()) {
