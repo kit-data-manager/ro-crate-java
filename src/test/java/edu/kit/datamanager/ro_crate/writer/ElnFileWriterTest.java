@@ -4,6 +4,7 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
+import edu.kit.datamanager.ro_crate.reader.CommonReaderTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -12,16 +13,25 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public interface ElnFileFormatTest extends TestableWriterStrategy {
+public interface ElnFileWriterTest extends TestableWriterStrategy {
 
     /**
      * Write in ELN format style, meaning with a subfolder in the zip file.
+     * Must use {@link ElnFormatWriter#usingElnStyle()}.
      *
      * @param crate the crate to write
      * @param target the target path to the save location
      * @throws IOException if an error occurs
      */
     void saveCrateElnStyle(Crate crate, Path target) throws IOException;
+
+    /**
+     * Same as {@link #saveCrateElnStyle(Crate, Path)} but with the alias
+     * {@link  ElnFormatWriter#withRootSubdirectory()}.
+     * @param crate the crate to write
+     * @param target the target path to the save location
+     */
+    void saveCrateSubdirectoryStyle(RoCrate crate, Path target) throws IOException;
 
     @Test
     default void testMakesElnStyleCrate(@TempDir Path tempDir) throws IOException {
@@ -66,5 +76,17 @@ public interface ElnFileFormatTest extends TestableWriterStrategy {
         HelpFunctions.compareCrateJsonToFileInResources(
                 builtCrate,
                 "/json/crate/fileAndDir.json");
+    }
+
+    @Test
+    default void testAlias(@TempDir Path tmpDir) throws IOException {
+        Path zip = tmpDir.resolve("test.eln").toAbsolutePath();
+        RoCrate crate = CommonReaderTest.newBaseCrate().build();
+
+        this.saveCrateSubdirectoryStyle(crate, zip);
+
+        assertTrue(zip.toFile().exists(), "The zip file should exist");
+        Path extractedPath = tmpDir.resolve("extracted");
+        ensureCrateIsExtractedIn(zip, extractedPath);
     }
 }

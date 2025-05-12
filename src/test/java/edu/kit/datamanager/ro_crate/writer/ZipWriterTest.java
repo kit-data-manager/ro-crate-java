@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZipWriterTest implements
         CommonWriterTest,
-        ElnFileFormatTest
+        ElnFileWriterTest
 {
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
@@ -28,16 +28,9 @@ class ZipWriterTest implements
                 .save(crate, target.toAbsolutePath().toString());
     }
 
-    @Test
-    public void testAlias(@TempDir Path tmpDir) throws IOException {
-        Path zip = tmpDir.resolve("test.eln").toAbsolutePath();
-        RoCrate crate = CommonReaderTest.newBaseCrate().build();
-
+    @Override
+    public void saveCrateSubdirectoryStyle(RoCrate crate, Path target) throws IOException {
         new CrateWriter<>(new ZipStrategy().withRootSubdirectory())
-                .save(crate, zip.toString());
-
-        assertTrue(zip.toFile().exists(), "The zip file should exist");
-        Path extractedPath = tmpDir.resolve("extracted");
-        ensureCrateIsExtractedIn(zip, extractedPath);
+                .save(crate, target.toString());
     }
 }
