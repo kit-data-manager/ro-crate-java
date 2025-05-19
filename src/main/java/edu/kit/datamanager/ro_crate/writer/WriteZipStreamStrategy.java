@@ -37,6 +37,11 @@ public class WriteZipStreamStrategy implements
      * or if it will contain a subdirectory with the crate.
      */
     protected boolean createRootSubdir = false;
+
+    /**
+     * In streams, we do not have a file name yet (or do not know it),
+     * so we need to set a default name for the root subdirectory.
+     */
     protected String rootSubdirName = "content";
 
     @Override

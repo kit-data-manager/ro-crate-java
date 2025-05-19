@@ -51,7 +51,7 @@ interface TestableWriterStrategy {
      */
     default void createManualCrateStructure(Path correctCrate, Path pathToFile, Path pathToDir) throws IOException {
         FileUtils.forceMkdir(correctCrate.toFile());
-        InputStream fileJson = ZipStreamStrategyTest.class
+        InputStream fileJson = ZipStreamWriterTest.class
                 .getResourceAsStream("/json/crate/fileAndDir.json");
         Assertions.assertNotNull(fileJson);
         // fill the directory with expected files and dirs

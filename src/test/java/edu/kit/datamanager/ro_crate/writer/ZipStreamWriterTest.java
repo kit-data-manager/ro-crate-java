@@ -9,7 +9,7 @@ import edu.kit.datamanager.ro_crate.RoCrate;
 /**
  * @author jejkal
  */
-class ZipStreamStrategyTest implements
+class ZipStreamWriterTest implements
         CommonWriterTest,
         ElnFileWriterTest
 {
