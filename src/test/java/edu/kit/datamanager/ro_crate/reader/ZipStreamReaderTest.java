@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class ZipStreamReaderTest implements
-        CommonReaderTest<InputStream, ZipStreamStrategy>,
-        ElnFileFormatTest<InputStream, ZipStreamStrategy>
+        CommonReaderTest<InputStream, ReadZipStreamStrategy>,
+        ElnFileFormatTest<InputStream, ReadZipStreamStrategy>
 {
     /**
      * At the point of writing this test,
@@ -39,8 +39,8 @@ class ZipStreamReaderTest implements
     }
 
     @Override
-    public ZipStreamStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
-        ZipStreamStrategy strategy = new ZipStreamStrategy(tmpDirectory, useUuidSubfolder);
+    public ReadZipStreamStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
+        ReadZipStreamStrategy strategy = new ReadZipStreamStrategy(tmpDirectory, useUuidSubfolder);
         assertFalse(strategy.isExtracted());
         if (useUuidSubfolder) {
             assertEquals(strategy.getTemporaryFolder().getFileName().toString(), strategy.getID());
@@ -52,7 +52,7 @@ class ZipStreamReaderTest implements
     }
 
     @Override
-    public Crate readCrate(ZipStreamStrategy strategy, Path source) throws IOException {
+    public Crate readCrate(ReadZipStreamStrategy strategy, Path source) throws IOException {
         Crate importedCrate = new CrateReader<>(strategy)
                 .readCrate(new FileInputStream(source.toFile()));
         assertTrue(strategy.isExtracted());

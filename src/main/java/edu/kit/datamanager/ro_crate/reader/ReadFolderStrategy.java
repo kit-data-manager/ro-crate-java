@@ -14,7 +14,7 @@ import java.nio.file.Path;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderStrategy implements GenericReaderStrategy<String> {
+public class ReadFolderStrategy implements GenericReaderStrategy<String> {
 
   @Override
   public ObjectNode readMetadataJson(String location) throws IOException {

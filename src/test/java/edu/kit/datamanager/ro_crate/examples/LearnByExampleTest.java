@@ -17,7 +17,7 @@ import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
-import edu.kit.datamanager.ro_crate.writer.FolderStrategy;
+import edu.kit.datamanager.ro_crate.writer.WriteFolderStrategy;
 import edu.kit.datamanager.ro_crate.writer.GenericWriterStrategy;
 import edu.kit.datamanager.ro_crate.writer.Writers;
 import org.apache.commons.io.FileUtils;
@@ -336,13 +336,13 @@ public class LearnByExampleTest {
 
         // Now, let's write it to a folder. Note the used strategy could be replaced with your own.
         Path folder = tempDir.resolve("folderCrate");
-        new CrateWriter<>(new FolderStrategy())
+        new CrateWriter<>(new WriteFolderStrategy())
                 .save(crate, folder.toString());
         // and read it back.
         RoCrate read = new CrateReader<>(
-                // Note: There are two FolderStrategy implementations, one for reading and one for writing.
+                // Note: There are two WriteFolderStrategy implementations, one for reading and one for writing.
                 // Java is a bit bad with imports, so we use the fully qualified name here.
-                new edu.kit.datamanager.ro_crate.reader.FolderStrategy()
+                new edu.kit.datamanager.ro_crate.reader.ReadFolderStrategy()
         )
                 .readCrate(folder.toAbsolutePath().toString());
 

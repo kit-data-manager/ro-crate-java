@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author jejkal
  */
-public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
+public class ReadZipStreamStrategy implements GenericReaderStrategy<InputStream> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZipStreamStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReadZipStreamStrategy.class);
     protected final String ID = UUID.randomUUID().toString();
     protected Path temporaryFolder = Path.of(String.format("./.tmp/ro-crate-java/zipStreamReader/%s/", ID));
     protected boolean isExtracted = false;
@@ -36,7 +36,7 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
      * Crates a ZipStreamReader with the default configuration as described in
      * the class documentation.
      */
-    public ZipStreamStrategy() {
+    public ReadZipStreamStrategy() {
     }
 
     /**
@@ -49,7 +49,7 @@ public class ZipStreamStrategy implements GenericReaderStrategy<InputStream> {
      * subdirectories of the given directory. These subdirectories will have
      * UUIDs as their names.
      */
-    public ZipStreamStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
+    public ReadZipStreamStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
         if (shallAddUuidSubfolder) {
             this.temporaryFolder = folderPath.resolve(ID);
         } else {

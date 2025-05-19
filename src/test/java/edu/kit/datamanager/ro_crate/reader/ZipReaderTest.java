@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ZipReaderTest implements
-        CommonReaderTest<String, ZipStrategy>,
-        ElnFileFormatTest<String, ZipStrategy>
+        CommonReaderTest<String, ReadZipStrategy>,
+        ElnFileFormatTest<String, ReadZipStrategy>
 {
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
@@ -24,8 +24,8 @@ class ZipReaderTest implements
     }
 
     @Override
-    public ZipStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
-        ZipStrategy strategy = new ZipStrategy(tmpDirectory, useUuidSubfolder);
+    public ReadZipStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
+        ReadZipStrategy strategy = new ReadZipStrategy(tmpDirectory, useUuidSubfolder);
         assertFalse(strategy.isExtracted());
         if (useUuidSubfolder) {
             assertEquals(strategy.getTemporaryFolder().getFileName().toString(), strategy.getID());
@@ -37,7 +37,7 @@ class ZipReaderTest implements
     }
 
     @Override
-    public Crate readCrate(ZipStrategy strategy, Path source) throws IOException {
+    public Crate readCrate(ReadZipStrategy strategy, Path source) throws IOException {
         Crate importedCrate = new CrateReader<>(strategy)
                 .readCrate(source.toAbsolutePath().toString());
         assertTrue(strategy.isExtracted());

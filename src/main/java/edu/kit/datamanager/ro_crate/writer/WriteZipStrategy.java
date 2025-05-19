@@ -2,71 +2,56 @@ package edu.kit.datamanager.ro_crate.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
-import edu.kit.datamanager.ro_crate.preview.CratePreview;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
-import net.lingala.zip4j.model.ZipParameters;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Implementation of the writing strategy to provide a way of writing crates to
  * a zip archive.
  */
-public class ZipStreamStrategy implements
-        GenericWriterStrategy<OutputStream>,
-        ElnFormatWriter<OutputStream> {
-
-    private static final Logger logger = LoggerFactory.getLogger(ZipStreamStrategy.class);
+public class WriteZipStrategy implements
+        GenericWriterStrategy<String>,
+        ElnFormatWriter<String>
+{
+    private static final Logger logger = LoggerFactory.getLogger(WriteZipStrategy.class);
 
     /**
      * Defines if the zip file will directly contain the crate,
      * or if it will contain a subdirectory with the crate.
      */
     protected boolean createRootSubdir = false;
-    protected String rootSubdirName = "content";
 
     @Override
-    public ElnFormatWriter<OutputStream> usingElnStyle() {
-        this.createRootSubdir = true;
-        return this;
-    }
-
-    /**
-     * Sets the name of a root subdirectory in the zip file.
-     * Implicitly also enables the creation of a root subdirectory.
-     * If used for ELN files, note the subdirectory name should be the same as the zip
-     * files name.
-     *
-     * @param name the name of the subdirectory
-     * @return this instance of ZipStreamStrategy
-     */
-    public ZipStreamStrategy setSubdirectoryName(String name) {
-        this.rootSubdirName = name;
+    public ElnFormatWriter<String> usingElnStyle() {
         this.createRootSubdir = true;
         return this;
     }
 
     @Override
-    public void save(Crate crate, OutputStream destination) throws IOException {
+    public void save(Crate crate, String destination) throws IOException {
         String innerFolderName = "";
         if (this.createRootSubdir) {
             String dot = Matcher.quoteReplacement(".");
             String end = Matcher.quoteReplacement("$");
-            innerFolderName = this.rootSubdirName
+            innerFolderName = Path.of(destination).getFileName()
+                    .toString()
                     // remove .zip or .eln from the end of the file name
                     // (?i) removes case sensitivity
                     .replaceFirst("(?i)" + dot + "zip" + end, "")
@@ -75,20 +60,20 @@ public class ZipStreamStrategy implements
                 innerFolderName += "/";
             }
         }
-        try (ZipOutputStream zipFile = new ZipOutputStream(destination)) {
+        try (ZipFile zipFile = new ZipFile(destination)) {
             saveMetadataJson(crate, zipFile, innerFolderName);
             saveDataEntities(crate, zipFile, innerFolderName);
             savePreview(crate, zipFile, innerFolderName);
         }
     }
 
-    private void saveDataEntities(Crate crate, ZipOutputStream zipStream, String prefix) throws IOException {
+    private void saveDataEntities(Crate crate, ZipFile zipFile, String prefix) throws IOException {
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            this.saveToStream(dataEntity, zipStream, prefix);
+            this.saveToZip(dataEntity, zipFile, prefix);
         }
     }
 
-    private void saveMetadataJson(Crate crate, ZipOutputStream zipStream, String prefix) throws IOException {
+    private void saveMetadataJson(Crate crate, ZipFile zipFile, String prefix) throws IOException {
         // write the metadata.json file
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip(prefix + "ro-crate-metadata.json");
@@ -96,20 +81,13 @@ public class ZipStreamStrategy implements
         // we create an JsonNode only to have the file written pretty
         JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
         String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        // write the ro-crate-metadata
-
-        byte[] buff = new byte[4096];
-        int readLen;
-        zipStream.putNextEntry(zipParameters);
         try (InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8))) {
-            while ((readLen = inputStream.read(buff)) != -1) {
-                zipStream.write(buff, 0, readLen);
-            }
+            // write the ro-crate-metadata
+            zipFile.addStream(inputStream, zipParameters);
         }
-        zipStream.closeEntry();
     }
 
-    private void savePreview(Crate crate, ZipOutputStream zipStream, String prefix) throws IOException {
+    private void savePreview(Crate crate, ZipFile zipFile, String prefix) throws IOException {
         Optional<CratePreview> preview = Optional.ofNullable(crate.getPreview());
         if (preview.isEmpty()) {
             return;
@@ -129,15 +107,14 @@ public class ZipStreamStrategy implements
         for (String path : paths) {
             File file = tmpPreviewFolder.toPath().resolve(path).toFile();
             if (file.isDirectory()) {
-                ZipUtil.addFolderToZipStream(
-                        zipStream,
-                        file,
-                        prefix + path);
+                ZipParameters parameters = new ZipParameters();
+                parameters.setRootFolderNameInZip(prefix + path);
+                parameters.setIncludeRootFolder(false);
+                zipFile.addFolder(file, parameters);
             } else {
-                ZipUtil.addFileToZipStream(
-                        zipStream,
-                        file,
-                        prefix + path);
+                ZipParameters zipParameters = new ZipParameters();
+                zipParameters.setFileNameInZip(prefix + path);
+                zipFile.addFile(file, zipParameters);
             }
         }
         try {
@@ -147,22 +124,21 @@ public class ZipStreamStrategy implements
         }
     }
 
-    private void saveToStream(DataEntity entity, ZipOutputStream zipStream, String prefix) throws IOException {
-        if (entity == null) {
+    private void saveToZip(DataEntity entity, ZipFile zipFile, String prefix) throws IOException {
+        if (entity == null || entity.getPath() == null) {
             return;
         }
 
         boolean isDirectory = entity.getPath().toFile().isDirectory();
         if (isDirectory) {
-            ZipUtil.addFolderToZipStream(
-                    zipStream,
-                    entity.getPath().toAbsolutePath().toString(),
-                    prefix + entity.getId());
+            ZipParameters parameters = new ZipParameters();
+            parameters.setRootFolderNameInZip(prefix + entity.getId());
+            parameters.setIncludeRootFolder(false);
+            zipFile.addFolder(entity.getPath().toFile(), parameters);
         } else {
-            ZipUtil.addFileToZipStream(
-                    zipStream,
-                    entity.getPath().toFile(),
-                    prefix + entity.getId());
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip(prefix + entity.getId());
+            zipFile.addFile(entity.getPath().toFile(), zipParameters);
         }
     }
 }

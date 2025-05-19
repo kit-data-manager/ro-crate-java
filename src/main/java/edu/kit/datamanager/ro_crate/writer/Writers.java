@@ -19,7 +19,7 @@ public class Writers {
      * @return a new instance of {@link CrateWriter} for writing to a folder
      */
     public static CrateWriter<String> newFolderWriter() {
-        return new CrateWriter<>(new FolderStrategy());
+        return new CrateWriter<>(new WriteFolderStrategy());
     }
 
     /**
@@ -28,7 +28,7 @@ public class Writers {
      * @return a new instance of {@link CrateWriter} for writing to a zip stream
      */
     public static CrateWriter<OutputStream> newZipStreamWriter() {
-        return new CrateWriter<>(new ZipStreamStrategy());
+        return new CrateWriter<>(new WriteZipStreamStrategy());
     }
 
     /**
@@ -37,6 +37,6 @@ public class Writers {
      * @return a new instance of {@link CrateWriter} for writing to a zip file
      */
     public static CrateWriter<String> newZipPathWriter() {
-        return new CrateWriter<>(new ZipStrategy());
+        return new CrateWriter<>(new WriteZipStrategy());
     }
 }

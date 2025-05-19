@@ -23,13 +23,13 @@ class ZipStreamStrategyTest implements
 
   @Override
   public void saveCrateElnStyle(Crate crate, Path target) throws IOException {
-    new CrateWriter<>(new ZipStreamStrategy().usingElnStyle())
+    new CrateWriter<>(new WriteZipStreamStrategy().usingElnStyle())
             .save(crate, new FileOutputStream(target.toFile()));
   }
 
   @Override
   public void saveCrateSubdirectoryStyle(RoCrate crate, Path target) throws IOException {
-    new CrateWriter<>(new ZipStreamStrategy().withRootSubdirectory())
+    new CrateWriter<>(new WriteZipStreamStrategy().withRootSubdirectory())
             .save(crate, new FileOutputStream(target.toFile()));
   }
 }

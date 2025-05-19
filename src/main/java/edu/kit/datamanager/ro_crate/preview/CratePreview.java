@@ -6,7 +6,7 @@ import java.nio.file.Files;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
-import edu.kit.datamanager.ro_crate.writer.FolderStrategy;
+import edu.kit.datamanager.ro_crate.writer.WriteFolderStrategy;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
@@ -38,7 +38,7 @@ public interface CratePreview {
         // disable preview generation to avoid recursion,
         // as this is usually called in the process of writing a crate
         // (including preview)
-        new CrateWriter<>(new FolderStrategy().disablePreview())
+        new CrateWriter<>(new WriteFolderStrategy().disablePreview())
                 .save(crate, targetDir.getAbsolutePath());
         this.saveAllToFolder(targetDir);
         try (var stream = Files.list(targetDir.toPath())) {

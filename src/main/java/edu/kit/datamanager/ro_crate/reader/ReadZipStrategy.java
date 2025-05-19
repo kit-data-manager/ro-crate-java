@@ -29,7 +29,7 @@ import java.util.UUID;
  * persistent location and possibly read it from there, if required. Or use
  * the ZipWriter to write it back to its source.
  */
-public class ZipStrategy implements GenericReaderStrategy<String> {
+public class ReadZipStrategy implements GenericReaderStrategy<String> {
 
   protected final String ID = UUID.randomUUID().toString();
   protected Path temporaryFolder = Path.of(String.format("./.tmp/ro-crate-java/zipReader/%s/", ID));
@@ -38,7 +38,7 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
   /**
    * Crates a ZipReader with the default configuration as described in the class documentation.
    */
-  public ZipStrategy() {}
+  public ReadZipStrategy() {}
 
   /**
    * Creates a ZipReader which will extract the contents temporary
@@ -51,7 +51,7 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
    *                              directory. These subdirectories
    *                              will have UUIDs as their names.
    */
-  public ZipStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
+  public ReadZipStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
     if (shallAddUuidSubfolder) {
       this.temporaryFolder = folderPath.resolve(ID);
     } else {

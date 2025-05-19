@@ -21,21 +21,21 @@ import java.nio.charset.StandardCharsets;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderStrategy implements GenericWriterStrategy<String> {
+public class WriteFolderStrategy implements GenericWriterStrategy<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(FolderStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(WriteFolderStrategy.class);
 
     protected boolean writePreview = true;
 
     /**
      * For internal use. Skips the preview generation when writing the crate.
      *
-     * @return this instance of FolderStrategy
+     * @return this instance of WriteFolderStrategy
      *
      * @deprecated May be removed in future versions. Not intended for public use.
      */
     @Deprecated(since = "2.1.0", forRemoval = true)
-    public FolderStrategy disablePreview() {
+    public WriteFolderStrategy disablePreview() {
         this.writePreview = false;
         return this;
     }
