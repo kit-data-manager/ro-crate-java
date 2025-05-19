@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -94,12 +95,7 @@ public class ReadZipStrategy implements GenericReaderStrategy<String> {
 
   private void readCrate(String location) throws IOException {
     File folder = temporaryFolder.toFile();
-    // ensure the directory is clean
-    if (folder.isDirectory()) {
-      FileUtils.cleanDirectory(folder);
-    } else if (folder.isFile()) {
-      FileUtils.delete(folder);
-    }
+    FileSystemUtil.mkdirOrDeleteContent(folder);
     // extract
     try (ZipFile zf = new ZipFile(location)) {
       zf.extractAll(temporaryFolder.toAbsolutePath().toString());

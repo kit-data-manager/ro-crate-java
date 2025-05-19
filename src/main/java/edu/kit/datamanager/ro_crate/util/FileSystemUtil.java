@@ -1,6 +1,11 @@
 package edu.kit.datamanager.ro_crate.util;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 public class FileSystemUtil {
@@ -44,5 +49,24 @@ public class FileSystemUtil {
             return path + "/";
         }
         return path;
+    }
+
+    /**
+     * Creates a directory or deletes its content if it already exists.
+     *
+     * @param folder the folder to create or delete content from
+     * @throws IOException if an I/O error occurs
+     */
+    public static void mkdirOrDeleteContent(File folder) throws IOException {
+        boolean isNonEmptyDir = folder.exists()
+                && folder.isDirectory()
+                && Objects.requireNonNull(folder.listFiles()).length > 0;
+        boolean isFile = folder.exists()
+                && !folder.isDirectory();
+
+        if (isNonEmptyDir || isFile) {
+            FileUtils.forceDelete(folder);
+        }
+        FileUtils.forceMkdir(folder);
     }
 }

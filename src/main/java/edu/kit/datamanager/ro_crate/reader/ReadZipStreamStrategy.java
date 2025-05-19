@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.UUID;
+
+import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.LocalFileHeader;
 import org.apache.commons.io.FileUtils;
@@ -108,16 +110,7 @@ public class ReadZipStreamStrategy implements GenericReaderStrategy<InputStream>
      */
     private void readCrate(InputStream stream) throws IOException {
         File folder = temporaryFolder.toFile();
-        // ensure the directory is clean
-        if (folder.exists()) {
-            if (folder.isDirectory()) {
-                FileUtils.cleanDirectory(folder);
-            } else if (folder.isFile()) {
-                FileUtils.delete(folder);
-            }
-        } else {
-            FileUtils.forceMkdir(folder);
-        }
+        FileSystemUtil.mkdirOrDeleteContent(folder);
 
         LocalFileHeader localFileHeader;
         int readLen;
