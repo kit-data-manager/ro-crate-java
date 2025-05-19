@@ -9,6 +9,8 @@ import java.io.IOException;
 /**
  * The class used for writing (exporting) crates. The class uses a strategy
  * pattern for writing crates as different formats. (zip, folders, etc.)
+ *
+ * @param <DESTINATION_TYPE> the type which determines the destination of the result
  */
 public class CrateWriter<DESTINATION_TYPE> {
 

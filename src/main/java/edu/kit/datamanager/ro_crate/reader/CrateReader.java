@@ -83,6 +83,8 @@ public class CrateReader<T> {
      *
      * @param location the location of the ro-crate to be read
      * @return the read RO-crate
+     *
+     * @throws IOException if the crate cannot be read
      */
     public RoCrate readCrate(T location) throws IOException {
         // get the ro-crate-metadata.json
