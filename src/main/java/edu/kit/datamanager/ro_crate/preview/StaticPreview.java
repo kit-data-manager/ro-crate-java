@@ -1,6 +1,6 @@
 package edu.kit.datamanager.ro_crate.preview;
 
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import java.io.File;
 import java.io.IOException;
 
@@ -64,9 +64,9 @@ public class StaticPreview implements CratePreview {
 
     @Override
     public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
-        ZipUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
+        ZipStreamUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
         if (this.otherFiles != null) {
-            ZipUtil.addFolderToZipStream(stream, this.otherFiles, "ro-crate-preview_files");
+            ZipStreamUtil.addFolderToZipStream(stream, this.otherFiles, "ro-crate-preview_files");
         }
     }
 }

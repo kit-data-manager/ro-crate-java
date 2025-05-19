@@ -11,7 +11,7 @@ import net.lingala.zip4j.model.ZipParameters;
  *
  * @author jejkal
  */
-public class ZipUtil {
+public class ZipStreamUtil {
 
     /**
      * Adds a folder and its contents to a ZipOutputStream.

@@ -2,7 +2,7 @@ package edu.kit.datamanager.ro_crate.preview;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -53,7 +53,7 @@ public class CustomPreview implements CratePreview {
 
     private CustomPreviewModel mapFromJson(String metadata) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = (JsonNode) mapper.readValue(metadata, JsonNode.class);
+        JsonNode root = mapper.readValue(metadata, JsonNode.class);
         JsonNode graph = root.get("@graph");
         CustomPreviewModel.ROCrate crate = new CustomPreviewModel.ROCrate();
         List<CustomPreviewModel.Dataset> datasets = new ArrayList<>();
@@ -196,13 +196,13 @@ public class CustomPreview implements CratePreview {
             //prepare output folder and writer
             FileUtils.forceMkdir(new File("temp"));
             //load and process template
-            try (FileWriter writer = new FileWriter(new File("temp/ro-crate-preview.html"))) {
+            try (FileWriter writer = new FileWriter("temp/ro-crate-preview.html")) {
                 //load and process template
                 template.process(dataModel, writer);
                 writer.flush();
             }
 
-            ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
+            ZipStreamUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
         } catch (TemplateException ex) {
             throw new IOException("Failed to generate preview.", ex);
         } finally {

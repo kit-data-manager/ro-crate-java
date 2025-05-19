@@ -6,6 +6,7 @@ import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
@@ -19,8 +20,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
 
 /**
  * Implementation of the writing strategy to provide a way of writing crates to
@@ -31,6 +32,7 @@ public class WriteZipStrategy implements
         ElnFormatWriter<String>
 {
     private static final Logger logger = LoggerFactory.getLogger(WriteZipStrategy.class);
+    public static final String TMP_DIR = "./.tmp/ro-crate-java/writer-zip-strategy/";
 
     /**
      * Defines if the zip file will directly contain the crate,
@@ -48,17 +50,10 @@ public class WriteZipStrategy implements
     public void save(Crate crate, String destination) throws IOException {
         String innerFolderName = "";
         if (this.createRootSubdir) {
-            String dot = Matcher.quoteReplacement(".");
-            String end = Matcher.quoteReplacement("$");
-            innerFolderName = Path.of(destination).getFileName()
-                    .toString()
-                    // remove .zip or .eln from the end of the file name
-                    // (?i) removes case sensitivity
-                    .replaceFirst("(?i)" + dot + "zip" + end, "")
-                    .replaceFirst("(?i)" + dot + "eln" + end, "");
-            if (!innerFolderName.endsWith("/")) {
-                innerFolderName += "/";
-            }
+            innerFolderName = FileSystemUtil.filterExtensionsFromFileName(
+                    Path.of(destination).getFileName().toString(),
+                    Set.of("ELN", "ZIP"));
+            innerFolderName = FileSystemUtil.ensureTrailingSlash(innerFolderName);
         }
         try (ZipFile zipFile = new ZipFile(destination)) {
             saveMetadataJson(crate, zipFile, innerFolderName);
@@ -93,7 +88,7 @@ public class WriteZipStrategy implements
             return;
         }
         final String ID = UUID.randomUUID().toString();
-        File tmpPreviewFolder = Path.of("./.tmp/ro-crate-java/writer-zipStrategy/")
+        File tmpPreviewFolder = Path.of(TMP_DIR)
                 .resolve(ID)
                 .toFile();
         FileUtils.forceMkdir(tmpPreviewFolder);
@@ -102,7 +97,7 @@ public class WriteZipStrategy implements
         preview.get().generate(crate, tmpPreviewFolder);
         String[] paths = tmpPreviewFolder.list();
         if (paths == null) {
-            throw new IOException("No files found in temporary folder");
+            throw new IOException("No preview files found in temporary folder. Preview generation failed.");
         }
         for (String path : paths) {
             File file = tmpPreviewFolder.toPath().resolve(path).toFile();

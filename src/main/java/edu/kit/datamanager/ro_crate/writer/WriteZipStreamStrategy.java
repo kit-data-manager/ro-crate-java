@@ -11,11 +11,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
 
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
+import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
@@ -31,6 +32,7 @@ public class WriteZipStreamStrategy implements
         ElnFormatWriter<OutputStream> {
 
     private static final Logger logger = LoggerFactory.getLogger(WriteZipStreamStrategy.class);
+    public static final String TMP_DIR = "./.tmp/ro-crate-java/writer-zip-stream-strategy/";
 
     /**
      * Defines if the zip file will directly contain the crate,
@@ -69,16 +71,10 @@ public class WriteZipStreamStrategy implements
     public void save(Crate crate, OutputStream destination) throws IOException {
         String innerFolderName = "";
         if (this.createRootSubdir) {
-            String dot = Matcher.quoteReplacement(".");
-            String end = Matcher.quoteReplacement("$");
-            innerFolderName = this.rootSubdirName
-                    // remove .zip or .eln from the end of the file name
-                    // (?i) removes case sensitivity
-                    .replaceFirst("(?i)" + dot + "zip" + end, "")
-                    .replaceFirst("(?i)" + dot + "eln" + end, "");
-            if (!innerFolderName.endsWith("/")) {
-                innerFolderName += "/";
-            }
+            innerFolderName = FileSystemUtil.filterExtensionsFromFileName(
+                    this.rootSubdirName,
+                    Set.of("ELN", "ZIP"));
+            innerFolderName = FileSystemUtil.ensureTrailingSlash(innerFolderName);
         }
         try (ZipOutputStream zipFile = new ZipOutputStream(destination)) {
             saveMetadataJson(crate, zipFile, innerFolderName);
@@ -120,7 +116,7 @@ public class WriteZipStreamStrategy implements
             return;
         }
         final String ID = UUID.randomUUID().toString();
-        File tmpPreviewFolder = Path.of("./.tmp/ro-crate-java/writer-zipStrategy/")
+        File tmpPreviewFolder = Path.of(TMP_DIR)
                 .resolve(ID)
                 .toFile();
         FileUtils.forceMkdir(tmpPreviewFolder);
@@ -129,17 +125,17 @@ public class WriteZipStreamStrategy implements
         preview.get().generate(crate, tmpPreviewFolder);
         String[] paths = tmpPreviewFolder.list();
         if (paths == null) {
-            throw new IOException("No files found in temporary folder");
+            throw new IOException("No preview files found in temporary folder. Preview generation failed.");
         }
         for (String path : paths) {
             File file = tmpPreviewFolder.toPath().resolve(path).toFile();
             if (file.isDirectory()) {
-                ZipUtil.addFolderToZipStream(
+                ZipStreamUtil.addFolderToZipStream(
                         zipStream,
                         file,
                         prefix + path);
             } else {
-                ZipUtil.addFileToZipStream(
+                ZipStreamUtil.addFileToZipStream(
                         zipStream,
                         file,
                         prefix + path);
@@ -159,12 +155,12 @@ public class WriteZipStreamStrategy implements
 
         boolean isDirectory = entity.getPath().toFile().isDirectory();
         if (isDirectory) {
-            ZipUtil.addFolderToZipStream(
+            ZipStreamUtil.addFolderToZipStream(
                     zipStream,
                     entity.getPath().toAbsolutePath().toString(),
                     prefix + entity.getId());
         } else {
-            ZipUtil.addFileToZipStream(
+            ZipStreamUtil.addFileToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
                     prefix + entity.getId());
