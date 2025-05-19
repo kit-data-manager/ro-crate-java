@@ -120,7 +120,8 @@ public class ReadZipStreamStrategy implements GenericReaderStrategy<InputStream>
             while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
                 String fileName = localFileHeader.getFileName();
                 File extractedFile = new File(folder, fileName).getCanonicalFile();
-                if (!extractedFile.toPath().startsWith(folder.getCanonicalPath())) {
+                Path targetRoot = folder.toPath().toRealPath();
+                if (!extractedFile.toPath().startsWith(targetRoot)) {
                     throw new IOException("Entry is outside of target directory: " + fileName);
                 }
                 if (localFileHeader.isDirectory()) {
