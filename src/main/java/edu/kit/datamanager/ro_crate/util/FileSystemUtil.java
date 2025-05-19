@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.regex.Matcher;
 
 public class FileSystemUtil {
@@ -58,9 +57,11 @@ public class FileSystemUtil {
      * @throws IOException if an I/O error occurs
      */
     public static void mkdirOrDeleteContent(File folder) throws IOException {
+        File[] files = folder.listFiles();
         boolean isNonEmptyDir = folder.exists()
                 && folder.isDirectory()
-                && Objects.requireNonNull(folder.listFiles()).length > 0;
+                && files != null
+                && files.length > 0;
         boolean isFile = folder.exists()
                 && !folder.isDirectory();
 
