@@ -66,7 +66,7 @@ public class StaticPreview implements CratePreview {
     public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
         ZipUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
         if (this.otherFiles != null) {
-            ZipUtil.addFolderToZipStream(stream, this.otherFiles, this.otherFiles.getName());
+            ZipUtil.addFolderToZipStream(stream, this.otherFiles, "ro-crate-preview_files");
         }
     }
 }
