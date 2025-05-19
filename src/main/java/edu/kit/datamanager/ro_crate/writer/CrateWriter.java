@@ -10,11 +10,11 @@ import java.io.IOException;
  * The class used for writing (exporting) crates. The class uses a strategy
  * pattern for writing crates as different formats. (zip, folders, etc.)
  */
-public class CrateWriter<DESTINATION> {
+public class CrateWriter<DESTINATION_TYPE> {
 
-    private final GenericWriterStrategy<DESTINATION> strategy;
+    private final GenericWriterStrategy<DESTINATION_TYPE> strategy;
 
-    public CrateWriter(GenericWriterStrategy<DESTINATION> strategy) {
+    public CrateWriter(GenericWriterStrategy<DESTINATION_TYPE> strategy) {
         this.strategy = strategy;
     }
 
@@ -24,7 +24,7 @@ public class CrateWriter<DESTINATION> {
      * @param crate the crate to write.
      * @param destination the location where the crate should be written.
      */
-    public void save(Crate crate, DESTINATION destination) throws IOException {
+    public void save(Crate crate, DESTINATION_TYPE destination) throws IOException {
         Validator defaultValidation = new Validator(new JsonSchemaValidation());
         defaultValidation.validate(crate);
         this.strategy.save(crate, destination);

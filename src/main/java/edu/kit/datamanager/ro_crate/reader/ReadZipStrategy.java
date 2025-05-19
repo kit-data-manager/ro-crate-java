@@ -14,11 +14,20 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 /**
- * A ReaderStrategy implementation which reads from ZipFiles.
+ * Reads a crate from a ZIP archive (file).
  * <p>
- * May be used as a dependency for CrateReader. It will unzip
- * the ZipFile in a path relative to the directory this application runs in.
- * By default, it will be `./.tmp/ro-crate-java/zipReader/$UUID/`.
+ * This class handles reading and extraction of RO-Crate content from ZIP archives
+ * into a temporary directory structure on the file system,
+ * which allows accessing the contained files.
+ * <p>
+ * Supports <a href=https://github.com/TheELNConsortium/TheELNFileFormat>ELN-Style crates</a>,
+ * meaning the crate may be either in the zip archive directly or in a single,
+ * direct subfolder beneath the root folder (/folder).
+ * <p>
+ * Note: This implementation checks for up to 50 subdirectories if multiple are present.
+ * This is to avoid zip bombs, which may contain a lot of subdirectories,
+ * and at the same time gracefully handle valid crated with hidden subdirectories
+ * (for example, thumbnails).
  * <p>
  * NOTE: The resulting crate may refer to these temporary files. Therefore,
  * these files are only being deleted before the JVM exits. If you need to free
@@ -36,7 +45,10 @@ public class ReadZipStrategy implements GenericReaderStrategy<String> {
   protected boolean isExtracted = false;
 
   /**
-   * Crates a ZipReader with the default configuration as described in the class documentation.
+   * Crates an instance with the default configuration.
+   * <p>
+   * The default configuration is to extract the ZipFile to
+   * `./.tmp/ro-crate-java/zipReader/$UUID/`.
    */
   public ReadZipStrategy() {}
 
