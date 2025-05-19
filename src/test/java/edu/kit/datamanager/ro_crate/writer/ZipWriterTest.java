@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class ZipWriterTest implements
         CommonWriterTest,
         ElnFileWriterTest
