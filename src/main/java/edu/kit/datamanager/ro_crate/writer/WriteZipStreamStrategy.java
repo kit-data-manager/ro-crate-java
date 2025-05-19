@@ -157,7 +157,7 @@ public class WriteZipStreamStrategy implements
         if (isDirectory) {
             ZipStreamUtil.addFolderToZipStream(
                     zipStream,
-                    entity.getPath().toAbsolutePath().toString(),
+                    entity.getPath().toFile(),
                     prefix + entity.getId());
         } else {
             ZipStreamUtil.addFileToZipStream(
