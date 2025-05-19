@@ -10,6 +10,7 @@ import edu.kit.datamanager.ro_crate.writer.WriteFolderStrategy;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interface for the ROCrate preview. This manages the human-readable
@@ -54,6 +55,8 @@ public interface CratePreview {
                             }
                         } catch (IOException e) {
                             // Silently ignore deletion errors
+                            LoggerFactory.getLogger(CratePreview.class)
+                                    .error("Failed to delete temporary file {}", path, e);
                         }
                     });
         }
