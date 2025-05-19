@@ -5,7 +5,7 @@ package edu.kit.datamanager.ro_crate.writer;
  *
  * @author Nikola Tzotchev on 9.2.2022 г.
  *
- * @deprecated Use {@link FolderStrategy} instead.
+ * @deprecated Use {@link WriteFolderStrategy} instead.
  */
 @Deprecated(since = "2.1.0", forRemoval = true)
-public class FolderWriter extends FolderStrategy {}
+public class FolderWriter extends WriteFolderStrategy {}

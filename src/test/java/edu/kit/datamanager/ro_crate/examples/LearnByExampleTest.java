@@ -17,7 +17,7 @@ import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
-import edu.kit.datamanager.ro_crate.writer.FolderStrategy;
+import edu.kit.datamanager.ro_crate.writer.WriteFolderStrategy;
 import edu.kit.datamanager.ro_crate.writer.GenericWriterStrategy;
 import edu.kit.datamanager.ro_crate.writer.Writers;
 import org.apache.commons.io.FileUtils;
@@ -42,20 +42,22 @@ public class LearnByExampleTest {
     /**
      * This creates a valid, empty RO-Crate builder.
      */
-    static final RoCrate.RoCrateBuilder STARTER_CRATE = new RoCrate.RoCrateBuilder(
-            "name",
-            "description",
-            "2025",
-            "licenseIdentifier"
-    );
+    static RoCrate.RoCrateBuilder NEW_STARTER_CRATE() {
+        return new RoCrate.RoCrateBuilder(
+                "name",
+                "description",
+                "2025",
+                "licenseIdentifier"
+        );
+    }
 
     /**
      * Calling the `build()` method on the builder creates a valid RO-Crate.
-     * Run this test to view the STARTER_CRATE JSON in the console.
+     * Run this test to view the NEW_STARTER_CRATE() JSON in the console.
      */
     @Test
     void aSimpleCrate() {
-        RoCrate almostEmptyCrate = STARTER_CRATE.build();
+        RoCrate almostEmptyCrate = NEW_STARTER_CRATE().build();
         assertNotNull(almostEmptyCrate);
         HelpFunctions.prettyPrintJsonString(almostEmptyCrate.getJsonMetadata());
     }
@@ -72,7 +74,7 @@ public class LearnByExampleTest {
      */
     @Test
     void addingYourFirstEntity() {
-        RoCrate myFirstCrate = STARTER_CRATE
+        RoCrate myFirstCrate = NEW_STARTER_CRATE()
                 // We can add new terms to our crate. The terms we can use are called "context".
                 .addValuePairToContext("Station", "www.station.com")
                 // We can also add whole contexts to our crate.
@@ -115,7 +117,7 @@ public class LearnByExampleTest {
      */
     @Test
     void specializingYourFirstEntity() {
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addDataEntity(
                         // Let's do something custom:
                         new DataEntity.DataEntityBuilder()
@@ -148,7 +150,7 @@ public class LearnByExampleTest {
         // Let's say this is the file we would like to point at with an entity.
         String lovelyFile = "https://github.com/kit-data-manager/ro-crate-java/issues/5";
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addDataEntity(
                         // Build our entity to point to the file:
                         new FileEntity.FileEntityBuilder()
@@ -187,7 +189,7 @@ public class LearnByExampleTest {
         // But in the crate we want it to be
         String seriousExperimentFile = "fantastic-experiment/2025-01-01.csv";
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addDataEntity(
                         // Build our entity to point to the file:
                         new FileEntity.FileEntityBuilder()
@@ -236,7 +238,7 @@ public class LearnByExampleTest {
         PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-6575-1022");
         OrganizationEntity organization = RorProvider.getOrganization("https://ror.org/04t3en479");
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addContextualEntity(person)
                 .addContextualEntity(organization)
                 .build();
@@ -263,7 +265,7 @@ public class LearnByExampleTest {
         PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-6575-1022");
         OrganizationEntity organization = RorProvider.getOrganization("https://ror.org/04t3en479");
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addContextualEntity(person)
                 .addContextualEntity(organization)
                 .build();
@@ -324,7 +326,7 @@ public class LearnByExampleTest {
         PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-6575-1022");
         OrganizationEntity organization = RorProvider.getOrganization("https://ror.org/04t3en479");
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .addContextualEntity(person)
                 .addContextualEntity(organization)
                 .build();
@@ -334,13 +336,13 @@ public class LearnByExampleTest {
 
         // Now, let's write it to a folder. Note the used strategy could be replaced with your own.
         Path folder = tempDir.resolve("folderCrate");
-        new CrateWriter<>(new FolderStrategy())
+        new CrateWriter<>(new WriteFolderStrategy())
                 .save(crate, folder.toString());
         // and read it back.
         RoCrate read = new CrateReader<>(
-                // Note: There are two FolderStrategy implementations, one for reading and one for writing.
+                // Note: There are two WriteFolderStrategy implementations, one for reading and one for writing.
                 // Java is a bit bad with imports, so we use the fully qualified name here.
-                new edu.kit.datamanager.ro_crate.reader.FolderStrategy()
+                new edu.kit.datamanager.ro_crate.reader.ReadFolderStrategy()
         )
                 .readCrate(folder.toAbsolutePath().toString());
 
@@ -368,7 +370,7 @@ public class LearnByExampleTest {
      */
     @Test
     void humanReadableContent() {
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .setPreview(new AutomaticPreview())
                 .build();
 
@@ -380,11 +382,13 @@ public class LearnByExampleTest {
      * Therefore, the constructor is a bit more complicated.
      */
     @Test
-    void staticPreview(@TempDir Path tempDir) {
+    void staticPreview(@TempDir Path tempDir) throws IOException {
         File mainPreviewHtml = tempDir.resolve("mainPreview.html").toFile();
         File additionalFilesDirectory = tempDir.resolve("additionalFiles").toFile();
+        FileUtils.forceMkdir(additionalFilesDirectory);
+        FileUtils.touch(mainPreviewHtml);
 
-        RoCrate crate = STARTER_CRATE
+        RoCrate crate = NEW_STARTER_CRATE()
                 .setPreview(new StaticPreview(mainPreviewHtml, additionalFilesDirectory))
                 .build();
 
@@ -408,7 +412,7 @@ public class LearnByExampleTest {
         String schemaPath = schemaUrl.getPath();
 
         // This crate for sure is not a workflow, so validation will fail.
-        RoCrate crate = STARTER_CRATE.build();
+        RoCrate crate = NEW_STARTER_CRATE().build();
 
         // And now do the validation.
         Validator validator = new Validator(new JsonSchemaValidation(schemaPath));

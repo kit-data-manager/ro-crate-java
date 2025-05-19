@@ -2,9 +2,12 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +15,20 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 /**
- * A ReaderStrategy implementation which reads from ZipFiles.
+ * Reads a crate from a ZIP archive (file).
  * <p>
- * May be used as a dependency for CrateReader. It will unzip
- * the ZipFile in a path relative to the directory this application runs in.
- * By default, it will be `./.tmp/ro-crate-java/zipReader/$UUID/`.
+ * This class handles reading and extraction of RO-Crate content from ZIP archives
+ * into a temporary directory structure on the file system,
+ * which allows accessing the contained files.
+ * <p>
+ * Supports <a href=https://github.com/TheELNConsortium/TheELNFileFormat>ELN-Style crates</a>,
+ * meaning the crate may be either in the zip archive directly or in a single,
+ * direct subfolder beneath the root folder (/folder).
+ * <p>
+ * Note: This implementation checks for up to 50 subdirectories if multiple are present.
+ * This is to avoid zip bombs, which may contain a lot of subdirectories,
+ * and at the same time gracefully handle valid crated with hidden subdirectories
+ * (for example, thumbnails).
  * <p>
  * NOTE: The resulting crate may refer to these temporary files. Therefore,
  * these files are only being deleted before the JVM exits. If you need to free
@@ -27,16 +39,19 @@ import java.util.UUID;
  * persistent location and possibly read it from there, if required. Or use
  * the ZipWriter to write it back to its source.
  */
-public class ZipStrategy implements GenericReaderStrategy<String> {
+public class ReadZipStrategy implements GenericReaderStrategy<String> {
 
   protected final String ID = UUID.randomUUID().toString();
   protected Path temporaryFolder = Path.of(String.format("./.tmp/ro-crate-java/zipReader/%s/", ID));
   protected boolean isExtracted = false;
 
   /**
-   * Crates a ZipReader with the default configuration as described in the class documentation.
+   * Crates an instance with the default configuration.
+   * <p>
+   * The default configuration is to extract the ZipFile to
+   * `./.tmp/ro-crate-java/zipReader/$UUID/`.
    */
-  public ZipStrategy() {}
+  public ReadZipStrategy() {}
 
   /**
    * Creates a ZipReader which will extract the contents temporary
@@ -49,7 +64,7 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
    *                              directory. These subdirectories
    *                              will have UUIDs as their names.
    */
-  public ZipStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
+  public ReadZipStrategy(Path folderPath, boolean shallAddUuidSubfolder) {
     if (shallAddUuidSubfolder) {
       this.temporaryFolder = folderPath.resolve(ID);
     } else {
@@ -78,46 +93,46 @@ public class ZipStrategy implements GenericReaderStrategy<String> {
     return isExtracted;
   }
 
-  private void readCrate(String location) {
-    try {
-      File folder = temporaryFolder.toFile();
-      // ensure the directory is clean
-      if (folder.isDirectory()) {
-        FileUtils.cleanDirectory(folder);
-      } else if (folder.isFile()) {
-        FileUtils.delete(folder);
-      }
-      // extract
-      try (ZipFile zf = new ZipFile(location)) {
-        zf.extractAll(temporaryFolder.toAbsolutePath().toString());
-        this.isExtracted = true;
-      }
-      // register deletion on exit
-      FileUtils.forceDeleteOnExit(folder);
-    } catch (IOException e) {
-      e.printStackTrace();
+  private void readCrate(String location) throws IOException {
+    File folder = temporaryFolder.toFile();
+    FileSystemUtil.mkdirOrDeleteContent(folder);
+    // extract
+    try (ZipFile zf = new ZipFile(location)) {
+      zf.extractAll(temporaryFolder.toAbsolutePath().toString());
+      this.isExtracted = true;
     }
+    // register deletion on exit
+    FileUtils.forceDeleteOnExit(folder);
   }
 
   @Override
-  public ObjectNode readMetadataJson(String location) {
+  public ObjectNode readMetadataJson(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }
 
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = temporaryFolder.resolve("ro-crate-metadata.json").toFile();
-    
-    try {
-      return objectMapper.readTree(jsonMetadata).deepCopy();
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+    File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
+    if (!jsonMetadata.isFile()) {
+      // Try to find the metadata file in subdirectories
+      File firstSubdir = FileUtils.listFilesAndDirs(
+            temporaryFolder.toFile(),
+            FileFilterUtils.directoryFileFilter(),
+            null // not recursive
+        )
+        .stream()
+        .limit(50)
+        .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
+      jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
     }
+
+    return objectMapper.readTree(jsonMetadata).deepCopy();
   }
 
   @Override
-  public File readContent(String location) {
+  public File readContent(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }

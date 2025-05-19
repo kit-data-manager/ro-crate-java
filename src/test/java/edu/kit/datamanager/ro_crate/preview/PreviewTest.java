@@ -1,13 +1,14 @@
 package edu.kit.datamanager.ro_crate.preview;
 
+import gg.jte.output.FileOutput;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,6 +77,41 @@ public class PreviewTest {
     }
 
     @Test
+    void staticPreviewSaveToZipStream(@TempDir Path dir) throws IOException {
+        var file1 = dir.resolve("file.html");
+        FileUtils.writeStringToFile(file1.toFile(), "random html, does not need to be valid for this test", Charset.defaultCharset());
+
+        var file2 = dir.resolve("directory");
+        var fileInDir = file2.resolve("fileInDir.html");
+        FileUtils.writeStringToFile(fileInDir.toFile(), "dajkdlfjdsklafj alksfjdalk fjl", Charset.defaultCharset());
+        StaticPreview preview = new StaticPreview(file1.toFile(), file2.toFile());
+
+        ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(dir.resolve("destination.zip").toFile()));
+        preview.saveAllToStream(
+                null,  // static preview does not need metadata
+                stream);
+        stream.flush();
+        stream.close();
+
+        try (ZipFile zf = new ZipFile(dir.resolve("destination.zip").toFile())) {
+            zf.extractAll(dir.resolve("extracted").toAbsolutePath().toString());
+        }
+
+        var e = dir.resolve("extracted");
+        var roPreview = e.resolve("ro-crate-preview.html");
+        var roDir = e.resolve("ro-crate-preview_files");
+        var roDirFile = roDir.resolve("fileInDir.html");
+        assertTrue(Files.isRegularFile(roPreview));
+        assertTrue(Files.isDirectory(roDir));
+        assertTrue(Files.isRegularFile(roDirFile));
+
+        assertTrue(FileUtils.contentEqualsIgnoreEOL(roPreview.toFile(), file1.toFile(), String.valueOf(Charset.defaultCharset())));
+        assertFalse(FileUtils.contentEqualsIgnoreEOL(roPreview.toFile(), fileInDir.toFile(), String.valueOf(Charset.defaultCharset())));
+
+        assertTrue(FileUtils.contentEqualsIgnoreEOL(roDirFile.toFile(), fileInDir.toFile(), String.valueOf(Charset.defaultCharset())));
+    }
+
+    @Test
     void testAutomaticPreviewAddToFolder(@TempDir Path dir) throws IOException {
         AutomaticPreview automaticPreview = new AutomaticPreview();
 
@@ -113,6 +149,41 @@ public class PreviewTest {
             //ok
         }
         zipFile.extractAll(crate.toString());
+        assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));
+    }
+
+    @Test
+    void testAutomaticPreviewZipStream(@TempDir Path dir) throws IOException {
+        AutomaticPreview preview = new AutomaticPreview();
+        String metadataPath = "/crates/other/idrc_project/ro-crate-metadata.json";
+        Path crate = dir.resolve("crate");
+
+        File zipFile = dir.resolve("test.zip").toFile();
+        {
+            ZipFile zip = new ZipFile(zipFile);
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setFileNameInZip("ro-crate-metadata.json");
+            InputStream crateJson = PreviewTest.class.getResourceAsStream(metadataPath);
+            zip.addStream(crateJson, zipParameters);
+            crateJson.close();
+        }
+        String metadata = new String(
+                PreviewTest.class.getResourceAsStream(metadataPath)
+                        .readAllBytes());
+        ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(zipFile));
+        preview.saveAllToStream(metadata, stream);
+        stream.flush();
+        stream.close();
+
+        try {
+            // this should trow an exception but not stop the execution
+            ZipFile randomZipFile = new ZipFile(dir.resolve("dddd.zip").toFile());
+            preview.saveAllToZip(randomZipFile);
+            Assertions.fail("Expected IOException when providing invalid ZIP file for preview.");
+        } catch (IOException ex) {
+            //ok
+        }
+        new ZipFile(zipFile).extractAll(crate.toString());
         assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));
     }
 
@@ -167,4 +238,38 @@ public class PreviewTest {
         assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));
     }
 
+    @Test
+    void testCustomPreviewZipStream(@TempDir Path tmp) throws IOException {
+        CustomPreview preview = new CustomPreview();
+        String metadataPath = "/crates/other/idrc_project/ro-crate-metadata.json";
+        Path crate = tmp.resolve("crate");
+        ZipParameters zipParameters = new ZipParameters();
+        zipParameters.setFileNameInZip("ro-crate-metadata.json");
+
+        File zipFile = tmp.resolve("test.zip").toFile();
+        {
+            ZipFile zip = new ZipFile(zipFile);
+            InputStream crateJson = PreviewTest.class.getResourceAsStream(metadataPath);
+            zip.addStream(crateJson, zipParameters);
+            crateJson.close();
+        }
+        String metadata = new String(
+                PreviewTest.class.getResourceAsStream(metadataPath)
+                        .readAllBytes());
+        ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(zipFile));
+        preview.saveAllToStream(metadata, stream);
+        stream.flush();
+        stream.close();
+
+        try {
+            // this should trow an exception but not stop the execution
+            ZipFile randomZipFile = new ZipFile(tmp.resolve("dddd.zip").toFile());
+            preview.saveAllToZip(randomZipFile);
+            Assertions.fail("Expected IOException when providing invalid input to preview.");
+        } catch (IOException ex) {
+            //ok
+        }
+        new ZipFile(zipFile).extractAll(crate.toString());
+        assertTrue(Files.isRegularFile(crate.resolve("ro-crate-preview.html")));
+    }
 }

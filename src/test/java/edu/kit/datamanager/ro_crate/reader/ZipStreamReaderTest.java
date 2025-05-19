@@ -5,25 +5,42 @@ import edu.kit.datamanager.ro_crate.writer.Writers;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class ZipStreamReaderTest extends CrateReaderTest<InputStream, ZipStreamStrategy> {
+class ZipStreamReaderTest implements
+        CommonReaderTest<InputStream, ReadZipStreamStrategy>,
+        ElnFileFormatTest<InputStream, ReadZipStreamStrategy>
+{
+    /**
+     * At the point of writing this test,
+     *  these files are in a zip format which cannot be read in streaming mode
+     */
     @Override
-    protected void saveCrate(Crate crate, Path target) throws IOException {
+    public boolean isInBlacklist(String input) {
+        return Set.of(
+                "https://github.com/TheELNConsortium/TheELNFileFormat/raw/refs/heads/master/examples/kadi4mat/records-example.eln",
+                "https://github.com/TheELNConsortium/TheELNFileFormat/raw/refs/heads/master/examples/kadi4mat/collections-example.eln"
+        )
+                .contains(input);
+    }
+
+    @Override
+    public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newZipStreamWriter().save(crate, new FileOutputStream(target.toFile()));
         assertTrue(target.toFile().isFile());
     }
 
     @Override
-    protected Crate readCrate(Path source) throws IOException {
+    public Crate readCrate(Path source) throws IOException {
         return Readers.newZipStreamReader().readCrate(new FileInputStream(source.toFile()));
     }
 
     @Override
-    protected ZipStreamStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
-        ZipStreamStrategy strategy = new ZipStreamStrategy(tmpDirectory, useUuidSubfolder);
+    public ReadZipStreamStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
+        ReadZipStreamStrategy strategy = new ReadZipStreamStrategy(tmpDirectory, useUuidSubfolder);
         assertFalse(strategy.isExtracted());
         if (useUuidSubfolder) {
             assertEquals(strategy.getTemporaryFolder().getFileName().toString(), strategy.getID());
@@ -35,7 +52,7 @@ class ZipStreamReaderTest extends CrateReaderTest<InputStream, ZipStreamStrategy
     }
 
     @Override
-    protected Crate readCrate(ZipStreamStrategy strategy, Path source) throws IOException {
+    public Crate readCrate(ReadZipStreamStrategy strategy, Path source) throws IOException {
         Crate importedCrate = new CrateReader<>(strategy)
                 .readCrate(new FileInputStream(source.toFile()));
         assertTrue(strategy.isExtracted());

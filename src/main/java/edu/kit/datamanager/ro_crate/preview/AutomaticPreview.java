@@ -1,6 +1,6 @@
 package edu.kit.datamanager.ro_crate.preview;
 
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
 /**
- * The default preview should use the rochtml tool
- * (https://www.npmjs.com/package/ro-crate-html-js) for creating a simple
- * preview file.
+ * The default preview should use the
+ * <a href="https://www.npmjs.com/package/ro-crate-html-js">rochtml tool</a>
+ * for creating a simple preview file.
  *
  * @author Nikola Tzotchev on 6.2.2022 г.
  * @version 1
@@ -66,13 +66,13 @@ public class AutomaticPreview implements CratePreview {
         if (PreviewGenerator.isRochtmlAvailable()) {
             try {
                 FileUtils.forceMkdir(new File("temp"));
-                try (FileWriter writer = new FileWriter(new File("temp/ro-crate-metadata.json"))) {
+                try (FileWriter writer = new FileWriter("temp/ro-crate-metadata.json")) {
                     writer.write(metadata);
                     writer.flush();
                 }
                 if (PreviewGenerator.isRochtmlAvailable()) {
                     PreviewGenerator.generatePreview("temp");
-                    ZipUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
+                    ZipStreamUtil.addFileToZipStream(stream, new File("temp/ro-crate-preview.html"), "ro-crate-preview.html");
                 }
             } finally {
                 try {
