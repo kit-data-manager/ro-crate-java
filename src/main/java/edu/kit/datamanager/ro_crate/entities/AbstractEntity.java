@@ -264,7 +264,7 @@ public class AbstractEntity {
      * @return The updated value of the property.
      *               Empty if value does not change!
      */
-    private static Optional<JsonNode> mergeIdIntoValue(String id, JsonNode currentValue) {
+    protected static Optional<JsonNode> mergeIdIntoValue(String id, JsonNode currentValue) {
         if (id == null || id.isBlank()) { return Optional.empty(); }
 
         ObjectMapper jsonBuilder = MyObjectMapper.getMapper();
