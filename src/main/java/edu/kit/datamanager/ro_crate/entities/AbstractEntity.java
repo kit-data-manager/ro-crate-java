@@ -239,12 +239,13 @@ public class AbstractEntity {
      * @param id the "id" of the property.
      */
     public void addIdProperty(String name, String id) {
+        if (id == null || id.isBlank()) { return; }
         mergeIdIntoValue(id, this.properties.get(name))
                 .ifPresent(newValue -> {
-                    this.linkedTo.add(id);
                     this.properties.set(name, newValue);
-                    this.notifyObservers();
                 });
+        this.linkedTo.add(id);
+        this.notifyObservers();
     }
 
     /**
