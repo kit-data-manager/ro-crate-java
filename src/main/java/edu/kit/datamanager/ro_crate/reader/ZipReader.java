@@ -18,10 +18,10 @@ import java.nio.file.Path;
  * persistent location and possibly read it from there, if required. Or use
  * the ZipWriter to write it back to its source.
  *
- * @deprecated Use {@link ZipStrategy} instead.
+ * @deprecated Use {@link ReadZipStrategy} instead.
  */
 @Deprecated(since = "2.1.0", forRemoval = true)
-public class ZipReader extends ZipStrategy {
+public class ZipReader extends ReadZipStrategy {
 
   /**
    * Crates a ZipReader with the default configuration as described in the class documentation.

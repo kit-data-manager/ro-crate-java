@@ -1,9 +1,8 @@
 package edu.kit.datamanager.ro_crate.preview;
 
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
+import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
@@ -13,7 +12,7 @@ import org.apache.commons.io.FileUtils;
 /**
  * This class adds a static preview to the crate, which consists of a
  * metadataHtml file and a folder containing other files required to render
- * metadataHtml. If will be put unchanged to the writer output, i.e., a zip
+ * metadataHtml. It will be put unchanged to the writer output, i.e., a zip
  * file, folder, or stream.
  *
  * @author jejkal
@@ -65,9 +64,9 @@ public class StaticPreview implements CratePreview {
 
     @Override
     public void saveAllToStream(String metadata, ZipOutputStream stream) throws IOException {
-        ZipUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
+        ZipStreamUtil.addFileToZipStream(stream, this.metadataHtml, "ro-crate-preview.html");
         if (this.otherFiles != null) {
-            ZipUtil.addFolderToZipStream(stream, this.otherFiles, this.otherFiles.getName());
+            ZipStreamUtil.addFolderToZipStream(stream, this.otherFiles, "ro-crate-preview_files");
         }
     }
 }

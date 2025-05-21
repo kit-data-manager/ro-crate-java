@@ -8,22 +8,24 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ZipReaderTest extends CrateReaderTest<String, ZipStrategy> {
-
+class ZipReaderTest implements
+        CommonReaderTest<String, ReadZipStrategy>,
+        ElnFileFormatTest<String, ReadZipStrategy>
+{
     @Override
-    protected void saveCrate(Crate crate, Path target) {
+    public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newZipPathWriter().save(crate, target.toAbsolutePath().toString());
         assertTrue(target.toFile().isFile());
     }
 
     @Override
-    protected Crate readCrate(Path source) throws IOException {
+    public Crate readCrate(Path source) throws IOException {
         return Readers.newZipPathReader().readCrate(source.toAbsolutePath().toString());
     }
 
     @Override
-    protected ZipStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
-        ZipStrategy strategy = new ZipStrategy(tmpDirectory, useUuidSubfolder);
+    public ReadZipStrategy newReaderStrategyWithTmp(Path tmpDirectory, boolean useUuidSubfolder) {
+        ReadZipStrategy strategy = new ReadZipStrategy(tmpDirectory, useUuidSubfolder);
         assertFalse(strategy.isExtracted());
         if (useUuidSubfolder) {
             assertEquals(strategy.getTemporaryFolder().getFileName().toString(), strategy.getID());
@@ -35,7 +37,7 @@ class ZipReaderTest extends CrateReaderTest<String, ZipStrategy> {
     }
 
     @Override
-    protected Crate readCrate(ZipStrategy strategy, Path source) throws IOException {
+    public Crate readCrate(ReadZipStrategy strategy, Path source) throws IOException {
         Crate importedCrate = new CrateReader<>(strategy)
                 .readCrate(source.toAbsolutePath().toString());
         assertTrue(strategy.isExtracted());

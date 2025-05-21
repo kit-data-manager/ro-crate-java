@@ -72,7 +72,7 @@ public class OrcidProvider {
           node.set(element.getKey(), element.getValue());
         }
       }
-      return new PersonEntity.PersonEntityBuilder().setAll(node).build();
+      return new PersonEntity.PersonEntityBuilder().setAllUnsafe(node).build();
     } catch (IOException e) {
       String errorMessage = String.format("IO error: %s", e.getMessage());
       logger.error(errorMessage);

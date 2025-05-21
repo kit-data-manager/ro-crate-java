@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -37,7 +38,7 @@ class BuilderSpec12Test {
     }
 
     @Test
-    void testModificationOfDraftCrate() throws URISyntaxException {
+    void testModificationOfDraftCrate() throws URISyntaxException, IOException {
         String path = this.getClass().getResource("/crates/spec-1.2-DRAFT/minimal-with-conformsTo-Array").getPath();
         RoCrate crate = Readers.newFolderReader().readCrate(path);
         Collection<String> existingProfiles = crate.getProfiles();

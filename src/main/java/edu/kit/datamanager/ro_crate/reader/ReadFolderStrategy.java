@@ -14,18 +14,14 @@ import java.nio.file.Path;
  * @author Nikola Tzotchev on 9.2.2022 г.
  * @version 1
  */
-public class FolderStrategy implements GenericReaderStrategy<String> {
+public class ReadFolderStrategy implements GenericReaderStrategy<String> {
 
   @Override
-  public ObjectNode readMetadataJson(String location) {
+  public ObjectNode readMetadataJson(String location) throws IOException {
     Path metadata = new File(location).toPath().resolve("ro-crate-metadata.json");
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ObjectNode objectNode = objectMapper.createObjectNode();
-    try {
-      objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
     return objectNode;
   }
 

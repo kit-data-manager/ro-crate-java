@@ -12,7 +12,6 @@ import edu.kit.datamanager.ro_crate.entities.contextual.PlaceEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.personprovider.OrcidProvider;
-import edu.kit.datamanager.ro_crate.reader.CrateReader;
 import edu.kit.datamanager.ro_crate.reader.Readers;
 
 import org.apache.commons.io.FileUtils;
@@ -23,17 +22,17 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class RealTest {
-
-    @SuppressWarnings("java:S2699") // disable warning about missing assertions
+class RealTest
+{
     @Test
     void testWithIDRCProject(@TempDir Path temp) throws IOException {
-
-        CrateReader<String> reader = Readers.newFolderReader();
         final String locationMetadataFile = "/crates/other/idrc_project/ro-crate-metadata.json";
-        Crate crate = reader.readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
+        Crate crate = Readers.newFolderReader()
+                .readCrate(RealTest.class.getResource("/crates/other/idrc_project").getPath());
 
+        assertNotNull(crate);
         HelpFunctions.compareCrateJsonToFileInResources(crate, locationMetadataFile);
 
         Path newFile = temp.resolve("new_file.txt");
@@ -47,6 +46,7 @@ class RealTest {
                         .build());
 
         PersonEntity person = OrcidProvider.getPerson("https://orcid.org/0000-0001-9842-9718");
+        assertNotNull(person);
         crate.addContextualEntity(person);
 
         // problem

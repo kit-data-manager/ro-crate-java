@@ -5,19 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import static edu.kit.datamanager.ro_crate.special.IdentifierUtils.isUrl;
-import edu.kit.datamanager.ro_crate.util.ZipUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
-import net.lingala.zip4j.model.ZipParameters;
-import org.apache.commons.io.FileUtils;
 
 /**
  * The base class of every data entity.
@@ -54,54 +46,6 @@ public class DataEntity extends AbstractEntity {
     @SuppressWarnings("unused")
     public void addAuthorId(String id) {
         this.addIdProperty("author", id);
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a zip archive.
-     *
-     * @param zipFile the zipFile where it should be written.
-     * @throws ZipException when something goes wrong with the writing to the
-     * zip file.
-     */
-    public void saveToZip(ZipFile zipFile) throws ZipException {
-        if (this.path != null) {
-            ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setFileNameInZip(this.getId());
-            zipFile.addFile(this.path.toFile(), zipParameters);
-        }
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a zip archive.
-     *
-     * @param zipStream The zip output stream where it should be written.
-     * @throws ZipException when something goes wrong with the writing to the
-     * zip file.
-     * @throws IOException If opening the file input stream fails.
-     */
-    public void saveToStream(ZipOutputStream zipStream) throws ZipException, IOException {
-        if (this.path != null) {
-            ZipUtil.addFileToZipStream(zipStream, this.path.toFile(), this.getId());
-        }
-    }
-
-    /**
-     * If the data entity contains a physical file. This method will write it
-     * when the crate is being written to a folder.
-     *
-     * @param file the folder location where the entity should be written.
-     * @throws IOException if something goes wrong with the writing.
-     */
-    public void savetoFile(File file) throws IOException {
-        if (this.getPath() != null) {
-            if (this.getPath().toFile().isDirectory()) {
-                FileUtils.copyDirectory(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
-            } else {
-                FileUtils.copyFile(this.getPath().toFile(), file.toPath().resolve(this.getId()).toFile());
-            }
-        }
     }
 
     @JsonIgnore

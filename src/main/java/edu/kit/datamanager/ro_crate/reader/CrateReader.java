@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ import java.util.stream.StreamSupport;
  * The constructor takes a strategy to support different ways of importing the
  * crates. (from zip, folder, etc.).
  * <p>
- * The reader consideres "hasPart" and "isPartOf" properties and considers all
+ * The reader considers "hasPart" and "isPartOf" properties and considers all
  * entities (in-)directly connected to the root entity ("./") as DataEntities.
  *
  * @param <T> the type of the location parameter
@@ -82,8 +83,10 @@ public class CrateReader<T> {
      *
      * @param location the location of the ro-crate to be read
      * @return the read RO-crate
+     *
+     * @throws IOException if the crate cannot be read
      */
-    public RoCrate readCrate(T location) {
+    public RoCrate readCrate(T location) throws IOException {
         // get the ro-crate-metadata.json
         ObjectNode metadataJson = strategy.readMetadataJson(location);
         // get the content of the crate
@@ -119,7 +122,7 @@ public class CrateReader<T> {
                     if (dataEntityIds.contains(eId)) {
                         // data entity
                         DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
-                                .setAll(entityJson.deepCopy());
+                                .setAllUnsafe(entityJson.deepCopy());
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
@@ -133,7 +136,7 @@ public class CrateReader<T> {
                         // contextual entity
                         crate.addContextualEntity(
                                 new ContextualEntity.ContextualEntityBuilder()
-                                        .setAll(entityJson.deepCopy())
+                                        .setAllUnsafe(entityJson.deepCopy())
                                         .build());
                     }
                 }
@@ -255,7 +258,7 @@ public class CrateReader<T> {
 
                 crate.setRootDataEntity(
                         new RootDataEntity.RootDataEntityBuilder()
-                                .setAll(root.deepCopy())
+                                .setAllUnsafe(root.deepCopy())
                                 .setHasPart(hasPartIds)
                                 .build());
 
@@ -333,7 +336,7 @@ public class CrateReader<T> {
 
     private void setCrateDescriptor(RoCrate crate, JsonNode descriptor) {
         ContextualEntity descriptorEntity = new ContextualEntity.ContextualEntityBuilder()
-                .setAll(descriptor.deepCopy())
+                .setAllUnsafe(descriptor.deepCopy())
                 .build();
         crate.setJsonDescriptor(descriptorEntity);
     }

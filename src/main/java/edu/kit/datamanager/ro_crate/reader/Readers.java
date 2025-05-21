@@ -19,10 +19,10 @@ public class Readers {
      *
      * @return A reader configured for ZIP files
      *
-     * @see ZipStreamStrategy#ZipStreamStrategy()
+     * @see ReadZipStreamStrategy#ReadZipStreamStrategy()
      */
     public static CrateReader<InputStream> newZipStreamReader() {
-        return new CrateReader<>(new ZipStreamStrategy());
+        return new CrateReader<>(new ReadZipStreamStrategy());
     }
 
     /**
@@ -33,10 +33,10 @@ public class Readers {
      * @param useUuidSubfolder Whether to create a UUID subfolder under extractPath
      * @return A reader configured for ZIP files with custom extraction
      *
-     * @see ZipStreamStrategy#ZipStreamStrategy(Path, boolean)
+     * @see ReadZipStreamStrategy#ReadZipStreamStrategy(Path, boolean)
      */
     public static CrateReader<InputStream> newZipStreamReader(Path extractPath, boolean useUuidSubfolder) {
-        return new CrateReader<>(new ZipStreamStrategy(extractPath, useUuidSubfolder));
+        return new CrateReader<>(new ReadZipStreamStrategy(extractPath, useUuidSubfolder));
     }
 
     /**
@@ -44,10 +44,10 @@ public class Readers {
      *
      * @return A reader configured for folders
      *
-     * @see FolderStrategy
+     * @see ReadFolderStrategy
      */
     public static CrateReader<String> newFolderReader() {
-        return new CrateReader<>(new FolderStrategy());
+        return new CrateReader<>(new ReadFolderStrategy());
     }
 
     /**
@@ -55,10 +55,10 @@ public class Readers {
      *
      * @return A reader configured for ZIP files
      *
-     * @see ZipStrategy#ZipStrategy()
+     * @see ReadZipStrategy#ReadZipStrategy()
      */
     public static CrateReader<String> newZipPathReader() {
-        return new CrateReader<>(new ZipStrategy());
+        return new CrateReader<>(new ReadZipStrategy());
     }
 
     /**
@@ -69,9 +69,9 @@ public class Readers {
      * @param useUuidSubfolder Whether to create a UUID subfolder under extractPath
      * @return A reader configured for ZIP files with custom extraction
      *
-     * @see ZipStrategy#ZipStrategy(Path, boolean)
+     * @see ReadZipStrategy#ReadZipStrategy(Path, boolean)
      */
     public static CrateReader<String> newZipPathReader(Path extractPath, boolean useUuidSubfolder) {
-        return new CrateReader<>(new ZipStrategy(extractPath, useUuidSubfolder));
+        return new CrateReader<>(new ReadZipStrategy(extractPath, useUuidSubfolder));
     }
 }
