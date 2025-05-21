@@ -57,7 +57,7 @@ public interface ElnFileFormatTest<
         // Download the ELN file
         URL url = URI.create(urlStr).toURL();
         Path elnFile = tmp.resolve("downloaded.eln");
-        FileUtils.copyURLToFile(url, elnFile.toFile(), 10000, 10000);
+        FileUtils.copyURLToFile(url, elnFile.toFile(), 20000, 20000);
         assertTrue(elnFile.toFile().exists());
 
         if (!isInBlacklist(urlStr)) {
