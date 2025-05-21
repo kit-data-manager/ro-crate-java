@@ -29,13 +29,22 @@ class ZipStreamReaderTest implements
 
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
-        Writers.newZipStreamWriter().save(crate, new FileOutputStream(target.toFile()));
-        assertTrue(target.toFile().isFile());
+        final File target_file = target.toFile();
+        try (
+                FileOutputStream fos = new FileOutputStream(target_file)
+        ) {
+            Writers.newZipStreamWriter().save(crate, fos);
+        }
+        assertTrue(target_file.isFile());
     }
 
     @Override
     public Crate readCrate(Path source) throws IOException {
-        return Readers.newZipStreamReader().readCrate(new FileInputStream(source.toFile()));
+        try (
+                FileInputStream fis = new FileInputStream(source.toFile())
+        ) {
+            return Readers.newZipStreamReader().readCrate(fis);
+        }
     }
 
     @Override
@@ -53,9 +62,13 @@ class ZipStreamReaderTest implements
 
     @Override
     public Crate readCrate(ReadZipStreamStrategy strategy, Path source) throws IOException {
-        Crate importedCrate = new CrateReader<>(strategy)
-                .readCrate(new FileInputStream(source.toFile()));
-        assertTrue(strategy.isExtracted());
-        return importedCrate;
+        try (
+                FileInputStream fis = new FileInputStream(source.toFile())
+        ) {
+            Crate importedCrate = new CrateReader<>(strategy).readCrate(fis);
+            assertNotNull(importedCrate);
+            assertTrue(strategy.isExtracted());
+            return importedCrate;
+        }
     }
 }
