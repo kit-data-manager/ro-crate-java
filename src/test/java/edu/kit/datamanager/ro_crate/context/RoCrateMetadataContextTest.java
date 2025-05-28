@@ -20,7 +20,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ContextTest {
+public class RoCrateMetadataContextTest {
 
   RoCrateMetadataContext context;
   RoCrateMetadataContext complexContext;
@@ -32,7 +32,7 @@ public class ContextTest {
 
     final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
+    JsonNode jsonNode = objectMapper.readTree(RoCrateMetadataContextTest.class.getResourceAsStream(crateManifestPath));
     this.complexContext = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 
