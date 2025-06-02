@@ -99,8 +99,8 @@ public class RoCrateMetadataContextTest {
     var objectMapper = MyObjectMapper.getMapper();
 
     ObjectNode rawContext = objectMapper.createObjectNode();
-    rawContext.put("house", "www.example.con/house");
-    rawContext.put("road", "www.example.con/road");
+    rawContext.put("house", "www.example.com/house");
+    rawContext.put("road", "www.example.com/road");
 
     ObjectNode rawCrate = objectMapper.createObjectNode();
     rawCrate.set("@context", rawContext);
@@ -108,6 +108,13 @@ public class RoCrateMetadataContextTest {
     assertNotNull(newContext);
 
     HelpFunctions.compare(newContext.getContextJsonEntity(), rawCrate, true);
+
+    var entityWithTerms = new ContextualEntity.ContextualEntityBuilder()
+            .setId("dkfaj")
+            .addType("house")
+            .addType("road")
+            .build();
+    assertTrue(newContext.checkEntity(entityWithTerms));
   }
 
   @Test
