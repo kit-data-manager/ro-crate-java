@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
+import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
@@ -277,5 +278,22 @@ public class RoCrateMetadataContextTest {
     }
     // prove immutability
     assertThrows(UnsupportedOperationException.class, () -> given.put("newKey", "newValue"));
+  }
+
+  @Test
+  void checkEntity_withDefinedPrefixedType_succeeds() throws IOException {
+    // assume we read a crate just for demonstration
+    RoCrate crate = new RoCrate();
+    // and we extend the context
+    RoCrateMetadataContext context =  new RoCrateMetadataContext();
+    context.addToContext("rdfs", "https://www.w3.org/2000/01/rdf-schema#");
+    crate.setMetadataContext(context);
+    // then we use the new context
+    DataEntity entity = new DataEntity.DataEntityBuilder()
+            .addType("rdfs:Property")
+            .build();
+    crate.addDataEntity(entity);
+    // Then we expect this to work
+    assertTrue(context.checkEntity(entity));
   }
 }

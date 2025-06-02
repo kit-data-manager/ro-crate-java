@@ -12,6 +12,7 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -117,6 +118,11 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
             entity.getProperties().path("@type"),
             new TypeReference<>() {}
     );
+
+    final Function<String, Boolean> isFail = checkMeStr -> this.contextMap.get(checkMeStr) == null
+            && this.contextMap.keySet().stream()
+            .noneMatch(key -> checkMeStr.startsWith(key + ":"));
+
     // check if the items in the array of types are present in the context
     for (String s : types) {
       // special cases:
@@ -134,7 +140,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         continue;
       }
 
-      if (this.contextMap.get(s) == null) {
+      if (isFail.apply(s)) {
         System.err.println("type " + s + " is missing from the context!");
         return false;
       }
@@ -147,7 +153,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         // full URLs are considered fine
         continue;
       }
-      if (this.contextMap.get(s) == null) {
+      if (isFail.apply(s)) {
         System.err.println("attribute name " + s + " is missing from context;");
         return false;
       }
