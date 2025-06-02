@@ -375,12 +375,14 @@ public class RoCrate implements Crate {
          * @return returns the builder for further usage.
          */
         public RoCrateBuilder addDataEntity(DataEntity dataEntity) {
+            this.metadataContext.checkEntity(dataEntity);
             this.payload.addDataEntity(dataEntity);
             this.rootDataEntity.addToHasPart(dataEntity.getId());
             return this;
         }
 
         public RoCrateBuilder addContextualEntity(ContextualEntity contextualEntity) {
+            this.metadataContext.checkEntity(contextualEntity);
             this.payload.addContextualEntity(contextualEntity);
             return this;
         }
