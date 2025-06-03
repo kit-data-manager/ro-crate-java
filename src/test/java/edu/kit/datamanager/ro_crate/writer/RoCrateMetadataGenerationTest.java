@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.writer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.RoCrate;
+import edu.kit.datamanager.ro_crate.HelpFunctions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -24,8 +25,12 @@ class RoCrateMetadataGenerationTest {
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
 
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
         // Parse metadata file
-        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode rootNode = objectMapper.readTree(metadata);
         JsonNode graph = rootNode.get("@graph");
 
         // Find ro-crate-java entity
@@ -49,8 +54,12 @@ class RoCrateMetadataGenerationTest {
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
 
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
         // Parse metadata file
-        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode rootNode = objectMapper.readTree(metadata);
         JsonNode roCrateJavaEntity = findEntityById(rootNode.get("@graph"), "#ro-crate-java");
 
         assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
@@ -70,8 +79,12 @@ class RoCrateMetadataGenerationTest {
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
 
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
         // Parse metadata file
-        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode rootNode = objectMapper.readTree(metadata);
         JsonNode graph = rootNode.get("@graph");
 
         // Get both entities
@@ -105,8 +118,12 @@ class RoCrateMetadataGenerationTest {
         Writers.newFolderWriter().save(crate, outputPath.toString());
         Writers.newFolderWriter().save(crate, outputPath.toString());
 
-        // Parse final metadata file
-        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(metadata);
         JsonNode graph = rootNode.get("@graph");
 
         // Get ro-crate-java entity
