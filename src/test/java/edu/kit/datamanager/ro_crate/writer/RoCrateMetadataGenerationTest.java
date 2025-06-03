@@ -170,6 +170,76 @@ class RoCrateMetadataGenerationTest {
             "Second update should be after first update");
     }
 
+    @Test
+    void should_HaveValidVersionFormat_When_WritingCrate(@TempDir Path tempDir) throws IOException {
+        // Create and write crate
+        RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(metadata);
+        JsonNode roCrateJavaEntity = findEntityById(rootNode.get("@graph"), "#ro-crate-java");
+
+        // Version format validation
+        @SuppressWarnings("DataFlowIssue")
+        String version = roCrateJavaEntity.get("version").asText();
+
+        // Semantic versioning regex pattern that allows:
+        // - Required: major.minor.patch (e.g., 1.2.3)
+        // - Optional: pre-release identifier (e.g., -rc1, -RC1, -beta.1, -SNAPSHOT)
+        // - Optional: build metadata (e.g., +build.123)
+        String semverPattern = "(?i)^\\d+\\.\\d+\\.\\d+(?:-(?:rc\\d+|alpha|beta|snapshot)(?:\\.\\d+)?)?(?:\\+[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*)?$";
+
+        assertTrue(version.matches(semverPattern),
+            String.format("Version '%s' should match semantic versioning format: major.minor.patch[-prerelease][+build]%n" +
+                        "Examples: 1.2.3, 1.2.3-rc1, 1.2.3-SNAPSHOT, 1.2.3-beta.1, 1.2.3+build.123", version));
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    @Test
+    void should_HaveCompleteMetadata_When_WritingCrate(@TempDir Path tempDir) throws IOException {
+        // Create and write crate
+        RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Read and print metadata for debugging
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(metadata);
+        JsonNode roCrateJavaEntity = findEntityById(rootNode.get("@graph"), "#ro-crate-java");
+
+        // Required properties with specific values
+        assertEquals("ro-crate-java", roCrateJavaEntity.get("name").asText(),
+            "should have correct name");
+        assertEquals("https://github.com/kit-data-manager/ro-crate-java",
+            roCrateJavaEntity.get("url").asText(),
+            "should have correct repository URL");
+        assertEquals("SoftwareApplication", roCrateJavaEntity.get("@type").asText(),
+            "should have correct type");
+
+        // Optional but recommended properties
+        assertNotNull(roCrateJavaEntity.get("description"),
+            "should have a description");
+        assertFalse(roCrateJavaEntity.get("description").asText().isEmpty(),
+                "description should not be empty");
+
+        assertNotNull(roCrateJavaEntity.get("license"),
+            "should have a license");
+        assertTrue(roCrateJavaEntity.has("softwareVersion"),
+            "should have softwareVersion as an alias for version");
+        assertEquals(roCrateJavaEntity.get("version").asText(),
+            roCrateJavaEntity.get("softwareVersion").asText(),
+            "version and softwareVersion should match");
+    }
+
     private JsonNode findEntityById(JsonNode graph, String id) {
         for (JsonNode entity : graph) {
             if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
