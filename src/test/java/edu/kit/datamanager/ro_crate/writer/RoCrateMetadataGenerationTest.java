@@ -9,6 +9,8 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.StreamSupport;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoCrateMetadataGenerationTest {
@@ -92,6 +94,65 @@ class RoCrateMetadataGenerationTest {
             "ro-crate-java's action should reference the CreateAction");
     }
 
+    @Test
+    void should_AccumulateActions_When_WritingMultipleTimes(@TempDir Path tempDir) throws IOException {
+        // Create and write crate first time
+        RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Write same crate two more times to simulate updates
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Parse final metadata file
+        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode graph = rootNode.get("@graph");
+
+        // Get ro-crate-java entity
+        JsonNode roCrateJavaEntity = findEntityById(graph, "#ro-crate-java");
+        assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
+
+        // Verify actions array exists and has three entries
+        assertTrue(roCrateJavaEntity.get("action").isArray(),
+            "ro-crate-java should have an array of actions");
+        assertEquals(3, roCrateJavaEntity.get("action").size(),
+            "should have three actions after three writes");
+
+        // Find all action entities
+        JsonNode createAction = findEntityByType(graph, "CreateAction");
+        assertNotNull(createAction, "should have one CreateAction");
+
+        JsonNode[] createActions = findEntitiesByType(graph, "UpdateAction");
+        assertEquals(1, createActions.length, "should have exactly one CreateAction");
+
+        JsonNode[] updateActions = findEntitiesByType(graph, "UpdateAction");
+        assertEquals(2, updateActions.length, "should have two UpdateActions");
+
+        // Verify CreateAction properties
+        assertNotNull(createAction.get("startTime"), "CreateAction should have startTime");
+        assertEquals("#ro-crate-java", createAction.get("agent").get("@id").asText(),
+            "CreateAction should reference ro-crate-java as agent");
+
+        // Verify UpdateAction properties
+        for (JsonNode updateAction : updateActions) {
+            assertNotNull(updateAction.get("startTime"),
+                "UpdateAction should have startTime");
+            assertEquals("#ro-crate-java", updateAction.get("agent").get("@id").asText(),
+                "UpdateAction should reference ro-crate-java as agent");
+        }
+
+        // Verify chronological order of timestamps
+        String createTime = createAction.get("startTime").asText();
+        String updateTime1 = updateActions[0].get("startTime").asText();
+        String updateTime2 = updateActions[1].get("startTime").asText();
+
+        assertTrue(createTime.compareTo(updateTime1) < 0,
+            "First update should be after creation");
+        assertTrue(updateTime1.compareTo(updateTime2) < 0,
+            "Second update should be after first update");
+    }
+
     private JsonNode findEntityById(JsonNode graph, String id) {
         for (JsonNode entity : graph) {
             if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
@@ -108,5 +169,11 @@ class RoCrateMetadataGenerationTest {
             }
         }
         return null;
+    }
+
+    private JsonNode[] findEntitiesByType(JsonNode graph, String type) {
+        return StreamSupport.stream(graph.spliterator(), false)
+            .filter(entity -> entity.has("@type") && entity.get("@type").asText().equals(type))
+            .toArray(JsonNode[]::new);
     }
 }
