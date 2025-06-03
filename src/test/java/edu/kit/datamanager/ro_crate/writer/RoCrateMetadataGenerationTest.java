@@ -61,6 +61,37 @@ class RoCrateMetadataGenerationTest {
             "should have version property");
     }
 
+    @Test
+    void should_HaveBidirectionalRelation_Between_RoCrateJavaAndItsAction(@TempDir Path tempDir) throws IOException {
+        // Create and write crate
+        RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+        Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode graph = rootNode.get("@graph");
+
+        // Get both entities
+        JsonNode roCrateJavaEntity = findEntityById(graph, "#ro-crate-java");
+        JsonNode createActionEntity = findEntityByType(graph, "CreateAction");
+
+        assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
+        assertNotNull(createActionEntity, "CreateAction entity should exist");
+
+        // Test CreateAction -> ro-crate-java reference
+        JsonNode agentRef = createActionEntity.get("agent");
+        assertNotNull(agentRef, "CreateAction should have agent property");
+        assertEquals("#ro-crate-java", agentRef.get("@id").asText(),
+            "CreateAction's agent should reference ro-crate-java");
+
+        // Test ro-crate-java -> CreateAction reference
+        JsonNode actionRef = roCrateJavaEntity.get("action");
+        assertNotNull(actionRef, "ro-crate-java should have action property");
+        assertEquals(createActionEntity.get("@id").asText(), actionRef.get("@id").asText(),
+            "ro-crate-java's action should reference the CreateAction");
+    }
+
     private JsonNode findEntityById(JsonNode graph, String id) {
         for (JsonNode entity : graph) {
             if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
