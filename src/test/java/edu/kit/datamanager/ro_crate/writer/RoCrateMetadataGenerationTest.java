@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
+import edu.kit.datamanager.ro_crate.reader.Readers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -238,6 +239,116 @@ class RoCrateMetadataGenerationTest {
         assertEquals(roCrateJavaEntity.get("version").asText(),
             roCrateJavaEntity.get("softwareVersion").asText(),
             "version and softwareVersion should match");
+    }
+
+    @Test
+    void should_AddProvenanceInfo_When_ModifyingExistingCrateWithoutProvenance(@TempDir Path tempDir) throws IOException {
+        // First create a crate without provenance information
+        RoCrate originalCrate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+
+        // Use writer with disabled provenance (not implemented yet)
+        Writers.newFolderWriter()
+                .withAutomaticProvenance(false)
+                .save(originalCrate, outputPath.toString());
+
+        // Verify the original crate has no provenance information
+        String originalMetadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(originalMetadata);
+
+        JsonNode originalRoot = objectMapper.readTree(originalMetadata);
+        JsonNode originalGraph = originalRoot.get("@graph");
+        assertNull(findEntityById(originalGraph, "#ro-crate-java"),
+            "Original crate should not have ro-crate-java entity");
+        assertNull(findEntityByType(originalGraph, "CreateAction"),
+            "Original crate should not have CreateAction");
+        assertNull(findEntityByType(originalGraph, "UpdateAction"),
+            "Original crate should not have UpdateAction");
+
+        // Now read and modify the crate
+        RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        modifiedCrate.getRootDataEntity().addProperty("description", "Modified crate");
+
+        // Write the modified crate with provenance enabled (default)
+        Path modifiedPath = tempDir.resolve("modified-crate");
+        Writers.newFolderWriter().save(modifiedCrate, modifiedPath.toString());
+
+        // Read and verify the modified crate's metadata
+        String modifiedMetadata = Files.readString(modifiedPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(modifiedMetadata);
+
+        JsonNode modifiedRoot = objectMapper.readTree(modifiedMetadata);
+        JsonNode modifiedGraph = modifiedRoot.get("@graph");
+
+        // Verify ro-crate-java entity was added
+        JsonNode roCrateJavaEntity = findEntityById(modifiedGraph, "#ro-crate-java");
+        assertNotNull(roCrateJavaEntity, "ro-crate-java entity should be added");
+
+        // Should only have UpdateAction, no CreateAction
+        assertNull(findEntityByType(modifiedGraph, "CreateAction"),
+            "Modified crate should not have CreateAction");
+
+        JsonNode updateAction = findEntityByType(modifiedGraph, "UpdateAction");
+        assertNotNull(updateAction, "Should have UpdateAction");
+
+        // Verify update action properties
+        assertNotNull(updateAction.get("startTime"),
+            "UpdateAction should have startTime");
+        assertEquals("#ro-crate-java",
+            updateAction.get("agent").get("@id").asText(),
+            "UpdateAction should reference ro-crate-java as agent");
+
+        // Verify ro-crate-java references the action
+        assertTrue(roCrateJavaEntity.get("action").isArray(),
+            "ro-crate-java should have an array of actions");
+        assertEquals(1, roCrateJavaEntity.get("action").size(),
+            "should have exactly one action");
+        assertEquals(updateAction.get("@id").asText(),
+            roCrateJavaEntity.get("action").get(0).get("@id").asText(),
+            "ro-crate-java should reference the UpdateAction");
+    }
+
+    @Test
+    void should_PreserveExistingProvenance_When_ModifyingCrate(@TempDir Path tempDir) throws IOException {
+        // First create a crate with normal provenance
+        RoCrate originalCrate = new RoCrate.RoCrateBuilder().build();
+        Path outputPath = tempDir.resolve("test-crate");
+        Writers.newFolderWriter().save(originalCrate, outputPath.toString());
+
+        // Now read and modify the crate
+        RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        modifiedCrate.getRootDataEntity().addProperty("description", "Modified crate");
+
+        // Write the modified crate
+        Writers.newFolderWriter().save(modifiedCrate, outputPath.toString());
+
+        // Read and verify the metadata
+        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        HelpFunctions.prettyPrintJsonString(metadata);
+
+        JsonNode root = objectMapper.readTree(metadata);
+        JsonNode graph = root.get("@graph");
+
+        // Should have both CreateAction and UpdateAction
+        JsonNode createAction = findEntityByType(graph, "CreateAction");
+        assertNotNull(createAction, "Original CreateAction should be preserved");
+
+        JsonNode[] updateActions = findEntitiesByType(graph, "UpdateAction");
+        assertEquals(1, updateActions.length, "Should have exactly one UpdateAction");
+
+        // Verify chronological order
+        String createTime = createAction.get("startTime").asText();
+        String updateTime = updateActions[0].get("startTime").asText();
+        assertTrue(createTime.compareTo(updateTime) < 0,
+            "Update should be after creation");
+
+        // Verify ro-crate-java entity references both actions
+        JsonNode roCrateJavaEntity = findEntityById(graph, "#ro-crate-java");
+        //noinspection DataFlowIssue
+        assertTrue(roCrateJavaEntity.get("action").isArray(),
+            "ro-crate-java should have an array of actions");
+        assertEquals(2, roCrateJavaEntity.get("action").size(),
+            "should have both actions");
     }
 
     private JsonNode findEntityById(JsonNode graph, String id) {
