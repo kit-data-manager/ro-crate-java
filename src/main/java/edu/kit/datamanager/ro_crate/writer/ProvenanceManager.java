@@ -45,6 +45,7 @@ class ProvenanceManager {
             .addType("SoftwareApplication")
             .addProperty("name", "ro-crate-java")
             .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
+            // TODO read software version and version from gradle (write into resources properties file when building and read it from there)
             .addProperty("version", "1.0.0")
             .addProperty("softwareVersion", "1.0.0")
             .addProperty("license", "Apache-2.0")
