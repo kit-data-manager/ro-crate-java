@@ -15,9 +15,15 @@ import java.io.IOException;
 public class CrateWriter<DESTINATION_TYPE> {
 
     private final GenericWriterStrategy<DESTINATION_TYPE> strategy;
+    protected boolean automaticProvenance = true;
 
     public CrateWriter(GenericWriterStrategy<DESTINATION_TYPE> strategy) {
         this.strategy = strategy;
+    }
+
+    public CrateWriter<DESTINATION_TYPE> withAutomaticProvenance(boolean automaticProvenance) {
+        this.automaticProvenance = automaticProvenance;
+        return this;
     }
 
     /**
@@ -29,6 +35,9 @@ public class CrateWriter<DESTINATION_TYPE> {
     public void save(Crate crate, DESTINATION_TYPE destination) throws IOException {
         Validator defaultValidation = new Validator(new JsonSchemaValidation());
         defaultValidation.validate(crate);
+        if (automaticProvenance) {
+            new ProvenanceManager().addProvenanceInformation(crate);
+        }
         this.strategy.save(crate, destination);
     }
 }
