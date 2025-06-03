@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.reader.Readers;
+import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
+import edu.kit.datamanager.ro_crate.validation.Validator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,13 +21,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoCrateMetadataGenerationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private Validator validator;
+
+    @BeforeEach
+    void setUp() {
+        validator = new Validator(new JsonSchemaValidation());
+    }
+
+    private void validateCrate(RoCrate crate) {
+        assertTrue(validator.validate(crate),
+            "Crate should validate against the JSON schema");
+    }
 
     @Test
     void should_ContainRoCrateJavaEntities_When_WritingEmptyCrate(@TempDir Path tempDir) throws IOException {
         // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        // Re-read the crate to verify it's still valid after writing
+        RoCrate readCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        validateCrate(readCrate);
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -52,8 +72,13 @@ class RoCrateMetadataGenerationTest {
     void should_HaveRequiredPropertiesInRoCrateJavaEntity_When_WritingCrate(@TempDir Path tempDir) throws IOException {
         // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        RoCrate readCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        validateCrate(readCrate);
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -77,8 +102,13 @@ class RoCrateMetadataGenerationTest {
     void should_HaveBidirectionalRelation_Between_RoCrateJavaAndItsAction(@TempDir Path tempDir) throws IOException {
         // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+
+        RoCrate readCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        validateCrate(readCrate);
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -112,12 +142,16 @@ class RoCrateMetadataGenerationTest {
     void should_AccumulateActions_When_WritingMultipleTimes(@TempDir Path tempDir) throws IOException {
         // Create and write crate first time
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+        validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
 
         // Write same crate two more times to simulate updates
         Writers.newFolderWriter().save(crate, outputPath.toString());
         Writers.newFolderWriter().save(crate, outputPath.toString());
+        validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -175,8 +209,11 @@ class RoCrateMetadataGenerationTest {
     void should_HaveValidVersionFormat_When_WritingCrate(@TempDir Path tempDir) throws IOException {
         // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+        validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -206,8 +243,11 @@ class RoCrateMetadataGenerationTest {
     void should_HaveCompleteMetadata_When_WritingCrate(@TempDir Path tempDir) throws IOException {
         // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(crate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
+        validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -245,6 +285,8 @@ class RoCrateMetadataGenerationTest {
     void should_AddProvenanceInfo_When_ModifyingExistingCrateWithoutProvenance(@TempDir Path tempDir) throws IOException {
         // First create a crate without provenance information
         RoCrate originalCrate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(originalCrate);
+
         Path outputPath = tempDir.resolve("test-crate");
 
         // Use writer with disabled provenance (not implemented yet)
@@ -267,7 +309,9 @@ class RoCrateMetadataGenerationTest {
 
         // Now read and modify the crate
         RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        validateCrate(modifiedCrate);
         modifiedCrate.getRootDataEntity().addProperty("description", "Modified crate");
+        validateCrate(modifiedCrate);
 
         // Write the modified crate with provenance enabled (default)
         Path modifiedPath = tempDir.resolve("modified-crate");
@@ -312,12 +356,16 @@ class RoCrateMetadataGenerationTest {
     void should_PreserveExistingProvenance_When_ModifyingCrate(@TempDir Path tempDir) throws IOException {
         // First create a crate with normal provenance
         RoCrate originalCrate = new RoCrate.RoCrateBuilder().build();
+        validateCrate(originalCrate);
+
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(originalCrate, outputPath.toString());
 
         // Now read and modify the crate
         RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
+        validateCrate(modifiedCrate);
         modifiedCrate.getRootDataEntity().addProperty("description", "Modified crate");
+        validateCrate(modifiedCrate);
 
         // Write the modified crate
         Writers.newFolderWriter().save(modifiedCrate, outputPath.toString());
