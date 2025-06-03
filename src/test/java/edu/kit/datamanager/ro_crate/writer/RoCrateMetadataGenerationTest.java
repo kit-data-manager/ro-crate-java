@@ -1,5 +1,7 @@
 package edu.kit.datamanager.ro_crate.writer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -7,46 +9,73 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoCrateMetadataGenerationTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
     void should_ContainRoCrateJavaEntities_When_WritingEmptyCrate(@TempDir Path tempDir) throws IOException {
-        // Create an empty RO-Crate
+        // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
-
-        // Write it to a temporary directory
         Path outputPath = tempDir.resolve("test-crate");
-        FolderWriter writer = new FolderWriter();
-        writer.write(crate, outputPath);
+        Writers.newFolderWriter().save(crate, outputPath.toString());
 
-        // Read the metadata file
-        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode graph = rootNode.get("@graph");
 
-        // Verify ro-crate-java entity exists
-        assertTrue(metadata.contains("\"@id\": \"#ro-crate-java\""));
-        assertTrue(metadata.contains("\"@type\": \"SoftwareApplication\""));
+        // Find ro-crate-java entity
+        JsonNode roCrateJavaEntity = findEntityById(graph, "#ro-crate-java");
+        assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
+        assertEquals("SoftwareApplication", roCrateJavaEntity.get("@type").asText(),
+            "ro-crate-java should be of type SoftwareApplication");
 
-        // Verify write action exists
-        assertTrue(metadata.contains("\"@type\": \"CreateAction\""));
-        assertTrue(metadata.contains("startTime"));
-        assertTrue(metadata.contains("agent"));
+        // Find CreateAction entity
+        JsonNode createActionEntity = findEntityByType(graph, "CreateAction");
+        assertNotNull(createActionEntity, "CreateAction entity should exist");
+        assertNotNull(createActionEntity.get("startTime"), "CreateAction should have startTime");
+        assertEquals("#ro-crate-java", createActionEntity.get("agent").get("@id").asText(),
+            "CreateAction should reference ro-crate-java as agent");
     }
 
     @Test
     void should_HaveRequiredPropertiesInRoCrateJavaEntity_When_WritingCrate(@TempDir Path tempDir) throws IOException {
+        // Create and write crate
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
         Path outputPath = tempDir.resolve("test-crate");
-        FolderWriter writer = new FolderWriter();
-        writer.write(crate, outputPath);
+        Writers.newFolderWriter().save(crate, outputPath.toString());
 
-        String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
+        // Parse metadata file
+        JsonNode rootNode = objectMapper.readTree(outputPath.resolve("ro-crate-metadata.json").toFile());
+        JsonNode roCrateJavaEntity = findEntityById(rootNode.get("@graph"), "#ro-crate-java");
 
-        // Test essential properties of the ro-crate-java entity
-        assertTrue(metadata.contains("\"name\": \"ro-crate-java\""));
-        assertTrue(metadata.contains("\"url\": \"https://github.com/kit-data-manager/ro-crate-java\""));
-        assertTrue(metadata.contains("\"version\""));
+        assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
+        assertEquals("ro-crate-java", roCrateJavaEntity.get("name").asText(),
+            "should have correct name");
+        assertEquals("https://github.com/kit-data-manager/ro-crate-java",
+            roCrateJavaEntity.get("url").asText(),
+            "should have correct repository URL");
+        assertNotNull(roCrateJavaEntity.get("version"),
+            "should have version property");
+    }
+
+    private JsonNode findEntityById(JsonNode graph, String id) {
+        for (JsonNode entity : graph) {
+            if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    private JsonNode findEntityByType(JsonNode graph, String type) {
+        for (JsonNode entity : graph) {
+            if (entity.has("@type") && entity.get("@type").asText().equals(type)) {
+                return entity;
+            }
+        }
+        return null;
     }
 }
