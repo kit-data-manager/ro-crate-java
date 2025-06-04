@@ -2,9 +2,12 @@ package edu.kit.datamanager.ro_crate.writer;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.ContextualEntityBuilder;
@@ -49,21 +52,42 @@ class ProvenanceManager {
         ContextualEntity self = crate.getAllContextualEntities().stream()
                 .filter(contextualEntity -> RO_CRATE_JAVA_ID.equals(contextualEntity.getId()))
                 .findFirst()
-                .orElseGet(() ->
-                        new ContextualEntityBuilder()
-                                .setId(RO_CRATE_JAVA_ID)
-                                .addType("SoftwareApplication")
-                                .addProperty("name", "ro-crate-java")
-                                .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
-                                // TODO read software version and version from gradle (write into resources properties file when building and read it from there)
-                                .addProperty("version", "1.0.0")
-                                .addProperty("softwareVersion", "1.0.0")
-                                .addProperty("license", "Apache-2.0")
-                                .addProperty("description", "A Java library for creating and manipulating RO-Crates")
-                                .addIdProperty("Action", newActionId)
-                                .build()
+                .orElseGet(() -> {
+                            String version = loadVersionFromProperties();
+                            return new ContextualEntityBuilder()
+                                    .setId(RO_CRATE_JAVA_ID)
+                                    .addType("SoftwareApplication")
+                                    .addProperty("name", "ro-crate-java")
+                                    .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
+                                    // TODO read software version and version from gradle (write into resources properties file when building and read it from there)
+                                    .addProperty("version", version)
+                                    .addProperty("softwareVersion", version)
+                                    .addProperty("license", "Apache-2.0")
+                                    .addProperty("description", "A Java library for creating and manipulating RO-Crates")
+                                    .addIdProperty("Action", newActionId)
+                                    .build();
+                        }
                 );
         self.addIdProperty("Action", newActionId);
         return self;
+    }
+
+    private String loadVersionFromProperties() {
+        try {
+            URL resource = this.getClass().getResource("/version.properties");
+            if (resource != null) {
+                try (InputStream input = resource.openStream()) {
+                    Properties properties = new Properties();
+                    properties.load(input);
+                    return properties.getProperty("version");
+                }
+            } else {
+                System.err.println("Properties file not found!");
+                return "unknown";
+            }
+        } catch (IOException e) {
+            System.err.println("Properties file not found!");
+            return "unknown";
+        }
     }
 }
