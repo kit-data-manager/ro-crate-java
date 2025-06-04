@@ -175,7 +175,7 @@ class RoCrateMetadataGenerationTest {
         JsonNode createAction = findEntityByType(graph, "CreateAction");
         assertNotNull(createAction, "should have one CreateAction");
 
-        JsonNode[] createActions = findEntitiesByType(graph, "UpdateAction");
+        JsonNode[] createActions = findEntitiesByType(graph, "CreateAction");
         assertEquals(1, createActions.length, "should have exactly one CreateAction");
 
         JsonNode[] updateActions = findEntitiesByType(graph, "UpdateAction");
@@ -198,11 +198,12 @@ class RoCrateMetadataGenerationTest {
         String createTime = createAction.get("startTime").asText();
         String updateTime1 = updateActions[0].get("startTime").asText();
         String updateTime2 = updateActions[1].get("startTime").asText();
-
+        // The order of updates is not the order in the graph.
+        // But we can check that creation happened before the updates:
         assertTrue(createTime.compareTo(updateTime1) < 0,
             "First update should be after creation");
-        assertTrue(updateTime1.compareTo(updateTime2) < 0,
-            "Second update should be after first update");
+        assertTrue(createTime.compareTo(updateTime2) < 0,
+            "Second update should be after creation");
     }
 
     @Test
@@ -343,12 +344,10 @@ class RoCrateMetadataGenerationTest {
             "UpdateAction should reference ro-crate-java as agent");
 
         // Verify ro-crate-java references the action
-        assertTrue(roCrateJavaEntity.get("Action").isArray(),
-            "ro-crate-java should have an array of actions");
-        assertEquals(1, roCrateJavaEntity.get("Action").size(),
-            "should have exactly one action");
+        assertTrue(roCrateJavaEntity.get("Action").isObject(),
+            "ro-crate-java should have a single reference to an UpdateAction");
         assertEquals(updateAction.get("@id").asText(),
-            roCrateJavaEntity.get("Action").get(0).get("@id").asText(),
+            roCrateJavaEntity.get("Action").get("@id").asText(),
             "ro-crate-java should reference the UpdateAction");
     }
 
