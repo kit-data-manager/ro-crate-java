@@ -10,6 +10,6 @@ authors:
   given-names: "Sabrine"
   orcid: "https://orcid.org/0000-0002-4480-6116"
 title: "ro-crate-java"
-version: 1.0.3
+version: 2.1.0-rc3
 date-released: 2022-07-19
 url: "https://github.com/kit-data-manager/ro-crate-java"
