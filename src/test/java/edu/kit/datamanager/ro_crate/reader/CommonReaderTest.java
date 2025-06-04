@@ -127,8 +127,12 @@ public interface CommonReaderTest<
         {
             // write raw crate and imported crate to two different directories
             CrateWriter<String> writer = Writers.newFolderWriter();
-            writer.save(rawCrate, rawCrateTarget.toString());
-            writer.save(importedCrate, importedCrateTarget.toString());
+            writer
+                    .withAutomaticProvenance(false)
+                    .save(rawCrate, rawCrateTarget.toString());
+            writer
+                    .withAutomaticProvenance(false)
+                    .save(importedCrate, importedCrateTarget.toString());
         }
 
         assertTrue(HelpFunctions.compareTwoDir(rawCrateTarget.toFile(), importedCrateTarget.toFile()));

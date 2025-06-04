@@ -14,7 +14,9 @@ class ZipReaderTest implements
 {
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
-        Writers.newZipPathWriter().save(crate, target.toAbsolutePath().toString());
+        Writers.newZipPathWriter()
+                .withAutomaticProvenance(false)
+                .save(crate, target.toAbsolutePath().toString());
         assertTrue(target.toFile().isFile());
     }
 

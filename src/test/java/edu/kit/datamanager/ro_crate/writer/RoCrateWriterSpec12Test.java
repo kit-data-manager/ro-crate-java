@@ -30,6 +30,7 @@ class RoCrateWriterSpec12Test {
         Path targetDir = tempDir.resolve("spec12writeUnmodified");
 
         Writers.newFolderWriter()
+                .withAutomaticProvenance(false)
                 .save(crate, targetDir.toAbsolutePath().toString());
 
         // compare directories

@@ -13,18 +13,21 @@ class ZipWriterTest implements
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newZipPathWriter()
+                .withAutomaticProvenance(false)
                 .save(crate, target.toAbsolutePath().toString());
     }
 
     @Override
     public void saveCrateElnStyle(Crate crate, Path target) throws IOException {
         new CrateWriter<>(new WriteZipStrategy().usingElnStyle())
+                .withAutomaticProvenance(false)
                 .save(crate, target.toAbsolutePath().toString());
     }
 
     @Override
     public void saveCrateSubdirectoryStyle(RoCrate crate, Path target) throws IOException {
         new CrateWriter<>(new WriteZipStrategy().withRootSubdirectory())
+                .withAutomaticProvenance(false)
                 .save(crate, target.toString());
     }
 }

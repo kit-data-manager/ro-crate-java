@@ -16,6 +16,7 @@ class FolderWriterTest implements CommonWriterTest {
     @Override
     public void saveCrate(Crate crate, Path target) throws IOException {
         Writers.newFolderWriter()
+                .withAutomaticProvenance(false)
                 .save(crate, target.toAbsolutePath().toString());
     }
 
