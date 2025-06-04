@@ -52,7 +52,7 @@ class ProvenanceManager {
             .addProperty("description", "A Java library for creating and manipulating RO-Crates");
 
         if (isFirstWrite) {
-            builder.addIdProperty("action", newActionId);
+            builder.addIdProperty("Action", newActionId);
         } else {
             Collection<ContextualEntity> entities = crate.getAllContextualEntities();
             for (ContextualEntity entity : entities) {
@@ -71,7 +71,7 @@ class ProvenanceManager {
             ContextualEntity existingEntity,
             String newActionId
     ) {
-        Object existingAction = existingEntity.getProperty("action");
+        Object existingAction = existingEntity.getProperty("Action");
         if (existingAction == null) {
             builder.addIdProperty("action", newActionId);
             return;
@@ -81,8 +81,8 @@ class ProvenanceManager {
         if (existingAction instanceof Map) {
             // Single previous action (as a Map containing @id)
             String existingActionId = ((Map<?, ?>) existingAction).get("@id").toString();
-            builder.addIdProperty("action", "#" + existingActionId);
-            builder.addIdProperty("action", newActionId);
+            builder.addIdProperty("Action", "#" + existingActionId);
+            builder.addIdProperty("Action", newActionId);
         } else if (existingAction instanceof Collection<?> oldActions) {
             // Multiple previous actions -> Add all existing actions
             oldActions.stream()
@@ -90,10 +90,10 @@ class ProvenanceManager {
                 .map(id -> !id.startsWith("#") ? "#" + id : id)
                 .forEach(id -> builder.addIdProperty("action", id));
             // Add the new action
-            builder.addIdProperty("action", newActionId);
+            builder.addIdProperty("Action", newActionId);
         } else {
             // Unexpected format, just add the new action
-            builder.addIdProperty("action", newActionId);
+            builder.addIdProperty("Action", newActionId);
         }
     }
 }

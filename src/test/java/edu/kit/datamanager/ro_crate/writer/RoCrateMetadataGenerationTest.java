@@ -132,7 +132,7 @@ class RoCrateMetadataGenerationTest {
             "CreateAction's agent should reference ro-crate-java");
 
         // Test ro-crate-java -> CreateAction reference
-        JsonNode actionRef = roCrateJavaEntity.get("action");
+        JsonNode actionRef = roCrateJavaEntity.get("Action");
         assertNotNull(actionRef, "ro-crate-java should have action property");
         assertEquals(createActionEntity.get("@id").asText(), actionRef.get("@id").asText(),
             "ro-crate-java's action should reference the CreateAction");
@@ -166,9 +166,9 @@ class RoCrateMetadataGenerationTest {
         assertNotNull(roCrateJavaEntity, "ro-crate-java entity should exist");
 
         // Verify actions array exists and has three entries
-        assertTrue(roCrateJavaEntity.get("action").isArray(),
+        assertTrue(roCrateJavaEntity.get("Action").isArray(),
             "ro-crate-java should have an array of actions");
-        assertEquals(3, roCrateJavaEntity.get("action").size(),
+        assertEquals(3, roCrateJavaEntity.get("Action").size(),
             "should have three actions after three writes");
 
         // Find all action entities
@@ -343,12 +343,12 @@ class RoCrateMetadataGenerationTest {
             "UpdateAction should reference ro-crate-java as agent");
 
         // Verify ro-crate-java references the action
-        assertTrue(roCrateJavaEntity.get("action").isArray(),
+        assertTrue(roCrateJavaEntity.get("Action").isArray(),
             "ro-crate-java should have an array of actions");
-        assertEquals(1, roCrateJavaEntity.get("action").size(),
+        assertEquals(1, roCrateJavaEntity.get("Action").size(),
             "should have exactly one action");
         assertEquals(updateAction.get("@id").asText(),
-            roCrateJavaEntity.get("action").get(0).get("@id").asText(),
+            roCrateJavaEntity.get("Action").get(0).get("@id").asText(),
             "ro-crate-java should reference the UpdateAction");
     }
 
@@ -393,9 +393,9 @@ class RoCrateMetadataGenerationTest {
         // Verify ro-crate-java entity references both actions
         JsonNode roCrateJavaEntity = findEntityById(graph, "#ro-crate-java");
         //noinspection DataFlowIssue
-        assertTrue(roCrateJavaEntity.get("action").isArray(),
+        assertTrue(roCrateJavaEntity.get("Action").isArray(),
             "ro-crate-java should have an array of actions");
-        assertEquals(2, roCrateJavaEntity.get("action").size(),
+        assertEquals(2, roCrateJavaEntity.get("Action").size(),
             "should have both actions");
     }
 
