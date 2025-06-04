@@ -16,7 +16,7 @@ class ProvenanceManager {
 
     void addProvenanceInformation(Crate crate) {
         // Determine if this is the first write
-        boolean isFirstWrite = !crate.getJsonMetadata().contains(RO_CRATE_JAVA_ID);
+        boolean isFirstWrite = !crate.getJsonMetadata().contains(RO_CRATE_JAVA_ID) && !crate.isImported();
 
         // Create action entity first
         String actionId = "#" + UUID.randomUUID();

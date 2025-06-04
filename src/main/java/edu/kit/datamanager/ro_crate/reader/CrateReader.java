@@ -97,7 +97,7 @@ public class CrateReader<T> {
         usedFiles.add(files.toPath().resolve(FILE_METADATA_JSON).toFile().getPath());
         usedFiles.add(files.toPath().resolve(FILE_PREVIEW_HTML).toFile().getPath());
         usedFiles.add(files.toPath().resolve(FILE_PREVIEW_FILES).toFile().getPath());
-        return rebuildCrate(metadataJson, files, usedFiles);
+        return rebuildCrate(metadataJson, files, usedFiles).markAsImported();
     }
 
     private RoCrate rebuildCrate(ObjectNode metadataJson, File files, HashSet<String> usedFiles) {
