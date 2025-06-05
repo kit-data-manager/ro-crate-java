@@ -6,7 +6,6 @@ import edu.kit.datamanager.ro_crate.util.ClasspathPropertiesVersionProvider;
 import edu.kit.datamanager.ro_crate.util.VersionProvider;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.ContextualEntityBuilder;
 
@@ -15,7 +14,18 @@ import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.
  * Handles the creation and updating of ro-crate-java entity and its actions.
  */
 class ProvenanceManager {
-    private static final String RO_CRATE_JAVA_ID = "#ro-crate-java";
+    private record IdPrefix(String prefix) {
+        public String withSuffix(String suffix) {
+            return prefix + "-" + suffix;
+        }
+
+        @Override
+        public String toString() {
+            return prefix;
+        }
+    }
+
+    private static final IdPrefix RO_CRATE_JAVA_ID = new IdPrefix("#ro-crate-java");
 
     protected VersionProvider versionProvider;
 
@@ -35,47 +45,52 @@ class ProvenanceManager {
         this.versionProvider = versionProvider;
     }
 
+    public String getLibraryId() {
+        return RO_CRATE_JAVA_ID.withSuffix(versionProvider.getVersion().toLowerCase());
+    }
+
     void addProvenanceInformation(Crate crate) {
         // Determine if this is the first write
-        boolean isFirstWrite = !crate.getJsonMetadata().contains(RO_CRATE_JAVA_ID) && !crate.isImported();
+        boolean isFirstWrite = crate.getAllContextualEntities().stream().noneMatch(
+                entity -> entity.getId().startsWith(RO_CRATE_JAVA_ID.toString()))
+                && !crate.isImported();
+
+        String libraryId = this.getLibraryId();
 
         // Create action entity first
-        String actionId = "#" + UUID.randomUUID();
-        ContextualEntity actionEntity = createActionEntity(actionId, isFirstWrite);
+        ContextualEntity actionEntity = createActionEntity(isFirstWrite, libraryId);
 
         // Create or update ro-crate-java entity
-        ContextualEntity roCrateJavaEntity = buildRoCrateJavaEntity(crate, actionId, isFirstWrite);
+        ContextualEntity roCrateJavaEntity = buildRoCrateJavaEntity(crate, actionEntity.getId(), libraryId);
 
         // Add entities to crate
         crate.addContextualEntity(roCrateJavaEntity);
         crate.addContextualEntity(actionEntity);
     }
 
-    private ContextualEntity createActionEntity(String actionId, boolean isFirstWrite) {
+    private ContextualEntity createActionEntity(boolean isFirstWrite, String libraryId) {
         return new ContextualEntityBuilder()
-            .setId(actionId)
             .addType(isFirstWrite ? "CreateAction" : "UpdateAction")
             .addProperty("startTime", Instant.now().toString())
-            .addIdProperty("agent", RO_CRATE_JAVA_ID)
+            .addIdProperty("agent", libraryId)
             .build();
     }
 
     private ContextualEntity buildRoCrateJavaEntity(
             Crate crate,
             String newActionId,
-            boolean isFirstWrite
+            String libraryId
     ) {
+        String version = this.versionProvider.getVersion();
         ContextualEntity self = crate.getAllContextualEntities().stream()
-                .filter(contextualEntity -> RO_CRATE_JAVA_ID.equals(contextualEntity.getId()))
+                .filter(contextualEntity -> libraryId.equals(contextualEntity.getId()))
                 .findFirst()
                 .orElseGet(() -> {
-                            String version = this.versionProvider.getVersion();
                             return new ContextualEntityBuilder()
-                                    .setId(RO_CRATE_JAVA_ID)
+                                    .setId(libraryId)
                                     .addType("SoftwareApplication")
                                     .addProperty("name", "ro-crate-java")
                                     .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
-                                    // TODO read software version and version from gradle (write into resources properties file when building and read it from there)
                                     .addProperty("version", version)
                                     .addProperty("softwareVersion", version)
                                     .addProperty("license", "Apache-2.0")
