@@ -13,7 +13,7 @@ import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.
  * Manages provenance information for RO-Crates.
  * Handles the creation and updating of ro-crate-java entity and its actions.
  */
-class ProvenanceManager {
+public class ProvenanceManager {
     protected record IdPrefix(String prefix) {
         public String withSuffix(String suffix) {
             return prefix + "-" + suffix;
@@ -49,7 +49,7 @@ class ProvenanceManager {
         return RO_CRATE_JAVA_ID_PREFIX.withSuffix(versionProvider.getVersion().toLowerCase());
     }
 
-    void addProvenanceInformation(Crate crate) {
+    protected void addProvenanceInformation(Crate crate) {
         // Determine if this is the first write
         boolean isFirstWrite = crate.getAllContextualEntities().stream().noneMatch(
                 entity -> entity.getId().startsWith(RO_CRATE_JAVA_ID_PREFIX.toString()))
@@ -68,7 +68,7 @@ class ProvenanceManager {
         crate.addContextualEntity(actionEntity);
     }
 
-    private ContextualEntity createActionEntity(boolean isFirstWrite, String libraryId) {
+    protected ContextualEntity createActionEntity(boolean isFirstWrite, String libraryId) {
         return new ContextualEntityBuilder()
                 .addType(isFirstWrite ? "CreateAction" : "UpdateAction")
                 .addIdProperty("result", "./")
@@ -77,7 +77,7 @@ class ProvenanceManager {
                 .build();
     }
 
-    private ContextualEntity buildRoCrateJavaEntity(
+    protected ContextualEntity buildRoCrateJavaEntity(
             Crate crate,
             String newActionId,
             String libraryId
@@ -86,19 +86,17 @@ class ProvenanceManager {
         ContextualEntity self = crate.getAllContextualEntities().stream()
                 .filter(contextualEntity -> libraryId.equals(contextualEntity.getId()))
                 .findFirst()
-                .orElseGet(() -> {
-                            return new ContextualEntityBuilder()
-                                    .setId(libraryId)
-                                    .addType("SoftwareApplication")
-                                    .addProperty("name", "ro-crate-java")
-                                    .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
-                                    .addProperty("version", version)
-                                    .addProperty("softwareVersion", version)
-                                    .addProperty("license", "Apache-2.0")
-                                    .addProperty("description", "A Java library for creating and manipulating RO-Crates")
-                                    .addIdProperty("Action", newActionId)
-                                    .build();
-                        }
+                .orElseGet(() -> new ContextualEntityBuilder()
+                        .setId(libraryId)
+                        .addType("SoftwareApplication")
+                        .addProperty("name", "ro-crate-java")
+                        .addProperty("url", "https://github.com/kit-data-manager/ro-crate-java")
+                        .addProperty("version", version)
+                        .addProperty("softwareVersion", version)
+                        .addProperty("license", "Apache-2.0")
+                        .addProperty("description", "A Java library for creating and manipulating RO-Crates")
+                        .addIdProperty("Action", newActionId)
+                        .build()
                 );
         self.addIdProperty("Action", newActionId);
         return self;

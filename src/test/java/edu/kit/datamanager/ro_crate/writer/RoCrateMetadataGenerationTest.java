@@ -294,7 +294,7 @@ class RoCrateMetadataGenerationTest {
 
         // Use writer with disabled provenance (not implemented yet)
         Writers.newFolderWriter()
-                .withAutomaticProvenance(false)
+                .withAutomaticProvenance(null)
                 .save(originalCrate, outputPath.toString());
 
         // Verify the original crate has no provenance information

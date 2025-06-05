@@ -41,7 +41,7 @@ public interface CratePreview {
         // (including preview)
         new CrateWriter<>(new WriteFolderStrategy().disablePreview())
                 // We assume the caller (e.g. a writer) already stored the provenance.
-                .withAutomaticProvenance(false)
+                .withAutomaticProvenance(null)
                 .save(crate, targetDir.getAbsolutePath());
         this.saveAllToFolder(targetDir);
         try (var stream = Files.list(targetDir.toPath())) {

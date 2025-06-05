@@ -128,10 +128,10 @@ public interface CommonReaderTest<
             // write raw crate and imported crate to two different directories
             CrateWriter<String> writer = Writers.newFolderWriter();
             writer
-                    .withAutomaticProvenance(false)
+                    .withAutomaticProvenance(null)
                     .save(rawCrate, rawCrateTarget.toString());
             writer
-                    .withAutomaticProvenance(false)
+                    .withAutomaticProvenance(null)
                     .save(importedCrate, importedCrateTarget.toString());
         }
 

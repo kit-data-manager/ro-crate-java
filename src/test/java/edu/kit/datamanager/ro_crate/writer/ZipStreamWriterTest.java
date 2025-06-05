@@ -18,7 +18,7 @@ class ZipStreamWriterTest implements
   public void saveCrate(Crate crate, Path target) throws IOException {
     try (FileOutputStream stream = new FileOutputStream(target.toFile())) {
       Writers.newZipStreamWriter()
-              .withAutomaticProvenance(false)
+              .withAutomaticProvenance(null)
               .save(crate, stream);
     }
   }
@@ -27,7 +27,7 @@ class ZipStreamWriterTest implements
   public void saveCrateElnStyle(Crate crate, Path target) throws IOException {
     try (FileOutputStream stream = new FileOutputStream(target.toFile())) {
       new CrateWriter<>(new WriteZipStreamStrategy().usingElnStyle())
-              .withAutomaticProvenance(false)
+              .withAutomaticProvenance(null)
               .save(crate, stream);
     }
   }
@@ -36,7 +36,7 @@ class ZipStreamWriterTest implements
   public void saveCrateSubdirectoryStyle(RoCrate crate, Path target) throws IOException {
     try (FileOutputStream stream = new FileOutputStream(target.toFile())) {
       new CrateWriter<>(new WriteZipStreamStrategy().withRootSubdirectory())
-              .withAutomaticProvenance(false)
+              .withAutomaticProvenance(null)
               .save(crate, stream);
     }
   }
