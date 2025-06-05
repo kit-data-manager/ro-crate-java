@@ -361,6 +361,11 @@ class RoCrateMetadataGenerationTest {
 
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(originalCrate, outputPath.toString());
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            // ignore
+        }
 
         // Now read and modify the crate
         RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
