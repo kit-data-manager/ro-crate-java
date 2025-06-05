@@ -73,21 +73,21 @@ class ProvenanceManager {
     }
 
     private String loadVersionFromProperties() {
-        try {
-            URL resource = this.getClass().getResource("/version.properties");
-            if (resource != null) {
-                try (InputStream input = resource.openStream()) {
-                    Properties properties = new Properties();
-                    properties.load(input);
-                    return properties.getProperty("version");
-                }
-            } else {
-                System.err.println("Properties file not found!");
-                return "unknown";
+        URL resource = this.getClass().getResource("/version.properties");
+        if (resource == null) {
+            throw new IllegalStateException("version.properties not found in classpath. This indicates a build configuration issue.");
+        }
+
+        try (InputStream input = resource.openStream()) {
+            Properties properties = new Properties();
+            properties.load(input);
+            String version = properties.getProperty("version");
+            if (version == null || version.trim().isEmpty()) {
+                throw new IllegalStateException("No version property found in version.properties");
             }
+            return version.trim();
         } catch (IOException e) {
-            System.err.println("Properties file not found!");
-            return "unknown";
+            throw new IllegalStateException("Failed to read version from properties file", e);
         }
     }
 }
