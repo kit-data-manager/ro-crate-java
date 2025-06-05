@@ -70,10 +70,11 @@ class ProvenanceManager {
 
     private ContextualEntity createActionEntity(boolean isFirstWrite, String libraryId) {
         return new ContextualEntityBuilder()
-            .addType(isFirstWrite ? "CreateAction" : "UpdateAction")
-            .addProperty("startTime", Instant.now().toString())
-            .addIdProperty("agent", libraryId)
-            .build();
+                .addType(isFirstWrite ? "CreateAction" : "UpdateAction")
+                .addIdProperty("result", "./")
+                .addProperty("startTime", Instant.now().toString())
+                .addIdProperty("agent", libraryId)
+                .build();
     }
 
     private ContextualEntity buildRoCrateJavaEntity(
