@@ -112,6 +112,21 @@ public class AbstractEntity {
         return this.properties.get(propertyKey);
     }
 
+    /**
+     * Returns the value of the property with the given key as a String.
+     * If the property is not found, it returns null.
+     *
+     * @param propertyKey the key of the property.
+     * @return the value of the property as a String or null if not found.
+     */
+    public String getIdProperty(String propertyKey) {
+        JsonNode node = this.properties.get(propertyKey);
+        if (node != null) {
+            return node.path("@id").asText(null);
+        }
+        return null;
+    }
+
     @JsonIgnore
     public String getId() {
         JsonNode id = this.properties.get("@id");
