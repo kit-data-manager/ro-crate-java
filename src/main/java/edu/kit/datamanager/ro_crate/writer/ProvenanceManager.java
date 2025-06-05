@@ -2,12 +2,10 @@ package edu.kit.datamanager.ro_crate.writer;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
+import edu.kit.datamanager.ro_crate.util.ClasspathPropertiesVersionProvider;
+import edu.kit.datamanager.ro_crate.util.VersionProvider;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.time.Instant;
-import java.util.Properties;
 import java.util.UUID;
 
 import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.ContextualEntityBuilder;
@@ -18,6 +16,24 @@ import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.
  */
 class ProvenanceManager {
     private static final String RO_CRATE_JAVA_ID = "#ro-crate-java";
+
+    protected VersionProvider versionProvider;
+
+    /**
+     * Constructs a ProvenanceManager with the default ClasspathPropertiesVersionProvider.
+     */
+    public ProvenanceManager() {
+        this(new ClasspathPropertiesVersionProvider());
+    }
+
+    /**
+     * Constructs a ProvenanceManager with a specified VersionProvider.
+     *
+     * @param versionProvider The VersionProvider to use for retrieving the version of ro-crate-java.
+     */
+    public ProvenanceManager(VersionProvider versionProvider) {
+        this.versionProvider = versionProvider;
+    }
 
     void addProvenanceInformation(Crate crate) {
         // Determine if this is the first write
@@ -53,7 +69,7 @@ class ProvenanceManager {
                 .filter(contextualEntity -> RO_CRATE_JAVA_ID.equals(contextualEntity.getId()))
                 .findFirst()
                 .orElseGet(() -> {
-                            String version = loadVersionFromProperties();
+                            String version = this.versionProvider.getVersion();
                             return new ContextualEntityBuilder()
                                     .setId(RO_CRATE_JAVA_ID)
                                     .addType("SoftwareApplication")
@@ -70,24 +86,5 @@ class ProvenanceManager {
                 );
         self.addIdProperty("Action", newActionId);
         return self;
-    }
-
-    private String loadVersionFromProperties() {
-        URL resource = this.getClass().getResource("/version.properties");
-        if (resource == null) {
-            throw new IllegalStateException("version.properties not found in classpath. This indicates a build configuration issue.");
-        }
-
-        try (InputStream input = resource.openStream()) {
-            Properties properties = new Properties();
-            properties.load(input);
-            String version = properties.getProperty("version");
-            if (version == null || version.trim().isEmpty()) {
-                throw new IllegalStateException("No version property found in version.properties");
-            }
-            return version.trim();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read version from properties file", e);
-        }
     }
 }
