@@ -17,6 +17,11 @@ public class CrateWriter<DESTINATION_TYPE> {
     private final GenericWriterStrategy<DESTINATION_TYPE> strategy;
     protected ProvenanceManager provenanceManager = new ProvenanceManager();
 
+    /**
+     * Constructs a CrateWriter with a specified strategy for writing crates.
+     *
+     * @param strategy the strategy to use for writing crates.
+     */
     public CrateWriter(GenericWriterStrategy<DESTINATION_TYPE> strategy) {
         this.strategy = strategy;
     }
