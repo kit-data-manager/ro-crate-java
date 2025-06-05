@@ -254,9 +254,7 @@ public class AbstractEntity {
     public void addIdProperty(String name, String id) {
         if (id == null || id.isBlank()) { return; }
         mergeIdIntoValue(id, this.properties.get(name))
-                .ifPresent(newValue -> {
-                    this.properties.set(name, newValue);
-                });
+                .ifPresent(newValue -> this.properties.set(name, newValue));
         this.linkedTo.add(id);
         this.notifyObservers();
     }
@@ -369,7 +367,7 @@ public class AbstractEntity {
     /**
      * Adds a property with date time format. The property should match the ISO 8601
      * date format.
-     * 
+     * <p>
      * Same as {@link #addProperty(String, String)} but with internal check.
      *
      * @param key   key of the property (e.g. datePublished)
@@ -424,7 +422,7 @@ public class AbstractEntity {
                 if (IdentifierUtils.isValidUri(id)) {
                     this.id = id;
                 } else {
-                    this.id = IdentifierUtils.encode(id).get();
+                    this.id = IdentifierUtils.encode(id).orElse(this.id);
                 }
             }
             return self();
@@ -461,7 +459,7 @@ public class AbstractEntity {
         /**
          * Adds a property with date time format. The property should match the ISO 8601
          * date format.
-         * 
+         * <p>
          * Same as {@link #addProperty(String, String)} but with internal check.
          *
          * @param key   key of the property (e.g. datePublished)
@@ -521,7 +519,7 @@ public class AbstractEntity {
         /**
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one.
-         * 
+         * <p>
          * Instead of {@code "name": "id" }
          * this will add {@code "name" : {"@id": "id"} }
          * 

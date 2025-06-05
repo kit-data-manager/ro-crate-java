@@ -6,8 +6,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class ClasspathPropertiesVersionProvider implements VersionProvider {
-    private static final String PROPERTIES_FILE = "ro-crate-java.properties";
-    private static final String VERSION_KEY = "version";
+    public static final String VERSION_PROPERTIES = "version.properties";
 
     /**
      * Cached version to avoid repeated file/resource reads.
@@ -27,14 +26,14 @@ public class ClasspathPropertiesVersionProvider implements VersionProvider {
             return cachedVersion;
         }
 
-        URL resource = this.getClass().getResource("/version.properties");
-        assert resource != null : "version.properties not found in classpath";
+        URL resource = this.getClass().getResource("/" + VERSION_PROPERTIES);
+        assert resource != null : VERSION_PROPERTIES + " not found in classpath";
 
         try (InputStream input = resource.openStream()) {
             Properties properties = new Properties();
             properties.load(input);
             String version = properties.getProperty("version");
-            assert version != null : "Version property not found in version.properties";
+            assert version != null : "Version property not found in " + VERSION_PROPERTIES;
             return version.trim();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read version from properties file", e);
