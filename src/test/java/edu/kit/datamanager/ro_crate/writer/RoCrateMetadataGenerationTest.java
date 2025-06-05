@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoCrateMetadataGenerationTest {
 
     private final String currentVersionId = new ProvenanceManager().getLibraryId();
-    private final String oldVersionId = new ProvenanceManager(() -> "1.0.0").getLibraryId();
-    private final String newVersionId = new ProvenanceManager(() -> "2.5.3").getLibraryId();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Validator validator;
