@@ -48,7 +48,7 @@ public class CrateWriter<DESTINATION_TYPE> {
         Validator defaultValidation = new Validator(new JsonSchemaValidation());
         defaultValidation.validate(crate);
         if (this.provenanceManager != null) {
-            new ProvenanceManager().addProvenanceInformation(crate);
+            this.provenanceManager.addProvenanceInformation(crate);
         }
         this.strategy.save(crate, destination);
     }
