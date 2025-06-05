@@ -14,8 +14,8 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.StreamSupport;
 
+import static edu.kit.datamanager.ro_crate.util.Graph.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoCrateMetadataGenerationTest {
@@ -400,29 +400,5 @@ class RoCrateMetadataGenerationTest {
             "ro-crate-java should have an array of actions");
         assertEquals(2, roCrateJavaEntity.get("Action").size(),
             "should have both actions");
-    }
-
-    private JsonNode findEntityById(JsonNode graph, String id) {
-        for (JsonNode entity : graph) {
-            if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
-                return entity;
-            }
-        }
-        return null;
-    }
-
-    private JsonNode findEntityByType(JsonNode graph, String type) {
-        for (JsonNode entity : graph) {
-            if (entity.has("@type") && entity.get("@type").asText().equals(type)) {
-                return entity;
-            }
-        }
-        return null;
-    }
-
-    private JsonNode[] findEntitiesByType(JsonNode graph, String type) {
-        return StreamSupport.stream(graph.spliterator(), false)
-            .filter(entity -> entity.has("@type") && entity.get("@type").asText().equals(type))
-            .toArray(JsonNode[]::new);
     }
 }
