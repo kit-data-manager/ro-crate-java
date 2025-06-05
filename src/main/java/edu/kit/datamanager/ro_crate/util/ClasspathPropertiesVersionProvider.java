@@ -28,18 +28,13 @@ public class ClasspathPropertiesVersionProvider implements VersionProvider {
         }
 
         URL resource = this.getClass().getResource("/version.properties");
-        if (resource == null) {
-            throw new IllegalStateException(
-                    "version.properties not found in classpath. This indicates a build configuration issue.");
-        }
+        assert resource != null : "version.properties not found in classpath";
 
         try (InputStream input = resource.openStream()) {
             Properties properties = new Properties();
             properties.load(input);
             String version = properties.getProperty("version");
-            if (version == null || version.trim().isEmpty()) {
-                throw new IllegalStateException("No version property found in version.properties");
-            }
+            assert version != null : "Version property not found in version.properties";
             return version.trim();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read version from properties file", e);

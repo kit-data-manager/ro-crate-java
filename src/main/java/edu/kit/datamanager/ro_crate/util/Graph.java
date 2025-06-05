@@ -11,6 +11,11 @@ import java.util.stream.StreamSupport;
  * {@see JsonUtilFunctions}.
  */
 public class Graph {
+
+    private Graph() {
+        // Private constructor to prevent instantiation
+    }
+
     /**
      * Finds an entity in the graph by its ID.
      *

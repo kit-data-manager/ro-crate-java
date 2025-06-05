@@ -120,11 +120,9 @@ public class AbstractEntity {
      * @return the value of the property as a String or null if not found.
      */
     public String getIdProperty(String propertyKey) {
-        JsonNode node = this.properties.get(propertyKey);
-        if (node != null) {
-            return node.path("@id").asText(null);
-        }
-        return null;
+        return Optional.ofNullable(this.properties.get(propertyKey))
+                .map(jsonNode -> jsonNode.path("@id").asText(null))
+                .orElse(null);
     }
 
     @JsonIgnore
