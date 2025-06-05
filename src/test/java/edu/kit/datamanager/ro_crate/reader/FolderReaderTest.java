@@ -21,7 +21,9 @@ class FolderReaderTest implements CommonReaderTest<String, ReadFolderStrategy>
 {
   @Override
   public void saveCrate(Crate crate, Path target) throws IOException {
-    Writers.newFolderWriter().save(crate, target.toAbsolutePath().toString());
+    Writers.newFolderWriter()
+            .withAutomaticProvenance(null)
+            .save(crate, target.toAbsolutePath().toString());
     assertTrue(target.toFile().isDirectory());
   }
 

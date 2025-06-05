@@ -15,9 +15,27 @@ import java.io.IOException;
 public class CrateWriter<DESTINATION_TYPE> {
 
     private final GenericWriterStrategy<DESTINATION_TYPE> strategy;
+    protected ProvenanceManager provenanceManager = new ProvenanceManager();
 
+    /**
+     * Constructs a CrateWriter with a specified strategy for writing crates.
+     *
+     * @param strategy the strategy to use for writing crates.
+     */
     public CrateWriter(GenericWriterStrategy<DESTINATION_TYPE> strategy) {
         this.strategy = strategy;
+    }
+
+    /**
+     * Sets the ProvenanceManager to be used for automatic provenance information
+     * generation when saving the crate.
+     *
+     * @param provenanceManager the ProvenanceManager to use. Using null will disable provenance management.
+     * @return this CrateWriter instance for method chaining.
+     */
+    public CrateWriter<DESTINATION_TYPE> withAutomaticProvenance(ProvenanceManager provenanceManager) {
+        this.provenanceManager = provenanceManager;
+        return this;
     }
 
     /**
@@ -29,6 +47,9 @@ public class CrateWriter<DESTINATION_TYPE> {
     public void save(Crate crate, DESTINATION_TYPE destination) throws IOException {
         Validator defaultValidation = new Validator(new JsonSchemaValidation());
         defaultValidation.validate(crate);
+        if (this.provenanceManager != null) {
+            new ProvenanceManager().addProvenanceInformation(crate);
+        }
         this.strategy.save(crate, destination);
     }
 }

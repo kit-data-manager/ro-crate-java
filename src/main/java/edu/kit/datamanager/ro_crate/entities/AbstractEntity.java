@@ -112,6 +112,19 @@ public class AbstractEntity {
         return this.properties.get(propertyKey);
     }
 
+    /**
+     * Returns the value of the property with the given key as a String.
+     * If the property is not found, it returns null.
+     *
+     * @param propertyKey the key of the property.
+     * @return the value of the property as a String or null if not found.
+     */
+    public String getIdProperty(String propertyKey) {
+        return Optional.ofNullable(this.properties.get(propertyKey))
+                .map(jsonNode -> jsonNode.path("@id").asText(null))
+                .orElse(null);
+    }
+
     @JsonIgnore
     public String getId() {
         JsonNode id = this.properties.get("@id");
@@ -241,9 +254,7 @@ public class AbstractEntity {
     public void addIdProperty(String name, String id) {
         if (id == null || id.isBlank()) { return; }
         mergeIdIntoValue(id, this.properties.get(name))
-                .ifPresent(newValue -> {
-                    this.properties.set(name, newValue);
-                });
+                .ifPresent(newValue -> this.properties.set(name, newValue));
         this.linkedTo.add(id);
         this.notifyObservers();
     }
@@ -356,7 +367,7 @@ public class AbstractEntity {
     /**
      * Adds a property with date time format. The property should match the ISO 8601
      * date format.
-     * 
+     * <p>
      * Same as {@link #addProperty(String, String)} but with internal check.
      *
      * @param key   key of the property (e.g. datePublished)
@@ -411,7 +422,7 @@ public class AbstractEntity {
                 if (IdentifierUtils.isValidUri(id)) {
                     this.id = id;
                 } else {
-                    this.id = IdentifierUtils.encode(id).get();
+                    this.id = IdentifierUtils.encode(id).orElse(this.id);
                 }
             }
             return self();
@@ -448,7 +459,7 @@ public class AbstractEntity {
         /**
          * Adds a property with date time format. The property should match the ISO 8601
          * date format.
-         * 
+         * <p>
          * Same as {@link #addProperty(String, String)} but with internal check.
          *
          * @param key   key of the property (e.g. datePublished)
@@ -508,7 +519,7 @@ public class AbstractEntity {
         /**
          * ID properties are often used when referencing other entities within
          * the ROCrate. This method adds automatically such one.
-         * 
+         * <p>
          * Instead of {@code "name": "id" }
          * this will add {@code "name" : {"@id": "id"} }
          * 

@@ -40,6 +40,8 @@ public interface CratePreview {
         // as this is usually called in the process of writing a crate
         // (including preview)
         new CrateWriter<>(new WriteFolderStrategy().disablePreview())
+                // We assume the caller (e.g. a writer) already stored the provenance.
+                .withAutomaticProvenance(null)
                 .save(crate, targetDir.getAbsolutePath());
         this.saveAllToFolder(targetDir);
         try (var stream = Files.list(targetDir.toPath())) {

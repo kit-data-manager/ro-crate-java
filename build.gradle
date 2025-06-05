@@ -111,6 +111,22 @@ configurations {
     performanceTestImplementation.extendsFrom implementation
 }
 
+// Task for creating a resource file with the version info
+tasks.register("generateVersionProps", WriteProperties) { t ->
+    def generatedResourcesDir = project.layout.buildDirectory.dir(["resources", "main"].join(File.separator))
+    def outputFile = generatedResourcesDir.map { it.file("version.properties") }
+
+    t.destinationFile = outputFile.get().asFile
+    t.property("version", version)
+}
+
+tasks.register("generateVersionPropsTest", WriteProperties) { t ->
+    def generatedResourcesDir = project.layout.buildDirectory.dir(["resources", "test"].join(File.separator))
+    def outputFile = generatedResourcesDir.map { it.file("version.properties") }
+
+    t.destinationFile = outputFile.get().asFile
+    t.property("version", version)
+}
 
 tasks.register('performanceContextEntitiesBenchmark', JavaExec) {
     description = "Run the context entities benchmarks."
@@ -154,8 +170,13 @@ tasks.register('performanceReadWriteMultipleCratesBenchmark', JavaExec) {
     mainClass = 'edu.kit.datamanager.ro_crate.multiplecrates.MultipleCratesWriteAndRead'
 }
 
+compileJava {
+    dependsOn generateVersionProps
+}
+
 test {
     useJUnitPlatform()
+    dependsOn generateVersionPropsTest
     finalizedBy jacocoTestReport
 }
 
