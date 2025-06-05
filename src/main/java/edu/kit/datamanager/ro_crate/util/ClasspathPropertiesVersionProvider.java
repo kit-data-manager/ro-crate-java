@@ -17,7 +17,7 @@ public class ClasspathPropertiesVersionProvider implements VersionProvider {
      * Constructs a ClasspathPropertiesVersionProvider that reads the version from a properties file in the classpath.
      */
     public ClasspathPropertiesVersionProvider() {
-        this.cachedVersion = getVersion();
+        // Lazy initialization - version loaded on first access
     }
 
     @Override
