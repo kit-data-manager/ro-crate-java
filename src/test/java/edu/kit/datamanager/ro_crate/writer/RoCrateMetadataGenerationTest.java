@@ -141,7 +141,7 @@ class RoCrateMetadataGenerationTest {
     }
 
     @Test
-    void should_AccumulateActions_When_WritingMultipleTimes(@TempDir Path tempDir) throws IOException {
+    void should_AccumulateActions_When_WritingMultipleTimes(@TempDir Path tempDir) throws IOException, InterruptedException {
         // Create and write crate first time
         RoCrate crate = new RoCrate.RoCrateBuilder().build();
         validateCrate(crate);
@@ -149,11 +149,14 @@ class RoCrateMetadataGenerationTest {
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(crate, outputPath.toString());
         validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
+        Thread.sleep(10);
 
         // Write same crate two more times to simulate updates
         Writers.newFolderWriter().save(crate, outputPath.toString());
+        Thread.sleep(10);
         Writers.newFolderWriter().save(crate, outputPath.toString());
         validateCrate(Readers.newFolderReader().readCrate(outputPath.toString()));
+        Thread.sleep(10);
 
         // Read and print metadata for debugging
         String metadata = Files.readString(outputPath.resolve("ro-crate-metadata.json"));
@@ -354,18 +357,14 @@ class RoCrateMetadataGenerationTest {
     }
 
     @Test
-    void should_PreserveExistingProvenance_When_ModifyingCrate(@TempDir Path tempDir) throws IOException {
+    void should_PreserveExistingProvenance_When_ModifyingCrate(@TempDir Path tempDir) throws IOException, InterruptedException {
         // First create a crate with normal provenance
         RoCrate originalCrate = new RoCrate.RoCrateBuilder().build();
         validateCrate(originalCrate);
 
         Path outputPath = tempDir.resolve("test-crate");
         Writers.newFolderWriter().save(originalCrate, outputPath.toString());
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            // ignore
-        }
+        Thread.sleep(10);
 
         // Now read and modify the crate
         RoCrate modifiedCrate = Readers.newFolderReader().readCrate(outputPath.toString());
