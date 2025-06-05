@@ -14,7 +14,7 @@ import static edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity.
  * Handles the creation and updating of ro-crate-java entity and its actions.
  */
 class ProvenanceManager {
-    private record IdPrefix(String prefix) {
+    protected record IdPrefix(String prefix) {
         public String withSuffix(String suffix) {
             return prefix + "-" + suffix;
         }
@@ -25,7 +25,7 @@ class ProvenanceManager {
         }
     }
 
-    private static final IdPrefix RO_CRATE_JAVA_ID = new IdPrefix("#ro-crate-java");
+    protected static final IdPrefix RO_CRATE_JAVA_ID_PREFIX = new IdPrefix("#ro-crate-java");
 
     protected VersionProvider versionProvider;
 
@@ -46,13 +46,13 @@ class ProvenanceManager {
     }
 
     public String getLibraryId() {
-        return RO_CRATE_JAVA_ID.withSuffix(versionProvider.getVersion().toLowerCase());
+        return RO_CRATE_JAVA_ID_PREFIX.withSuffix(versionProvider.getVersion().toLowerCase());
     }
 
     void addProvenanceInformation(Crate crate) {
         // Determine if this is the first write
         boolean isFirstWrite = crate.getAllContextualEntities().stream().noneMatch(
-                entity -> entity.getId().startsWith(RO_CRATE_JAVA_ID.toString()))
+                entity -> entity.getId().startsWith(RO_CRATE_JAVA_ID_PREFIX.toString()))
                 && !crate.isImported();
 
         String libraryId = this.getLibraryId();
