@@ -18,8 +18,6 @@ apply plugin: 'net.researchgate.release'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-apply from: 'gradle/updateCff.gradle'
-
    
 //for plugin net.researchgate.release 
 //see https://github.com/researchgate/gradle-release
