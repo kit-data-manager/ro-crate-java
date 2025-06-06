@@ -199,3 +199,5 @@ if (System.getProperty('profile') == "release") {
     println 'Using release profile for building ' + project.getName()
     apply from: 'gradle/profile-release.gradle'
 }
+
+apply from: 'gradle/updateCff.gradle'
