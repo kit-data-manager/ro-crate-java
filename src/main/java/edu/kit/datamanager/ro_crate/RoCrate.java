@@ -50,6 +50,24 @@ public class RoCrate implements Crate {
 
     protected Collection<File> untrackedFiles;
 
+    /**
+     * Indicates whether this crate has been imported from an external source.
+     * This is used to determine if ro-crate-java should add a CreateAction
+     * or an UpdateAction in the provenance on export.
+     */
+    protected boolean isImported = false;
+
+    @Override
+    public RoCrate markAsImported() {
+        this.isImported = true;
+        return this;
+    }
+
+    @Override
+    public boolean isImported() {
+        return this.isImported;
+    }
+
     @Override
     public CratePreview getPreview() {
         return this.roCratePreview;
@@ -375,12 +393,14 @@ public class RoCrate implements Crate {
          * @return returns the builder for further usage.
          */
         public RoCrateBuilder addDataEntity(DataEntity dataEntity) {
+            this.metadataContext.checkEntity(dataEntity);
             this.payload.addDataEntity(dataEntity);
             this.rootDataEntity.addToHasPart(dataEntity.getId());
             return this;
         }
 
         public RoCrateBuilder addContextualEntity(ContextualEntity contextualEntity) {
+            this.metadataContext.checkEntity(contextualEntity);
             this.payload.addContextualEntity(contextualEntity);
             return this;
         }

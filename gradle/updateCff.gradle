@@ -1,0 +1,70 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+/**
+ * This file defines the updateCff task.
+ *
+ * This task hooks into the workflow of the release task,
+ * which, according to the source code of the release plugin,
+ * seems to be defined like this:
+ *
+ * tasks = [
+ * "${p}createScmAdapter" as String,
+ * "${p}initScmAdapter" as String,
+ * "${p}checkCommitNeeded" as String,
+ * "${p}checkUpdateNeeded" as String,
+ * "${p}checkoutMergeToReleaseBranch" as String,
+ * "${p}unSnapshotVersion" as String,
+ * "${p}confirmReleaseVersion" as String,
+ * -> we insert our task here <-
+ * "${p}checkSnapshotDependencies" as String,
+ * "${p}runBuildTasks" as String,
+ * "${p}preTagCommit" as String,
+ * "${p}createReleaseTag" as String,
+ * "${p}checkoutMergeFromReleaseBranch" as String,
+ * "${p}updateVersion" as String,
+ * "${p}commitNewVersion" as String
+ * ]
+ */
+
+tasks.register('updateCff') {
+    group = 'release'
+    description = 'Updates the version in CITATION.cff file'
+
+    outputs.file("CITATION.cff")
+
+    doLast {
+        def version = project.version.toString()
+        def today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+
+        def cffFile = file('CITATION.cff')
+        def content = cffFile.text
+
+        // Update or insert version
+        if (content.contains('version:')) {
+            content = content.replaceAll(/(?m)^version:\s*.+$/, "version: ${version}")
+        } else {
+            content = content + "\nversion: ${version}"
+        }
+
+        // Update or insert date-released
+        if (content.contains('date-released:')) {
+            content = content.replaceAll(/(?m)^date-released:\s*.+$/, "date-released: ${today}")
+        } else {
+            content = content + "\ndate-released: ${today}"
+        }
+
+        cffFile.text = content
+        println "Updated CITATION.cff to version ${version} and date-released ${today}"
+    }
+}
+
+// Make sure your custom task runs after a specific task in the release sequence
+tasks.named('updateCff') {
+    mustRunAfter(tasks.named('confirmReleaseVersion'))
+}
+
+// Ensure subsequent tasks in the release sequence run after your custom task
+tasks.named('checkSnapshotDependencies') {
+    dependsOn('updateCff')
+}

@@ -12,6 +12,7 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,7 +39,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   protected final HashMap<String, String> other = new HashMap<>();
 
   /**
-   * Default constructor for the creation of the default context.
+   * Default constructor for the creation of the v1.1 default context.
    */
   public RoCrateMetadataContext() {
     this.addToContextFromUrl(DEFAULT_CONTEXT);
@@ -46,6 +47,8 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
 
   /**
    * Constructor for creating the context from a list of url.
+   * <p>
+   * Note: Does NOT contain the default context if not explicitly given!
    *
    * @param urls the url list with different context.
    */
@@ -55,6 +58,8 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
 
   /**
    * Constructor for creating the context from a json object.
+   * <p>
+   * Note: Does NOT contain the default context if not explicitly given!
    *
    * @param context the Json object of the context.
    */
@@ -83,6 +88,28 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     }
   }
 
+  /**
+   * Converts the context into a JSON-LD representation.
+   * <p>
+   * The resulting JSON structure depends on the content:
+   * - If there's only one URL and no key-value pairs: {"@context": "url"}
+   * - If there are multiple URLs and/or key-value pairs: {"@context": ["url1", "url2", {"key1": "value1", "key2": "value2"}]}
+   * <p>
+   * Example output:
+   * <pre>
+   * {
+   *   "@context": [
+   *     "https://w3id.org/ro/crate/1.1/context",
+   *     {
+   *       "schema": "http://schema.org/",
+   *       "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+   *     }
+   *   ]
+   * }
+   * </pre>
+   *
+   * @return an ObjectNode containing the JSON-LD context representation
+   */
   @Override
   public ObjectNode getContextJsonEntity() {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
@@ -106,6 +133,21 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return finalNode;
   }
 
+  /**
+   * Checks if the given entity is valid according to the context.
+   * <p>
+   * - full URLs in the @type and field names are considered valid without further checks.
+   * - The "@id" value is treated as a special case, where it refers to the entity's ID.
+   * - The "@json" type is a linked data built-in type and is always considered valid.
+   * - If a type or field name is not found in the context, it will print an error message and return false.
+   * - This method checks both the types in the @type array and the field names in the entity's properties.
+   * - Prefixes in the context are considered valid if they match the context keys.
+   * - Suffixes after a valid prefix are considered valid in any case. This is not perfect,
+   *   but it would be hard to handle correctly.
+   *
+   * @param entity the entity to check
+   * @return true if the entity is valid, false otherwise
+   */
   @Override
   public boolean checkEntity(AbstractEntity entity) {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
@@ -117,6 +159,11 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
             entity.getProperties().path("@type"),
             new TypeReference<>() {}
     );
+
+    final Function<String, Boolean> isFail = checkMeStr -> this.contextMap.get(checkMeStr) == null
+            && this.contextMap.keySet().stream()
+            .noneMatch(key -> checkMeStr.startsWith(key + ":"));
+
     // check if the items in the array of types are present in the context
     for (String s : types) {
       // special cases:
@@ -134,7 +181,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         continue;
       }
 
-      if (this.contextMap.get(s) == null) {
+      if (isFail.apply(s)) {
         System.err.println("type " + s + " is missing from the context!");
         return false;
       }
@@ -147,7 +194,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         // full URLs are considered fine
         continue;
       }
-      if (this.contextMap.get(s) == null) {
+      if (isFail.apply(s)) {
         System.err.println("attribute name " + s + " is missing from context;");
         return false;
       }
@@ -155,6 +202,13 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return true;
   }
 
+  /**
+   * Adds a URL to the context.
+   * <p>
+   * It will try to fetch the context from the URL.
+   *
+   * @param url the URL to add
+   */
   @Override
   public void addToContextFromUrl(String url) {
     this.urls.add(url);
@@ -194,18 +248,31 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         }));
   }
 
+    /**
+     * Adds a key-value pair to the context.
+     *
+     * @param key   the key to add. It may be a prefix or a term.
+     * @param value the value to add
+     */
   @Override
   public void addToContext(String key, String value) {
     this.contextMap.put(key, value);
     this.other.put(key, value);
   }
 
+  /**
+   * @param key the key for the value to retrieve.
+   * @return the value of the key if it exists in the context, null otherwise.
+   */
   @Override
   public String getValueOf(String key) {
     return Optional.ofNullable(this.contextMap.get(key))
             .orElseGet(() -> this.other.get(key));
   }
 
+  /**
+   * @return the set of all keys in the context.
+   */
   @Override
   public Set<String> getKeys() {
     List<String> merged = new ArrayList<>();
@@ -214,6 +281,11 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return Set.copyOf(merged);
   }
 
+  /**
+   * @return a map of all key-value pairs in the context. Note that some pairs may come
+   * from URLs or a pair may not be available as a context was not successfully resolved
+   * from a URL.
+   */
   @Override
   public Map<String, String> getPairs() {
     Map<String, String> merged = new HashMap<>();
@@ -222,13 +294,18 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     return Map.copyOf(merged);
   }
 
-
+  /**
+   * @param key the key to delete from the context.
+   */
   @Override
   public void deleteValuePairFromContext(String key) {
     this.contextMap.remove(key);
     this.other.remove(key);
   }
 
+  /**
+   * @param url the URL to delete from the context.
+   */
   @Override
   public void deleteUrlFromContext(String url) {
     this.urls.remove(url);

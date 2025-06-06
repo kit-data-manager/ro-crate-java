@@ -23,6 +23,28 @@ import edu.kit.datamanager.ro_crate.special.CrateVersion;
 public interface Crate {
 
   /**
+   * Mark the crate as imported, i.e. it has been read from a file
+   * or is for other reasons not considered a new crate.
+   * <p>
+   * This is useful mostly for readers to indicate this in case
+   * the crate may not have any provenance information yet and
+   * should still be recognized as an imported crate.
+   *
+   * @return this crate, for convenience.
+   */
+  Crate markAsImported();
+
+  /**
+   * Check if the crate is marked as imported.
+   * <p>
+   * If true, it indicates that the crate has been read from a file
+   * or is for other reasons not considered a new crate.
+   *
+   * @return true if the crate is marked as imported, false otherwise.
+   */
+  boolean isImported();
+
+  /**
    * Read version from the crate descriptor and return it as a class
    * representation.
    * <p>

@@ -33,7 +33,9 @@ class ZipStreamReaderTest implements
         try (
                 FileOutputStream fos = new FileOutputStream(target_file)
         ) {
-            Writers.newZipStreamWriter().save(crate, fos);
+            Writers.newZipStreamWriter()
+                    .withAutomaticProvenance(null)
+                    .save(crate, fos);
         }
         assertTrue(target_file.isFile());
     }

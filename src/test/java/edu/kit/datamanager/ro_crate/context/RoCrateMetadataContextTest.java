@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
+import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ContextTest {
+public class RoCrateMetadataContextTest {
 
   RoCrateMetadataContext context;
   RoCrateMetadataContext complexContext;
@@ -32,7 +33,7 @@ public class ContextTest {
 
     final String crateManifestPath = "/crates/extendedContextExample/ro-crate-metadata.json";
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    JsonNode jsonNode = objectMapper.readTree(ContextTest.class.getResourceAsStream(crateManifestPath));
+    JsonNode jsonNode = objectMapper.readTree(RoCrateMetadataContextTest.class.getResourceAsStream(crateManifestPath));
     this.complexContext = new RoCrateMetadataContext(jsonNode.get("@context"));
   }
 
@@ -98,8 +99,8 @@ public class ContextTest {
     var objectMapper = MyObjectMapper.getMapper();
 
     ObjectNode rawContext = objectMapper.createObjectNode();
-    rawContext.put("house", "www.example.con/house");
-    rawContext.put("road", "www.example.con/road");
+    rawContext.put("house", "www.example.com/house");
+    rawContext.put("road", "www.example.com/road");
 
     ObjectNode rawCrate = objectMapper.createObjectNode();
     rawCrate.set("@context", rawContext);
@@ -107,6 +108,13 @@ public class ContextTest {
     assertNotNull(newContext);
 
     HelpFunctions.compare(newContext.getContextJsonEntity(), rawCrate, true);
+
+    var entityWithTerms = new ContextualEntity.ContextualEntityBuilder()
+            .setId("dkfaj")
+            .addType("house")
+            .addType("road")
+            .build();
+    assertTrue(newContext.checkEntity(entityWithTerms));
   }
 
   @Test
@@ -277,5 +285,22 @@ public class ContextTest {
     }
     // prove immutability
     assertThrows(UnsupportedOperationException.class, () -> given.put("newKey", "newValue"));
+  }
+
+  @Test
+  void checkEntity_withDefinedPrefixedType_succeeds() throws IOException {
+    // assume we read a crate just for demonstration
+    RoCrate crate = new RoCrate();
+    // and we extend the context
+    RoCrateMetadataContext context =  new RoCrateMetadataContext();
+    context.addToContext("rdfs", "https://www.w3.org/2000/01/rdf-schema#");
+    crate.setMetadataContext(context);
+    // then we use the new context
+    DataEntity entity = new DataEntity.DataEntityBuilder()
+            .addType("rdfs:Property")
+            .build();
+    crate.addDataEntity(entity);
+    // Then we expect this to work
+    assertTrue(context.checkEntity(entity));
   }
 }
