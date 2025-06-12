@@ -31,6 +31,7 @@ tasks.register('updateCff') {
     group = 'release'
     description = 'Updates the version in CITATION.cff file'
 
+    inputs.file("CITATION.cff")
     outputs.file("CITATION.cff")
 
     doLast {
@@ -40,18 +41,22 @@ tasks.register('updateCff') {
         def cffFile = file('CITATION.cff')
         def content = cffFile.text
 
+        if (!content.endsWith("\n")) {
+            content += "\n" // Ensure the file ends with a newline
+        }
+
         // Update or insert version
-        if (content.contains('version:')) {
+        if (content =~ /(?m)^version:/) {
             content = content.replaceAll(/(?m)^version:\s*.+$/, "version: ${version}")
         } else {
-            content = content + "\nversion: ${version}"
+            content = content + "version: ${version}\n"
         }
 
         // Update or insert date-released
-        if (content.contains('date-released:')) {
+        if (content =~ /(?m)^date-released:/) {
             content = content.replaceAll(/(?m)^date-released:\s*.+$/, "date-released: ${today}")
         } else {
-            content = content + "\ndate-released: ${today}"
+            content = content + "date-released: ${today}\n"
         }
 
         cffFile.text = content
