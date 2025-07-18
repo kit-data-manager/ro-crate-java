@@ -38,7 +38,7 @@ repositories {
 }
 
 ext {
-    jacksonVersion  = '2.19.0'
+    jacksonVersion  = '2.19.2'
 }
 
 dependencies {
