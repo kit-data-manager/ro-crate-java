@@ -56,7 +56,7 @@ dependencies {
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:7.0'
+    implementation 'com.github.fslev:json-compare:7.1'
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.0'
     // logging
