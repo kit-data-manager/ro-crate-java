@@ -46,8 +46,8 @@ public class RootDataEntityTest {
                 .addAuthor("a2")
                 .build();
 
-        assertTrue(rootDataEntity.hasInHasPart(id1));
-        assertTrue(rootDataEntity.hasInHasPart(id2));
+        assertTrue(rootDataEntity.hasPart(id1));
+        assertTrue(rootDataEntity.hasPart(id2));
         HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/root.json");
     }
 

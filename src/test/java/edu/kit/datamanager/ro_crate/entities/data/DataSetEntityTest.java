@@ -72,7 +72,7 @@ public class DataSetEntityTest {
                 .addToHasPart(second_content)
                 .build();
 
-        assertTrue(dir.hasInHasPart(id));
+        assertTrue(dir.hasPart(id));
         HelpFunctions.compareEntityWithFile(dir, "/json/entities/data/directoryWeb.json");
     }
 
