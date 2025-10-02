@@ -76,8 +76,8 @@ public class DataSetEntity extends DataEntity {
             this.hasPart = new HashSet<>();
         }
 
-        public T setHasPart(Set<String> hastPart) {
-            this.hasPart = hastPart;
+        public T setHasPart(Set<String> hasPart) {
+            this.hasPart = hasPart;
             return self();
         }
 
