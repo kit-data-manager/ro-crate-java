@@ -49,6 +49,11 @@ public class AbstractEntity {
     private static final EntityValidation entityValidation
             = new EntityValidation(new JsonSchemaValidation());
 
+    /**
+     * This set contains all the ids of the entities that are linked by
+     * this entity. This information is provided to crate payloads to make
+     * the removal of entities faster.
+     */
     @JsonIgnore
     private final Set<String> linkedTo;
 
