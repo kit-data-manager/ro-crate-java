@@ -45,7 +45,25 @@ public class DataSetEntity extends DataEntity {
         this.hasPart.add(id);
     }
 
+    /**
+     * Check if the hasPart property contains a specific id.
+     *
+     * @deprecated use {@link #hasPart(String)} instead.
+     *
+     * @param id the id to check for
+     * @return true if the id is present, false otherwise
+     */
+    @Deprecated(forRemoval = true)
     public boolean hasInHasPart(String id) {
+        return this.hasPart.contains(id);
+    }
+
+    /**
+     * Check if the hasPart property contains a specific id.
+     * @param id the id to check for
+     * @return true if the id is present, false otherwise
+     */
+    public boolean hasPart(String id) {
         return this.hasPart.contains(id);
     }
 
