@@ -18,6 +18,10 @@ public class DataSetEntity extends DataEntity {
 
     public static final String TYPE = "Dataset";
 
+    /**
+     * The hasPart property is used to indicate that the described resource is a
+     * composite resource, and to point to the parts that it includes.
+     */
     @JsonSerialize(using = HasPartSerializer.class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public Set<String> hasPart;
