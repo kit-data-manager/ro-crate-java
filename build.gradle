@@ -62,7 +62,7 @@ dependencies {
     // logging
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
     // JSON-LD, Zenodo mapping
-    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.6.0'
+    implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.7.0'
     // metadata validation, profiles based on JSON schema
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.8"
     implementation 'org.glassfish:jakarta.json:2.0.1'
