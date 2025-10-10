@@ -16,7 +16,7 @@ plugins {
     id "io.freefair.maven-publish-java" version "8.14.2"
 }
 
-group 'edu.kit.datamanager'
+group = 'edu.kit.datamanager'
 description = "A library for easy creation and modification of valid RO-Crates."
 
 println "Running gradle version: $gradle.gradleVersion"
@@ -24,8 +24,10 @@ println "Building ${name} version: ${version}"
 println "JDK version: ${JavaVersion.current()}"
 println "Profile (system property): ${System.getProperty('profile')}"
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 if (JavaVersion.current() == JavaVersion.VERSION_17) {
     println "Setting encoding to UTF-8 manually"

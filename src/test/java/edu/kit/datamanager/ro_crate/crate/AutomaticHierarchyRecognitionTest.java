@@ -74,10 +74,9 @@ public class AutomaticHierarchyRecognitionTest {
         assertTrue(processedFolder.hasPart("data/processed/results.txt"));
 
         // Root should only contain top-level entities
-        assertTrue(crate.getRootDataEntity().hasPart("data/"));
-        assertFalse(
-            crate.getRootDataEntity().hasPart("data/raw/experiment1.csv")
-        );
+        var root = crate.getRootDataEntity();
+        assertTrue(root.hasPart("data/"));
+        assertEquals(1, root.hasPart.size());
     }
 
     /**
@@ -103,6 +102,11 @@ public class AutomaticHierarchyRecognitionTest {
         // Then: Both hasPart and isPartOf should be set
         assertTrue(folder.hasPart("folder/file.txt"));
         assertEquals("folder/", file.getProperties().get("isPartOf").asText());
+        // same for root!
+        var root = crate.getRootDataEntity();
+        assertTrue(root.hasPart("folder/"));
+        assertEquals(1, root.hasPart.size());
+        assertEquals(root.getId(), folder.getProperties().get("isPartOf").asText(""));
     }
 
     /**
@@ -225,10 +229,12 @@ public class AutomaticHierarchyRecognitionTest {
 
         DataEntity remoteEntity = new DataEntity.DataEntityBuilder()
             .setId("https://example.com/remote-file.txt")
+            .addType("File")
             .build();
 
         DataEntity doiEntity = new DataEntity.DataEntityBuilder()
             .setId("doi:10.1234/example")
+            .addType("CreativeWork")
             .build();
 
         DataSetEntity folder = new DataSetEntity.DataSetBuilder()
@@ -274,6 +280,7 @@ public class AutomaticHierarchyRecognitionTest {
         // Manually create circular reference in IDs (this is contrived but tests the logic)
         DataEntity circularEntity = new DataEntity.DataEntityBuilder()
             .setId("folder1/folder2/../../../folder1/file.txt") // resolves to folder1/file.txt
+            .addType("File")
             .build();
 
         crate.addDataEntity(folder1);
@@ -322,7 +329,10 @@ public class AutomaticHierarchyRecognitionTest {
         assertTrue(result.hasErrors());
 
         // Original state should be preserved
-        assertTrue(crate.getRootDataEntity().hasPart("")); // Original relationship intact
+        assertTrue(crate.getRootDataEntity().hasPart("document.pdf"));
+        assertTrue(
+            crate.getRootDataEntity().hasPart("document.pdf/embedded_data.txt")
+        );
     }
 
     /**
@@ -352,7 +362,7 @@ public class AutomaticHierarchyRecognitionTest {
         HierarchyRecognitionResult info = result;
 
         assertEquals(1, info.getCreatedEntities().size()); // "folder/" was created
-        assertEquals(1, info.getProcessedRelationships().size()); // folder -> file relationship
+        assertEquals(2, info.getProcessedRelationships().size()); // root -> folder -> file relationship
         assertTrue(info.getSkippedEntities().isEmpty()); // no entities skipped
         assertTrue(info.getWarnings().isEmpty()); // no warnings
     }

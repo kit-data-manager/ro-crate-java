@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
+import edu.kit.datamanager.ro_crate.crate.HierarchyRecognition;
 import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionConfig;
 import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
@@ -296,36 +297,20 @@ public class RoCrate implements Crate {
         return this.untrackedFiles;
     }
 
-    /**
-     * Automatically recognizes hierarchical file structure from DataEntity IDs
-     * and connects them using hasPart relationships.
-     * <p>
-     * WARNING: This will not change existing hasPart relationships.
-     * Only processes IDs that appear to be relative file paths.
-     *
-     * @param alsoAddIsPartOf if true, also adds isPartOf relationships from child to parent
-     * @return result object containing information about what was processed, as well as potential errors.
-     */
-    public HierarchyRecognitionResult createDataEntityFileStructure(boolean alsoAddIsPartOf) {
-        HierarchyRecognitionConfig config =
-            new HierarchyRecognitionConfig().setInverseRelationships(
-                alsoAddIsPartOf
-            );
+    @Override
+    public HierarchyRecognitionResult createDataEntityFileStructure(
+        boolean addInverseRelationships
+    ) {
+        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
+                .setInverseRelationships(addInverseRelationships);
         return this.createDataEntityFileStructure(config);
     }
 
-    /**
-     * Automatically recognizes hierarchical file structure from DataEntity IDs
-     * and connects them using hasPart relationships with fine-grained configuration.
-     *
-     * @param config configuration object specifying how the recognition should behave
-     * @return result object containing information about what was processed, as well as potential errors.
-     */
+    @Override
     public HierarchyRecognitionResult createDataEntityFileStructure(
         HierarchyRecognitionConfig config
     ) {
-        // TODO: Implement the actual hierarchy recognition logic
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new HierarchyRecognition(this, config).buildHierarchy();
     }
 
     /**
