@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
+import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionConfig;
+import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
@@ -135,4 +137,26 @@ public interface Crate {
   void deleteUrlFromContext(String url);
 
   Collection<File> getUntrackedFiles();
+
+  /**
+   * Automatically recognizes hierarchical file structure from DataEntity IDs
+   * and connects them using hasPart relationships.
+   * <p>
+   * WARNING: This will not change existing hasPart relationships.
+   *
+   * @param addInverseRelationships if true, also adds isPartOf relationships from child to parent
+   * @return result object containing information about what was processed, as well as potential errors.
+   */
+  HierarchyRecognitionResult createDataEntityFileStructure(boolean addInverseRelationships);
+
+  /**
+   * Automatically recognizes hierarchical file structure from DataEntity IDs
+   * and connects them using hasPart relationships with fine-grained configuration.
+   * <p>
+   * Note: Only processes IDs that appear to be relative file paths.
+   *
+   * @param config configuration object specifying how the recognition should behave
+   * @return result object containing information about what was processed, as well as potential errors.
+   */
+  HierarchyRecognitionResult createDataEntityFileStructure(HierarchyRecognitionConfig config);
 }
