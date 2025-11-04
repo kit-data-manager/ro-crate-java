@@ -122,6 +122,16 @@ public interface Crate {
    */
   void addDataEntity(DataEntity entity);
 
+  /**
+   * Adds a data entity to the crate with a specified parent ID.
+   * <p>
+   * Consider using
+   * @param entity the DataEntity to add to this crate.
+   * @param parentId the ID of the parent entity. Must not be null.
+   * @throws IllegalArgumentException if parentId is null or not found, or not a DataEntity.
+   */
+  void addDataEntity(DataEntity entity, String parentId) throws IllegalArgumentException;
+
   void addContextualEntity(ContextualEntity entity);
 
   void deleteEntityById(String entityId);

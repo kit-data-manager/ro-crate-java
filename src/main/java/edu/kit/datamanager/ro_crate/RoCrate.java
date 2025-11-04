@@ -13,6 +13,7 @@ import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
@@ -243,6 +244,42 @@ public class RoCrate implements Crate {
     }
 
     @Override
+    public void addDataEntity(DataEntity entity, String parentId)
+        throws IllegalArgumentException {
+        if (parentId == null) {
+            throw new IllegalArgumentException("Parent ID is null.");
+        }
+
+        DataEntity parentEntity = this.getDataEntityById(parentId);
+        if (parentEntity == null) {
+            throw new IllegalArgumentException(
+                "Parent ID not found in the crate."
+            );
+        }
+
+        if (parentEntity.getTypes().contains("File")) {
+            throw new IllegalArgumentException(
+                "Parent entity cannot be a File."
+            );
+        }
+
+        if (!parentEntity.getTypes().contains("Dataset")) {
+            throw new IllegalArgumentException(
+                "Parent entity must be a Dataset in order to contain another DataEntity as a part."
+            );
+        }
+
+        this.metadataContext.checkEntity(entity);
+
+        if (parentEntity instanceof DataSetEntity) {
+            ((DataSetEntity) parentEntity).addToHasPart(entity.getId());
+        } else {
+            parentEntity.addProperty("hasPart", entity.getId());
+        }
+        this.roCratePayload.addDataEntity(entity);
+    }
+
+    @Override
     public void addContextualEntity(ContextualEntity entity) {
         this.metadataContext.checkEntity(entity);
         this.roCratePayload.addContextualEntity(entity);
@@ -301,8 +338,10 @@ public class RoCrate implements Crate {
     public HierarchyRecognitionResult createDataEntityFileStructure(
         boolean addInverseRelationships
     ) {
-        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
-                .setInverseRelationships(addInverseRelationships);
+        HierarchyRecognitionConfig config =
+            new HierarchyRecognitionConfig().setInverseRelationships(
+                addInverseRelationships
+            );
         return this.createDataEntityFileStructure(config);
     }
 
@@ -437,6 +476,41 @@ public class RoCrate implements Crate {
             this.payload.addDataEntity(dataEntity);
             this.rootDataEntity.addToHasPart(dataEntity.getId());
             return this;
+        }
+
+        public void addDataEntity(DataEntity entity, String parentId)
+            throws IllegalArgumentException {
+            if (parentId == null) {
+                throw new IllegalArgumentException("Parent ID is null.");
+            }
+
+            DataEntity parentEntity = this.getDataEntityById(parentId);
+            if (parentEntity == null) {
+                throw new IllegalArgumentException(
+                    "Parent ID not found in the crate."
+                );
+            }
+
+            if (parentEntity.getTypes().contains("File")) {
+                throw new IllegalArgumentException(
+                    "Parent entity cannot be a File."
+                );
+            }
+
+            if (!parentEntity.getTypes().contains("Dataset")) {
+                throw new IllegalArgumentException(
+                    "Parent entity must be a Dataset in order to contain another DataEntity as a part."
+                );
+            }
+
+            this.metadataContext.checkEntity(entity);
+
+            if (parentEntity instanceof DataSetEntity) {
+                ((DataSetEntity) parentEntity).addToHasPart(entity.getId());
+            } else {
+                parentEntity.addProperty("hasPart", entity.getId());
+            }
+            this.roCratePayload.addDataEntity(entity);
         }
 
         public RoCrateBuilder addContextualEntity(
