@@ -12,6 +12,7 @@ import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
@@ -106,6 +107,13 @@ public interface Crate {
   String getJsonMetadata();
 
   DataEntity getDataEntityById(java.lang.String id);
+
+  /**
+   * Gets a data set entity by its ID.
+   * @param id the ID of the data set entity
+   * @return the DataSetEntity with the specified ID or empty if not found
+   */
+  Optional<DataSetEntity> getDataSetById(String id);
 
   Set<DataEntity> getAllDataEntities();
 
