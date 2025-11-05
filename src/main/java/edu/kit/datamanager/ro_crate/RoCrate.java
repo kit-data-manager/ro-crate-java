@@ -496,7 +496,10 @@ public class RoCrate implements Crate {
                 throw new IllegalArgumentException("Parent ID is null.");
             }
 
-            DataEntity parentEntity = this.payload.getDataEntityById(parentId);
+            DataEntity parentEntity = parentId.equals("./")
+                    ? this.rootDataEntity
+                    : this.payload.getDataEntityById(parentId);
+
             if (parentEntity == null) {
                 throw new IllegalArgumentException(
                     "Parent ID not found in the crate."
