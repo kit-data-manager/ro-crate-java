@@ -9,6 +9,7 @@ import edu.kit.datamanager.ro_crate.entities.serializers.HasPartSerializer;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A helping class for the creating of Data entities of type Dataset.
@@ -35,7 +36,9 @@ public class DataSetEntity extends DataEntity {
      */
     public DataSetEntity(AbstractDataSetBuilder<?> entityBuilder) {
         super(entityBuilder);
-        this.hasPart = entityBuilder.hasPart;
+        this.hasPart = entityBuilder.hasPart.stream()
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toSet());
         this.addType(TYPE);
     }
 
@@ -44,7 +47,9 @@ public class DataSetEntity extends DataEntity {
     }
 
     public void addToHasPart(String id) {
-        this.hasPart.add(id);
+        if (id != null && !id.isEmpty()) {
+            this.hasPart.add(id);
+        }
     }
 
     /**
