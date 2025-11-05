@@ -350,10 +350,8 @@ public class RoCrate implements Crate {
     public HierarchyRecognitionResult createDataEntityFileStructure(
         boolean addInverseRelationships
     ) {
-        HierarchyRecognitionConfig config =
-            new HierarchyRecognitionConfig().setInverseRelationships(
-                addInverseRelationships
-            );
+        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
+                .withSetInverseRelationships(addInverseRelationships);
         return this.createDataEntityFileStructure(config);
     }
 
