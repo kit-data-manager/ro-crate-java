@@ -8,6 +8,7 @@ import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
@@ -114,31 +115,47 @@ public class CrateReader<T> {
 
         if (graph.isArray()) {
             moveRootEntitiesFromGraphToCrate(crate, (ArrayNode) graph);
-            RootDataEntity root = crate.getRootDataEntity();
-            if (root != null) {
-                Set<String> dataEntityIds = getDataEntityIds(root, graph);
-                for (JsonNode entityJson : graph) {
-                    String eId = unpackId(entityJson);
-                    if (dataEntityIds.contains(eId)) {
+        }
+        RootDataEntity root = crate.getRootDataEntity();
+        boolean rootExtractionSuccessful = root != null;
+
+        if (rootExtractionSuccessful) {
+            Set<String> dataEntityIds = getDataEntityIds(root, graph);
+            for (JsonNode entityJson : graph) {
+                String eId = unpackId(entityJson);
+                ObjectNode properties = entityJson.deepCopy();
+                boolean isDataEntity = dataEntityIds.contains(eId);
+
+                if (isDataEntity) {
+                    DataEntity data = null;
+                    boolean isDataSet = properties.path("@type").asText().equals("Dataset")
+                            || properties.path("@type").valueStream()
+                            .anyMatch(typeString -> typeString.asText().equals("Dataset"));
+                    if (isDataSet) {
+                        data = new DataSetEntity.DataSetBuilder()
+                                .setAllUnsafe(properties)
+                                .build();
+                    } else {
                         // data entity
-                        DataEntity.DataEntityBuilder dataEntity = new DataEntity.DataEntityBuilder()
-                                .setAllUnsafe(entityJson.deepCopy());
+                        DataEntity.DataEntityBuilder builder = new DataEntity.DataEntityBuilder()
+                                .setAllUnsafe(properties);
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
                             usedFiles.add(file.getPath());
-                            dataEntity.setLocationWithExceptions(file.toPath())
+                            builder.setLocationWithExceptions(file.toPath())
                                     .setId(file.getName());
                         });
-
-                        crate.addDataEntityWithoutRootHasPart(dataEntity.build());
-                    } else {
-                        // contextual entity
-                        crate.addContextualEntity(
-                                new ContextualEntity.ContextualEntityBuilder()
-                                        .setAllUnsafe(entityJson.deepCopy())
-                                        .build());
+                        data = builder.build();
                     }
+                    crate.addDataEntityWithoutRootHasPart(data);
+
+                } else {
+                    // contextual entity
+                    crate.addContextualEntity(
+                            new ContextualEntity.ContextualEntityBuilder()
+                                    .setAllUnsafe(properties)
+                                    .build());
                 }
             }
         }

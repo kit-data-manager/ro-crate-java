@@ -209,6 +209,15 @@ public class RoCrate implements Crate {
     }
 
     @Override
+    public Optional<DataSetEntity> getDataSetById(String id) {
+        DataEntity data = this.roCratePayload.getDataEntityById(id);
+        if (data instanceof DataSetEntity) {
+            return Optional.of((DataSetEntity) data);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Set<DataEntity> getAllDataEntities() {
         return new HashSet<>(this.roCratePayload.getAllDataEntities());
     }
