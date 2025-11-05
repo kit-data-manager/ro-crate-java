@@ -496,7 +496,7 @@ public class RoCrate implements Crate {
                 throw new IllegalArgumentException("Parent ID is null.");
             }
 
-            DataEntity parentEntity = this.getDataEntityById(parentId);
+            DataEntity parentEntity = this.payload.getDataEntityById(parentId);
             if (parentEntity == null) {
                 throw new IllegalArgumentException(
                     "Parent ID not found in the crate."
@@ -522,7 +522,7 @@ public class RoCrate implements Crate {
             } else {
                 parentEntity.addProperty("hasPart", entity.getId());
             }
-            this.roCratePayload.addDataEntity(entity);
+            this.payload.addDataEntity(entity);
         }
 
         public RoCrateBuilder addContextualEntity(
