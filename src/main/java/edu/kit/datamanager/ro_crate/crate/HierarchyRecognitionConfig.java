@@ -1,98 +1,43 @@
 package edu.kit.datamanager.ro_crate.crate;
 
 /**
- * Configuration class for automatic hierarchy recognition functionality.
- * This class provides fine-grained control over how the hierarchy recognition
- * algorithm behaves using a fluent interface with setter methods.
+ * Configuration class for automatic hierarchy recognition.
+ * This class provides control over how the hierarchy recognition.
+ *
+ * <ul>
+ *     <li>createMissingIntermediateEntities: Whether missing intermediate folder entities should be automatically created. Default: false</li>
+ *     <li>createInverseRelationships: Whether isPartOf relationships should be added in addition to hasPart. Default: false</li>
+ *     <li>removeExistingConnections: Whether hasPart relationships should be added (false) or remove existing relations in beforehand (true). Default: false</li>
+ * </ul>
  */
-public class HierarchyRecognitionConfig {
-
-    /**
-     * Whether missing intermediate folder entities should be automatically created.
-     * <p>
-     * Default: false (only connect existing entities)
-     */
-    public boolean createMissingIntermediateEntities = false;
-
-    /**
-     * Whether isPartOf relationships should be added in addition to hasPart.
-     * <p>
-     * Default: false (only add hasPart relationships)
-     */
-    public boolean setInverseRelationships = false;
-
-    /**
-     * Whether hasPart relationships should be added (false)
-     * or remove existing relations in beforehand (true).
-     * <p>
-     * Default: false (keep relations)
-     */
-    public boolean removeExistingConnections = false;
-
+public record HierarchyRecognitionConfig(
+        boolean createMissingIntermediateEntities,
+        boolean createInverseRelationships,
+        boolean removeExistingConnections
+) {
     /**
      * Creates a new configuration with default values.
+     * <p>
+     * Default values:
+     * <ul>
+     *   <li>createMissingIntermediateEntities: false</li>
+     *   <li>createInverseRelationships: false</li>
+     *   <li>removeExistingConnections: false</li>
+     * </ul>
      */
     public HierarchyRecognitionConfig() {
-        // All defaults are set via field initializers
+        this(false, false, false);
     }
 
-    /**
-     * Sets whether missing intermediate folder entities should be automatically created.
-     *
-     * @param create true to create missing DataSetEntity instances for intermediate folders
-     * @return this configuration object for method chaining
-     */
-    public HierarchyRecognitionConfig createMissingIntermediateEntities(
-        boolean create
-    ) {
-        this.createMissingIntermediateEntities = create;
-        return this;
+    public HierarchyRecognitionConfig withCreateMissingIntermediateEntities(boolean value) {
+        return new HierarchyRecognitionConfig(value, this.createInverseRelationships, this.removeExistingConnections);
     }
 
-    /**
-     * Sets whether isPartOf relationships should be added in addition to hasPart.
-     *
-     * @param addIsPartOf true to add bidirectional relationships
-     * @return this configuration object for method chaining
-     */
-    public HierarchyRecognitionConfig setInverseRelationships(
-        boolean addIsPartOf
-    ) {
-        this.setInverseRelationships = addIsPartOf;
-        return this;
+    public HierarchyRecognitionConfig withSetInverseRelationships(boolean value) {
+        return new HierarchyRecognitionConfig(this.createMissingIntermediateEntities, value, this.removeExistingConnections);
     }
 
-    /**
-     * Whether hasPart relationships should be added (false)
-     * or remove existing relations in beforehand (true).
-     *
-     * @param removeExistingConnections true to remove existing connections
-     * @return this configuration object for method chaining
-     */
-    public HierarchyRecognitionConfig removeExistingConnections(
-        boolean removeExistingConnections
-    ) {
-        this.removeExistingConnections = removeExistingConnections;
-        return this;
-    }
-
-    /**
-     * Creates a configuration with default sensible values.
-     * @return default configuration
-     */
-    public static HierarchyRecognitionConfig defaultConfig() {
-        return new HierarchyRecognitionConfig();
-    }
-
-    @Override
-    public String toString() {
-        return (
-            "HierarchyRecognitionConfig{" +
-            "createMissingIntermediateEntities=" +
-            createMissingIntermediateEntities +
-            ", addIsPartOfRelationships=" +
-            setInverseRelationships +
-            '}'
-        );
+    public HierarchyRecognitionConfig withRemoveExistingConnections(boolean value) {
+        return new HierarchyRecognitionConfig(this.createMissingIntermediateEntities, this.createInverseRelationships, value);
     }
 }

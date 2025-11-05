@@ -123,9 +123,9 @@ public class AutomaticHierarchyRecognitionTest {
 
         // When: We configure to create missing intermediate entities
         HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
-            .createMissingIntermediateEntities(true)
-            .setInverseRelationships(true)
-            .removeExistingConnections(true);
+            .withCreateMissingIntermediateEntities(true)
+            .withSetInverseRelationships(true)
+            .withRemoveExistingConnections(true);
 
         HierarchyRecognitionResult result = crate.createDataEntityFileStructure(
             config
@@ -180,8 +180,8 @@ public class AutomaticHierarchyRecognitionTest {
         crate.addDataEntity(folder);
 
         // When: We merge with existing relationships
-        HierarchyRecognitionConfig config =
-            new HierarchyRecognitionConfig().removeExistingConnections(true);
+        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
+                    .withRemoveExistingConnections(true);
 
         crate.createDataEntityFileStructure(config);
 
@@ -346,10 +346,8 @@ public class AutomaticHierarchyRecognitionTest {
 
         crate.addDataEntity(file);
 
-        HierarchyRecognitionConfig config =
-            new HierarchyRecognitionConfig().createMissingIntermediateEntities(
-                true
-            );
+        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
+                .withCreateMissingIntermediateEntities(true);
 
         // When: We recognize hierarchy
         HierarchyRecognitionResult result = crate.createDataEntityFileStructure(
@@ -358,11 +356,10 @@ public class AutomaticHierarchyRecognitionTest {
 
         // Then: Result should provide useful information
         assertTrue(result.isSuccessful());
-        HierarchyRecognitionResult info = result;
 
-        assertEquals(1, info.createdEntities().size()); // "folder/" was created
-        assertEquals(2, info.processedRelationships().size()); // root -> folder -> file relationship
-        assertTrue(info.skippedEntities().isEmpty()); // no entities skipped
-        assertTrue(info.warnings().isEmpty()); // no warnings
+        assertEquals(1, result.createdEntities().size()); // "folder/" was created
+        assertEquals(2, result.processedRelationships().size()); // root -> folder -> file relationship
+        assertTrue(result.skippedEntities().isEmpty()); // no entities skipped
+        assertTrue(result.warnings().isEmpty()); // no warnings
     }
 }

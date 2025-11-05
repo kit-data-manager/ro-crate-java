@@ -45,12 +45,12 @@ public class HierarchyRecognition {
             }
 
             // Create missing intermediate entities if configured
-            if (config.createMissingIntermediateEntities) {
+            if (config.createMissingIntermediateEntities()) {
                 this.createMissingIntermediateEntities(pathEntities, result);
             }
 
             // Clear existing relationships if configured
-            if (config.removeExistingConnections) {
+            if (config.removeExistingConnections()) {
                 this.clearExistingRelationships(pathEntities);
             }
 
@@ -185,7 +185,7 @@ public class HierarchyRecognition {
             }
 
             // Add isPartOf relationship if configured
-            if (config.setInverseRelationships) {
+            if (config.createInverseRelationships()) {
                 childEntity.addProperty("isPartOf", actualParentId);
             }
 
