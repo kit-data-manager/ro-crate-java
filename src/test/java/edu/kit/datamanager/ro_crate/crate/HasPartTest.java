@@ -18,7 +18,8 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test similar to AutomaticHierarchyRecognitionTest
+ * Tests related to the addDataEntity(DataEntity, String) method and the hasPart
+ * property.
  */
 public class HasPartTest {
 
