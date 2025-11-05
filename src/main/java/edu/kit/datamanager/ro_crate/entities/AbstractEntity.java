@@ -629,6 +629,13 @@ public class AbstractEntity {
             // This will currently only print errors.
             AbstractEntity.entityValidation.entityValidation(properties);
             this.properties = properties;
+            JsonNode typeProps = properties.path("@type");
+            if (typeProps.isArray()) {
+                typeProps.valueStream()
+                        .forEach(value -> this.addType(value.asText()));
+            } else if (typeProps.isTextual()) {
+                this.addType(typeProps.asText());
+            }
             this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
             return self();
         }
