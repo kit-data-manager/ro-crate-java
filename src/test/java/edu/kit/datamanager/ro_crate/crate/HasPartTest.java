@@ -80,7 +80,7 @@ public class HasPartTest {
         }
 
         @Test
-        public void givenCrateFromDisk_whenAddingToFolder_thenConnectionExists(
+        public void givenCrateWithFolderWithFile_whenReadingFromDisk_thenConnectionExists(
                 @TempDir Path path
         ) throws IOException {
             // Given crate from disk
@@ -89,20 +89,21 @@ public class HasPartTest {
                     .addDataEntity(new DataSetEntity.DataSetBuilder().setId(folderId).build())
                     .build();
 
-            Writers.newFolderWriter().save(this.crate, path.toString());
-            this.crate = Readers.newFolderReader().readCrate(path.toString());
-
             // When adding entity to folder
             String dataId = "d";
             FileEntity d = new FileEntity.FileEntityBuilder()
                     .setId(dataId)
                     .build();
             this.crate.addDataEntity(d, folderId);
+
+            Writers.newFolderWriter().save(this.crate, path.toString());
+            Crate read = Readers.newFolderReader().readCrate(path.toString());
+
             // Then this connection exists
             // Note how the types are loaded when deserializing. Alternatively, you can find them in their properties.
-            assertTrue(this.crate.getDataEntityById(folderId).getTypes().contains("Dataset"));
+            assertTrue(read.getDataEntityById(folderId).getTypes().contains("Dataset"));
             // Note how you can cast an entity to a dataSetEntity.
-            assertTrue(this.crate.getDataSetById(folderId).orElseThrow().hasPart(dataId));
+            assertTrue(read.getDataSetById(folderId).orElseThrow().hasPart(dataId));
         }
     }
 
@@ -168,27 +169,28 @@ public class HasPartTest {
         }
 
         @Test
-        public void givenCrateFromDisk_whenAddingToFolder_thenConnectionExists(
+        public void givenCrateWithFolderWithFile_whenReadingFromDisk_thenConnectionExists(
                 @TempDir Path path
         ) throws IOException {
             // Given crate from disk
             String folderId = "./folder/";
-            Crate crate = this.builder.addDataEntity(
-                            new DataSetEntity.DataSetBuilder()
-                                    .setId(folderId)
-                                    .build()
-                    )
-                    .build();
+            this.builder.addDataEntity(
+                    new DataSetEntity.DataSetBuilder()
+                            .setId(folderId)
+                            .build()
+            );
 
-            Writers.newFolderWriter().save(crate, path.toString());
-            Crate read = Readers.newFolderReader().readCrate(path.toString());
 
             // When adding entity to folder
             String dataId = "d";
             FileEntity d = new FileEntity.FileEntityBuilder()
                     .setId(dataId)
                     .build();
-            read.addDataEntity(d, folderId);
+            this.builder.addDataEntity(d, folderId);
+
+            Writers.newFolderWriter().save(this.builder.build(), path.toString());
+            Crate read = Readers.newFolderReader().readCrate(path.toString());
+
             // Then this connection exists
             // Note how the types are loaded when deserializing. Alternatively, you can find them in their properties.
             assertTrue(read.getDataEntityById(folderId).getTypes().contains("Dataset"));
