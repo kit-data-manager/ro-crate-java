@@ -122,11 +122,11 @@ public interface Crate {
 
   Set<DataEntity> getAllDataEntities();
 
-  ContextualEntity getContextualEntityById(java.lang.String id);
+  ContextualEntity getContextualEntityById(String id);
 
   Set<ContextualEntity> getAllContextualEntities();
 
-  AbstractEntity getEntityById(java.lang.String id);
+  AbstractEntity getEntityById(String id);
 
   /**
    * Adds a data entity to the crate.
