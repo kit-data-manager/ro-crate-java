@@ -106,7 +106,12 @@ public interface Crate {
 
   String getJsonMetadata();
 
-  DataEntity getDataEntityById(java.lang.String id);
+  /**
+   * Gets a data entity by its ID.
+   * @param id the ID of the data entity
+   * @return the DataEntity with the specified ID or null if not found
+   */
+  DataEntity getDataEntityById(String id);
 
   /**
    * Gets a data set entity by its ID.
