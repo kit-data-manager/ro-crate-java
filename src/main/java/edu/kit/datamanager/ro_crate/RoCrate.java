@@ -589,15 +589,12 @@ public class RoCrate implements Crate {
             return this;
         }
 
-        public RoCrateBuilder addUrlToContext(java.lang.String url) {
+        public RoCrateBuilder addUrlToContext(String url) {
             this.metadataContext.addToContextFromUrl(url);
             return this;
         }
 
-        public RoCrateBuilder addValuePairToContext(
-            java.lang.String key,
-            java.lang.String value
-        ) {
+        public RoCrateBuilder addValuePairToContext(String key, String value) {
             this.metadataContext.addToContext(key, value);
             return this;
         }
