@@ -1,8 +1,10 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.serializers.HasPartSerializer;
 
 import java.util.HashSet;
@@ -94,6 +96,17 @@ public class DataSetEntity extends DataEntity {
                 this.hasPart.add(dataEntity);
                 this.relatedItems.add(dataEntity);
             }
+            return self();
+        }
+
+        @Override
+        public T setAllUnsafe(ObjectNode properties) {
+            super.setAllUnsafe(properties);
+            JsonNode hasPart = properties.path("hasPart");
+            this.hasPart.add(hasPart.asText());
+            hasPart.valueStream().forEach(
+                    value -> this.hasPart.add(value.asText())
+            );
             return self();
         }
 
