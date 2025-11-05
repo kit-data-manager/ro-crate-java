@@ -204,7 +204,7 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public DataEntity getDataEntityById(java.lang.String id) {
+    public DataEntity getDataEntityById(String id) {
         return this.roCratePayload.getDataEntityById(id);
     }
 
