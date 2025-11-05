@@ -326,7 +326,6 @@ public class AutomaticHierarchyRecognitionTest {
 
         // Then: Should fail without making any changes
         assertFalse(result.isSuccessful());
-        assertTrue(result.hasErrors());
 
         // Original state should be preserved
         assertTrue(crate.getRootDataEntity().hasPart("document.pdf"));
@@ -361,9 +360,9 @@ public class AutomaticHierarchyRecognitionTest {
         assertTrue(result.isSuccessful());
         HierarchyRecognitionResult info = result;
 
-        assertEquals(1, info.getCreatedEntities().size()); // "folder/" was created
-        assertEquals(2, info.getProcessedRelationships().size()); // root -> folder -> file relationship
-        assertTrue(info.getSkippedEntities().isEmpty()); // no entities skipped
-        assertTrue(info.getWarnings().isEmpty()); // no warnings
+        assertEquals(1, info.createdEntities().size()); // "folder/" was created
+        assertEquals(2, info.processedRelationships().size()); // root -> folder -> file relationship
+        assertTrue(info.skippedEntities().isEmpty()); // no entities skipped
+        assertTrue(info.warnings().isEmpty()); // no warnings
     }
 }

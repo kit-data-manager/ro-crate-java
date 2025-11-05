@@ -20,8 +20,7 @@ public class HierarchyRecognition {
     }
 
     public HierarchyRecognitionResult buildHierarchy() {
-        HierarchyRecognitionResult.Builder resultBuilder =
-                new HierarchyRecognitionResult.Builder();
+        HierarchyRecognitionResult result = new HierarchyRecognitionResult();
 
         try {
             // Get all data entities to process
@@ -35,19 +34,19 @@ public class HierarchyRecognition {
                 if (FileSystemUtil.isFilePath(id)) {
                     pathEntities.put(id, entity);
                 } else {
-                    resultBuilder.addSkippedEntity(entity);
+                    result.addSkippedEntity(entity);
                 }
             }
 
 
             // Validate hierarchy before making changes
-            if (!HierarchyRecognition.validateHierarchy(pathEntities, resultBuilder)) {
-                return resultBuilder.build();
+            if (!HierarchyRecognition.validateHierarchy(pathEntities, result)) {
+                return result;
             }
 
             // Create missing intermediate entities if configured
             if (config.createMissingIntermediateEntities) {
-                this.createMissingIntermediateEntities(pathEntities, resultBuilder);
+                this.createMissingIntermediateEntities(pathEntities, result);
             }
 
             // Clear existing relationships if configured
@@ -56,15 +55,15 @@ public class HierarchyRecognition {
             }
 
             // Build hierarchy relationships
-            this.buildHierarchyRelationships(pathEntities, config, resultBuilder);
+            this.buildHierarchyRelationships(pathEntities, config, result);
 
-            return resultBuilder.build();
+            return result;
         } catch (Exception e) {
-            resultBuilder.addError(
+            result.addError(
                     "Unexpected error during hierarchy recognition: " +
                             e.getMessage()
             );
-            return resultBuilder.build();
+            return result;
         }
     }
 
@@ -72,12 +71,12 @@ public class HierarchyRecognition {
      * Validates that the hierarchy is consistent (no files containing other files/folders).
      *
      * @param pathEntities map of path IDs to DataEntities
-     * @param resultBuilder builder to collect errors
+     * @param result builder to collect errors
      * @return true if valid, false if invalid hierarchy detected
      */
     protected static boolean validateHierarchy(
             Map<String, DataEntity> pathEntities,
-            HierarchyRecognitionResult.Builder resultBuilder
+            HierarchyRecognitionResult result
     ) {
         for (Map.Entry<String, DataEntity> entry : pathEntities.entrySet()) {
             String childId = entry.getKey();
@@ -98,7 +97,7 @@ public class HierarchyRecognition {
 
             // Check for invalid hierarchy: file cannot contain another file/folder
             if (parentEntity.getTypes().contains("File")) {
-                resultBuilder.addError(
+                result.addError(
                         "Invalid hierarchy: file '" +
                                 parentEntity.getId() +
                                 "' cannot contain '" +
@@ -115,11 +114,11 @@ public class HierarchyRecognition {
      * Creates missing intermediate DataSetEntity instances for folder paths.
      *
      * @param pathEntities map of path IDs to DataEntities
-     * @param resultBuilder builder to collect created entities
+     * @param result builder to collect created entities
      */
     protected void createMissingIntermediateEntities(
             Map<String, DataEntity> pathEntities,
-            HierarchyRecognitionResult.Builder resultBuilder
+            HierarchyRecognitionResult result
     ) {
         Set<String> missingPaths = new HashSet<>();
 
@@ -146,14 +145,14 @@ public class HierarchyRecognition {
 
             this.crate.addDataEntity(newEntity);
             pathEntities.put(missingPath, newEntity);
-            resultBuilder.addCreatedEntity(newEntity);
+            result.addCreatedEntity(newEntity);
         }
     }
 
     protected void buildHierarchyRelationships(
             Map<String, DataEntity> pathEntities,
             HierarchyRecognitionConfig config,
-            HierarchyRecognitionResult.Builder resultBuilder
+            HierarchyRecognitionResult result
     ) {
         for (Map.Entry<String, DataEntity> entry : pathEntities.entrySet()) {
             String childId = entry.getKey();
@@ -179,7 +178,7 @@ public class HierarchyRecognition {
             // Add hasPart relationship
             if (parentEntity instanceof DataSetEntity) {
                 ((DataSetEntity) parentEntity).addToHasPart(childId);
-                resultBuilder.addProcessedRelationship(
+                result.addProcessedRelationship(
                         actualParentId,
                         childId
                 );
