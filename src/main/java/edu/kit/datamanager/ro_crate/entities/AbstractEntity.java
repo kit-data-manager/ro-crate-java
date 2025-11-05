@@ -443,7 +443,9 @@ public class AbstractEntity {
             if (this.types == null) {
                 this.types = new HashSet<>();
             }
-            this.types.add(type);
+            if (type != null || !type.isEmpty()) {
+                this.types.add(type);
+            }
             return self();
         }
 
