@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
-import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionConfig;
-import edu.kit.datamanager.ro_crate.crate.HierarchyRecognitionResult;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;

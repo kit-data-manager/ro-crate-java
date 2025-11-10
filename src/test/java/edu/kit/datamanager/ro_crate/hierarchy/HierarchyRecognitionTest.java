@@ -1,4 +1,4 @@
-package edu.kit.datamanager.ro_crate.crate;
+package edu.kit.datamanager.ro_crate.hierarchy;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,13 +7,14 @@ import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import java.nio.file.Paths;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Automatic Hierarchy Recognition - API Tests & Usage Examples
  */
-public class AutomaticHierarchyRecognitionTest {
+public class HierarchyRecognitionTest {
 
     private RoCrate crate;
 

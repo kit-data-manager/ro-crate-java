@@ -1,4 +1,4 @@
-package edu.kit.datamanager.ro_crate.crate;
+package edu.kit.datamanager.ro_crate.hierarchy;
 
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
