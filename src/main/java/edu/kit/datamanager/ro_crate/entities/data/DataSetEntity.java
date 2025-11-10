@@ -111,10 +111,16 @@ public class DataSetEntity extends DataEntity {
         public T setAllUnsafe(ObjectNode properties) {
             super.setAllUnsafe(properties);
             JsonNode hasPart = properties.path("hasPart");
-            this.hasPart.add(hasPart.asText());
-            hasPart.valueStream().forEach(
-                    value -> this.hasPart.add(value.asText())
-            );
+            String txt = hasPart.asText();
+            if (!txt.isBlank()) {
+                this.hasPart.add(txt);
+            }
+            hasPart.valueStream()
+                    .map(JsonNode::asText)
+                    .filter(value -> !value.isBlank())
+                    .forEach(
+                            value -> this.hasPart.add(value)
+                    );
             return self();
         }
 
