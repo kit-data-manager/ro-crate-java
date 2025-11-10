@@ -20,6 +20,11 @@ public class RoCratePayload implements CratePayload {
 
   private final HashMap<String, DataEntity> dataEntities;
   private final HashMap<String, ContextualEntity> contextualEntities;
+
+  /**
+    * A map containing for each entity id a set of ids of entities that are linked to it.
+    * This is used to make the removal of entities from the crate faster.
+   */
   private final HashMap<String, Set<String>> associatedItems;
 
   /**

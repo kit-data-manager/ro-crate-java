@@ -49,6 +49,11 @@ public class AbstractEntity {
     private static final EntityValidation entityValidation
             = new EntityValidation(new JsonSchemaValidation());
 
+    /**
+     * This set contains all the ids of the entities that are linked by
+     * this entity. This information is provided to crate payloads to make
+     * the removal of entities faster.
+     */
     @JsonIgnore
     private final Set<String> linkedTo;
 
@@ -438,7 +443,9 @@ public class AbstractEntity {
             if (this.types == null) {
                 this.types = new HashSet<>();
             }
-            this.types.add(type);
+            if (type != null && !type.isEmpty()) {
+                this.types.add(type);
+            }
             return self();
         }
 
@@ -622,6 +629,13 @@ public class AbstractEntity {
             // This will currently only print errors.
             AbstractEntity.entityValidation.entityValidation(properties);
             this.properties = properties;
+            JsonNode typeProps = properties.path("@type");
+            if (typeProps.isArray()) {
+                typeProps.valueStream()
+                        .forEach(value -> this.addType(value.asText()));
+            } else if (typeProps.isTextual()) {
+                this.addType(typeProps.asText());
+            }
             this.relatedItems.addAll(JsonUtilFunctions.getIdPropertiesFromJsonNode(properties));
             return self();
         }

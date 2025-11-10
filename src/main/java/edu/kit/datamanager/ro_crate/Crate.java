@@ -7,9 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
@@ -103,15 +106,27 @@ public interface Crate {
 
   String getJsonMetadata();
 
-  DataEntity getDataEntityById(java.lang.String id);
+  /**
+   * Gets a data entity by its ID.
+   * @param id the ID of the data entity
+   * @return the DataEntity with the specified ID or null if not found
+   */
+  DataEntity getDataEntityById(String id);
+
+  /**
+   * Gets a data set entity by its ID.
+   * @param id the ID of the data set entity
+   * @return the DataSetEntity with the specified ID or empty if not found
+   */
+  Optional<DataSetEntity> getDataSetById(String id);
 
   Set<DataEntity> getAllDataEntities();
 
-  ContextualEntity getContextualEntityById(java.lang.String id);
+  ContextualEntity getContextualEntityById(String id);
 
   Set<ContextualEntity> getAllContextualEntities();
 
-  AbstractEntity getEntityById(java.lang.String id);
+  AbstractEntity getEntityById(String id);
 
   /**
    * Adds a data entity to the crate.
@@ -120,12 +135,31 @@ public interface Crate {
    */
   void addDataEntity(DataEntity entity);
 
+  /**
+   * Adds a data entity to the crate with a specified parent ID.
+   * <p>
+   * Consider using
+   * @param entity the DataEntity to add to this crate.
+   * @param parentId the ID of the parent entity. Must not be null.
+   * @throws IllegalArgumentException if parentId is null or not found, or not a DataEntity.
+   */
+  void addDataEntity(DataEntity entity, String parentId) throws IllegalArgumentException;
+
   void addContextualEntity(ContextualEntity entity);
 
   void deleteEntityById(String entityId);
 
   void setUntrackedFiles(Collection<File> files);
 
+  /**
+   * Unsafely adds a collection of entities to the crate.
+   * <p>
+   * WARNING: This method does not perform any checks and may lead to an inconsistent crate state.
+   *
+   * @param entities the collection of entities to add
+   * @deprecated use individual add methods to ensure crate consistency. If you really need an unchecked method, consider creating a subclass or contact us at our issue tracker so we can discuss replacements before removal.
+   */
+  @Deprecated(forRemoval = true)
   void addFromCollection(Collection<? extends AbstractEntity> entities);
 
   void addItemFromDataCite(String locationUrl);
@@ -135,4 +169,26 @@ public interface Crate {
   void deleteUrlFromContext(String url);
 
   Collection<File> getUntrackedFiles();
+
+  /**
+   * Automatically recognizes hierarchical file structure from DataEntity IDs
+   * and connects them using hasPart relationships.
+   * <p>
+   * WARNING: This will not change existing hasPart relationships.
+   *
+   * @param addInverseRelationships if true, also adds isPartOf relationships from child to parent
+   * @return result object containing information about what was processed, as well as potential errors.
+   */
+  HierarchyRecognitionResult createDataEntityFileStructure(boolean addInverseRelationships);
+
+  /**
+   * Automatically recognizes hierarchical file structure from DataEntity IDs
+   * and connects them using hasPart relationships with fine-grained configuration.
+   * <p>
+   * Note: Only processes IDs that appear to be relative file paths.
+   *
+   * @param config configuration object specifying how the recognition should behave
+   * @return result object containing information about what was processed, as well as potential errors.
+   */
+  HierarchyRecognitionResult createDataEntityFileStructure(HierarchyRecognitionConfig config);
 }

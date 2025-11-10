@@ -13,6 +13,54 @@ public class FileSystemUtil {
     }
 
     /**
+     * Checks if the given ID appears to be a file path.
+     * <p>
+     * Specifically excludes IDs starting with "doi:", "http", or "https".
+     *
+     * @param id the ID to check
+     * @return true if it looks like a file path, false otherwise
+     */
+    public static boolean isFilePath(String id) {
+        return id != null && !(
+                id.startsWith("doi:") ||
+                id.startsWith("http://") ||
+                id.startsWith("https://")
+        );
+    }
+
+    /**
+     * Gets the parent path of a given path.
+     * @param path the path to evaluate.
+     * @return the parent path, or null if no parent exists.
+     */
+    public static String getParentPath(String path) {
+        if (path == null || path.equals("./") || path.isEmpty()) {
+            return null;
+        }
+
+        // Normalize path - remove trailing slash for consistency
+        String normalizedPath = path.endsWith("/")
+                ? path.substring(0, path.length() - 1)
+                : path;
+
+        int lastSlash = normalizedPath.lastIndexOf('/');
+        if (lastSlash == -1) {
+            return "./"; // Root directory
+        }
+
+        String parentPath = normalizedPath.substring(0, lastSlash);
+
+        // If parent is empty, it's root
+        if (parentPath.isEmpty()) {
+            return "./";
+        }
+
+        // For validation, we need to check both with and without trailing slash
+        // since files don't have trailing slash but folders do
+        return parentPath;
+    }
+
+    /**
      * Removes a specific set of given file extensions from a file name, if present.
      * The extensions are case-insensitive. Given "ELN", "eln" or "Eln" will also match.
      * The dot (.) before the extension is also assumed and removed implicitly:

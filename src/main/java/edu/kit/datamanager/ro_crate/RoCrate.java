@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
 import edu.kit.datamanager.ro_crate.context.RoCrateMetadataContext;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognition;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-
+import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.dataentities.ImportFromDataCite;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
@@ -23,7 +25,6 @@ import edu.kit.datamanager.ro_crate.special.CrateVersion;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
 import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
-
 import java.io.File;
 import java.net.URI;
 import java.util.*;
@@ -105,12 +106,12 @@ public class RoCrate implements Crate {
     public void setJsonDescriptor(ContextualEntity jsonDescriptor) {
         this.jsonDescriptor = jsonDescriptor;
     }
-    
+
     @Override
     public RootDataEntity getRootDataEntity() {
         return rootDataEntity;
     }
-    
+
     @Override
     public void setRootDataEntity(RootDataEntity rootDataEntity) {
         this.rootDataEntity = rootDataEntity;
@@ -123,8 +124,7 @@ public class RoCrate implements Crate {
         this.roCratePayload = new RoCratePayload();
         this.untrackedFiles = new HashSet<>();
         this.metadataContext = new RoCrateMetadataContext();
-        rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
-                .build();
+        rootDataEntity = new RootDataEntity.RootDataEntityBuilder().build();
         jsonDescriptor = new JsonDescriptor();
     }
 
@@ -150,12 +150,12 @@ public class RoCrate implements Crate {
         JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
         if (conformsTo.isArray()) {
             return StreamSupport.stream(conformsTo.spliterator(), false)
-                    .filter(TreeNode::isObject)
-                    .map(obj -> obj.path("@id").asText())
-                    .map(CrateVersion::fromSpecUri)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst();
+                .filter(TreeNode::isObject)
+                .map(obj -> obj.path("@id").asText())
+                .map(CrateVersion::fromSpecUri)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
         } else if (conformsTo.isObject()) {
             return CrateVersion.fromSpecUri(conformsTo.get("@id").asText());
         } else {
@@ -168,9 +168,9 @@ public class RoCrate implements Crate {
         JsonNode conformsTo = this.jsonDescriptor.getProperty("conformsTo");
         if (conformsTo.isArray()) {
             return StreamSupport.stream(conformsTo.spliterator(), false)
-                    .filter(TreeNode::isObject)
-                    .map(obj -> obj.path("@id").asText())
-                    .collect(Collectors.toSet());
+                .filter(TreeNode::isObject)
+                .map(obj -> obj.path("@id").asText())
+                .collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
         }
@@ -184,11 +184,19 @@ public class RoCrate implements Crate {
         node.setAll(this.metadataContext.getContextJsonEntity());
 
         var graph = objectMapper.createArrayNode();
-        ObjectNode root = objectMapper.convertValue(this.rootDataEntity, ObjectNode.class);
+        ObjectNode root = objectMapper.convertValue(
+            this.rootDataEntity,
+            ObjectNode.class
+        );
         graph.add(root);
 
-        graph.add(objectMapper.convertValue(this.jsonDescriptor, JsonNode.class));
-        if (this.roCratePayload != null && this.roCratePayload.getEntitiesMetadata() != null) {
+        graph.add(
+            objectMapper.convertValue(this.jsonDescriptor, JsonNode.class)
+        );
+        if (
+            this.roCratePayload != null &&
+            this.roCratePayload.getEntitiesMetadata() != null
+        ) {
             graph.addAll(this.roCratePayload.getEntitiesMetadata());
         }
         node.set("@graph", graph);
@@ -196,8 +204,17 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public DataEntity getDataEntityById(java.lang.String id) {
+    public DataEntity getDataEntityById(String id) {
         return this.roCratePayload.getDataEntityById(id);
+    }
+
+    @Override
+    public Optional<DataSetEntity> getDataSetById(String id) {
+        DataEntity data = this.roCratePayload.getDataEntityById(id);
+        if (data instanceof DataSetEntity) {
+            return Optional.of((DataSetEntity) data);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -236,6 +253,45 @@ public class RoCrate implements Crate {
     }
 
     @Override
+    public void addDataEntity(DataEntity entity, String parentId)
+        throws IllegalArgumentException {
+        if (parentId == null) {
+            throw new IllegalArgumentException("Parent ID is null.");
+        }
+
+        DataEntity parentEntity = parentId.equals("./")
+                ? this.getRootDataEntity()
+                : this.getDataEntityById(parentId);
+
+        if (parentEntity == null) {
+            throw new IllegalArgumentException(
+                "Parent ID not found in the crate."
+            );
+        }
+
+        if (parentEntity.getTypes().contains("File")) {
+            throw new IllegalArgumentException(
+                "Parent entity cannot be a File."
+            );
+        }
+
+        if (!parentEntity.getTypes().contains("Dataset")) {
+            throw new IllegalArgumentException(
+                "Parent entity must be a Dataset in order to contain another DataEntity as a part."
+            );
+        }
+
+        this.metadataContext.checkEntity(entity);
+
+        if (parentEntity instanceof DataSetEntity) {
+            ((DataSetEntity) parentEntity).addToHasPart(entity.getId());
+        } else {
+            parentEntity.addProperty("hasPart", entity.getId());
+        }
+        this.roCratePayload.addDataEntity(entity);
+    }
+
+    @Override
     public void addContextualEntity(ContextualEntity entity) {
         this.metadataContext.checkEntity(entity);
         this.roCratePayload.addContextualEntity(entity);
@@ -248,8 +304,14 @@ public class RoCrate implements Crate {
         // remove from the root data entity hasPart
         this.rootDataEntity.removeFromHasPart(entityId);
         // remove from the root entity and the file descriptor
-        JsonUtilFunctions.removeFieldsWith(entityId, this.rootDataEntity.getProperties());
-        JsonUtilFunctions.removeFieldsWith(entityId, this.jsonDescriptor.getProperties());
+        JsonUtilFunctions.removeFieldsWith(
+            entityId,
+            this.rootDataEntity.getProperties()
+        );
+        JsonUtilFunctions.removeFieldsWith(
+            entityId,
+            this.jsonDescriptor.getProperties()
+        );
     }
 
     @Override
@@ -268,7 +330,9 @@ public class RoCrate implements Crate {
     }
 
     @Override
-    public void addFromCollection(Collection<? extends AbstractEntity> entities) {
+    public void addFromCollection(
+        Collection<? extends AbstractEntity> entities
+    ) {
         this.roCratePayload.addEntities(entities);
     }
 
@@ -280,6 +344,22 @@ public class RoCrate implements Crate {
     @Override
     public Collection<File> getUntrackedFiles() {
         return this.untrackedFiles;
+    }
+
+    @Override
+    public HierarchyRecognitionResult createDataEntityFileStructure(
+        boolean addInverseRelationships
+    ) {
+        HierarchyRecognitionConfig config = new HierarchyRecognitionConfig()
+                .withSetInverseRelationships(addInverseRelationships);
+        return this.createDataEntityFileStructure(config);
+    }
+
+    @Override
+    public HierarchyRecognitionResult createDataEntityFileStructure(
+        HierarchyRecognitionConfig config
+    ) {
+        return new HierarchyRecognition(this, config).buildHierarchy();
     }
 
     /**
@@ -306,13 +386,18 @@ public class RoCrate implements Crate {
          * @param datePublished the published date of the crate.
          * @param licenseId the license identifier of the crate.
          */
-        public RoCrateBuilder(String name, String description, String datePublished, String licenseId) {
+        public RoCrateBuilder(
+            String name,
+            String description,
+            String datePublished,
+            String licenseId
+        ) {
             this.payload = new RoCratePayload();
             this.metadataContext = new RoCrateMetadataContext();
             this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
-                    .addProperty("name", name)
-                    .addProperty(PROPERTY_DESCRIPTION, description)
-                    .build();
+                .addProperty("name", name)
+                .addProperty(PROPERTY_DESCRIPTION, description)
+                .build();
             this.setLicense(licenseId);
             this.addDatePublishedWithExceptions(datePublished);
         }
@@ -325,13 +410,18 @@ public class RoCrate implements Crate {
          * @param datePublished the published date of the crate.
          * @param license the license entity of the crate.
          */
-        public RoCrateBuilder(String name, String description, String datePublished, ContextualEntity license) {
+        public RoCrateBuilder(
+            String name,
+            String description,
+            String datePublished,
+            ContextualEntity license
+        ) {
             this.payload = new RoCratePayload();
             this.metadataContext = new RoCrateMetadataContext();
             this.rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
-                    .addProperty("name", name)
-                    .addProperty(PROPERTY_DESCRIPTION, description)
-                    .build();
+                .addProperty("name", name)
+                .addProperty(PROPERTY_DESCRIPTION, description)
+                .build();
             this.setLicense(license);
             this.addDatePublishedWithExceptions(datePublished);
         }
@@ -343,8 +433,7 @@ public class RoCrate implements Crate {
         public RoCrateBuilder() {
             this.payload = new RoCratePayload();
             this.metadataContext = new RoCrateMetadataContext();
-            rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
-                    .build();
+            rootDataEntity = new RootDataEntity.RootDataEntityBuilder().build();
         }
 
         /**
@@ -399,7 +488,47 @@ public class RoCrate implements Crate {
             return this;
         }
 
-        public RoCrateBuilder addContextualEntity(ContextualEntity contextualEntity) {
+        public void addDataEntity(DataEntity entity, String parentId)
+            throws IllegalArgumentException {
+            if (parentId == null) {
+                throw new IllegalArgumentException("Parent ID is null.");
+            }
+
+            DataEntity parentEntity = parentId.equals("./")
+                    ? this.rootDataEntity
+                    : this.payload.getDataEntityById(parentId);
+
+            if (parentEntity == null) {
+                throw new IllegalArgumentException(
+                    "Parent ID not found in the crate."
+                );
+            }
+
+            if (parentEntity.getTypes().contains("File")) {
+                throw new IllegalArgumentException(
+                    "Parent entity cannot be a File."
+                );
+            }
+
+            if (!parentEntity.getTypes().contains("Dataset")) {
+                throw new IllegalArgumentException(
+                    "Parent entity must be a Dataset in order to contain another DataEntity as a part."
+                );
+            }
+
+            this.metadataContext.checkEntity(entity);
+
+            if (parentEntity instanceof DataSetEntity) {
+                ((DataSetEntity) parentEntity).addToHasPart(entity.getId());
+            } else {
+                parentEntity.addProperty("hasPart", entity.getId());
+            }
+            this.payload.addDataEntity(entity);
+        }
+
+        public RoCrateBuilder addContextualEntity(
+            ContextualEntity contextualEntity
+        ) {
             this.metadataContext.checkEntity(contextualEntity);
             this.payload.addContextualEntity(contextualEntity);
             return this;
@@ -430,7 +559,8 @@ public class RoCrate implements Crate {
          * @return the builder
          */
         public RoCrateBuilder setLicense(String licenseId) {
-            ContextualEntity licenseEntity = new ContextualEntity.ContextualEntityBuilder()
+            ContextualEntity licenseEntity =
+                new ContextualEntity.ContextualEntityBuilder()
                     .setId(licenseId)
                     .build();
             this.setLicense(licenseEntity);
@@ -445,8 +575,12 @@ public class RoCrate implements Crate {
          * @return this builder
          * @throws IllegalArgumentException if format is not ISO 8601
          */
-        public RoCrateBuilder addDatePublishedWithExceptions(String dateValue) throws IllegalArgumentException {
-            this.rootDataEntity.addDateTimePropertyWithExceptions("datePublished", dateValue);
+        public RoCrateBuilder addDatePublishedWithExceptions(String dateValue)
+            throws IllegalArgumentException {
+            this.rootDataEntity.addDateTimePropertyWithExceptions(
+                "datePublished",
+                dateValue
+            );
             return this;
         }
 
@@ -455,12 +589,12 @@ public class RoCrate implements Crate {
             return this;
         }
 
-        public RoCrateBuilder addUrlToContext(java.lang.String url) {
+        public RoCrateBuilder addUrlToContext(String url) {
             this.metadataContext.addToContextFromUrl(url);
             return this;
         }
 
-        public RoCrateBuilder addValuePairToContext(java.lang.String key, java.lang.String value) {
+        public RoCrateBuilder addValuePairToContext(String key, String value) {
             this.metadataContext.addToContext(key, value);
             return this;
         }
@@ -507,7 +641,12 @@ public class RoCrate implements Crate {
         /**
          * @see RoCrateBuilder#RoCrateBuilder(String, String, String, String)
          */
-        public BuilderWithDraftFeatures(String name, String description, String datePublished, String licenseId) {
+        public BuilderWithDraftFeatures(
+            String name,
+            String description,
+            String datePublished,
+            String licenseId
+        ) {
             super(name, description, datePublished, licenseId);
         }
 
@@ -515,7 +654,12 @@ public class RoCrate implements Crate {
          * @see RoCrateBuilder#RoCrateBuilder(String, String, String,
          * ContextualEntity)
          */
-        public BuilderWithDraftFeatures(String name, String description, String datePublished, ContextualEntity licenseId) {
+        public BuilderWithDraftFeatures(
+            String name,
+            String description,
+            String datePublished,
+            ContextualEntity licenseId
+        ) {
             super(name, description, datePublished, licenseId);
         }
 
@@ -540,9 +684,9 @@ public class RoCrate implements Crate {
          */
         public BuilderWithDraftFeatures alsoConformsTo(URI specification) {
             descriptorBuilder
-                    .addConformsTo(specification)
-                    // usage of a draft feature results in draft version numbers of the crate
-                    .setVersion(CrateVersion.LATEST_UNSTABLE);
+                .addConformsTo(specification)
+                // usage of a draft feature results in draft version numbers of the crate
+                .setVersion(CrateVersion.LATEST_UNSTABLE);
             return this;
         }
     }
