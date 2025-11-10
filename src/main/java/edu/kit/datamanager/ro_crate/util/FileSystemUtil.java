@@ -21,10 +21,10 @@ public class FileSystemUtil {
      * @return true if it looks like a file path, false otherwise
      */
     public static boolean isFilePath(String id) {
-        return !(
-                id.startsWith("doi:") &&
-                        id.startsWith("http") &&
-                        id.startsWith("https")
+        return id != null && !(
+                id.startsWith("doi:") ||
+                id.startsWith("http://") ||
+                id.startsWith("https://")
         );
     }
 
