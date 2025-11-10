@@ -1,4 +1,4 @@
-package edu.kit.datamanager.ro_crate.crate;
+package edu.kit.datamanager.ro_crate.hierarchy;
 
 /**
  * Configuration class for automatic hierarchy recognition.
