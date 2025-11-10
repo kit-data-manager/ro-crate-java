@@ -151,6 +151,15 @@ public interface Crate {
 
   void setUntrackedFiles(Collection<File> files);
 
+  /**
+   * Unsafely adds a collection of entities to the crate.
+   * <p>
+   * WARNING: This method does not perform any checks and may lead to an inconsistent crate state.
+   *
+   * @param entities the collection of entities to add
+   * @deprecated use individual add methods to ensure crate consistency. If you really need an unchecked method, consider creating a subclass or contact us at our issue tracker so we can discuss replacements before removal.
+   */
+  @Deprecated(forRemoval = true)
   void addFromCollection(Collection<? extends AbstractEntity> entities);
 
   void addItemFromDataCite(String locationUrl);
