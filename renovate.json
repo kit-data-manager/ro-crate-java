@@ -1,4 +1,6 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices", ":semanticCommits"],
   "labels": ["dependencies"],
   "baseBranches": ["development"],
   "minimumReleaseAge": "3 days"
