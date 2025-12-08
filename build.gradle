@@ -60,7 +60,7 @@ dependencies {
     // compare json documents in tests
     implementation 'com.github.fslev:json-compare:7.2'
     // url validator
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.0'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
     // logging
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
     // JSON-LD, Zenodo mapping
