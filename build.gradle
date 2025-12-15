@@ -66,7 +66,7 @@ dependencies {
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.7.0'
     // metadata validation, profiles based on JSON schema
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.9"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "2.0.1"
     implementation 'org.glassfish:jakarta.json:2.0.1'
     //JTE for template processing
     implementation('gg.jte:jte:3.2.1')
