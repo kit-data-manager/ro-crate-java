@@ -27,19 +27,19 @@ jobs:
     steps:
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
     - name: Set up openJDK version
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
       with:
         java-version: ${{ matrix.jdk }}
         distribution: 'zulu'
     - name: Install Dependencies
       run: npm install -g ro-crate-html-js
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5
+      uses: gradle/actions/setup-gradle@f29f5a9d7b09a7c6b29859002d29d24e1674c884 # v5
     - name: Build and Test with Gradle
       run: ./gradlew -Dprofile=release build
     - name: Upload (test) reports as artifact on GitHub on manual runs
       if: github.event_name == 'workflow_dispatch'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
       with:
         name: test-report ${{ matrix.os }} JDK ${{ matrix.jdk }}
         path: build/reports
