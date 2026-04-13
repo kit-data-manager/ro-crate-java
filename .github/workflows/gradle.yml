@@ -39,7 +39,7 @@ jobs:
       run: ./gradlew -Dprofile=release build
     - name: Upload (test) reports as artifact on GitHub on manual runs
       if: github.event_name == 'workflow_dispatch'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
       with:
         name: test-report ${{ matrix.os }} JDK ${{ matrix.jdk }}
         path: build/reports
