@@ -3,8 +3,6 @@ plugins {
     id 'jvm-test-suite'
     id 'application'
     id 'jacoco'
-    // Adds coveralls task for CI to send results to the coveralls service.
-    id "com.github.kt3k.coveralls" version "2.12.2"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
@@ -186,7 +184,7 @@ jacocoTestReport {
     dependsOn test
     reports {
         csv.required = true
-        xml.required = true // coveralls plugin depends on xml format report
+        xml.required = true // codecov plugin may depend on xml format report
     }
 }
 

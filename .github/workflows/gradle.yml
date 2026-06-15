@@ -9,7 +9,7 @@ name: Build & Tests
 
 on:
   push:
-    branches: [ main, development ]
+    branches: [main, development]
   pull_request:
   workflow_dispatch:
 
@@ -21,31 +21,50 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        jdk: [ 17, 21 ]  # (open)JDK releases
+        jdk: [21, 25] # (open)JDK releases
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-    - name: Set up openJDK version
-      uses: actions/setup-java@v5
-      with:
-        java-version: ${{ matrix.jdk }}
-        distribution: 'zulu'
-    - name: Install Dependencies
-      run: npm install -g ro-crate-html-js
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@5e2ebd065dc2488b7a6ad670704656cbbe1e8f60 # v6
-    - name: Build and Test with Gradle
-      run: ./gradlew -Dprofile=release build
-    - name: Upload (test) reports as artifact on GitHub on manual runs
-      if: github.event_name == 'workflow_dispatch'
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-      with:
-        name: test-report ${{ matrix.os }} JDK ${{ matrix.jdk }}
-        path: build/reports
-    - name: Do one Coveralls test report
-      if: matrix.os == 'ubuntu-latest' && matrix.jdk == 21
-      run: ./gradlew -Dprofile=release jacocoTestReport coveralls
-    - name: Compile Javadoc
-      if: matrix.os == 'ubuntu-latest' && matrix.jdk == 21
-      run: ./gradlew javadoc
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up openJDK version
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: "zulu"
+      - name: Install Dependencies
+        run: npm install -g ro-crate-html-js
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@5e2ebd065dc2488b7a6ad670704656cbbe1e8f60 # v6
+      - name: Build and Test with Gradle
+        run: ./gradlew -Dprofile=release build
+      - name: Upload (test) reports as artifact on GitHub on manual runs
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: test-report ${{ matrix.os }} JDK ${{ matrix.jdk }}
+          path: build/reports
+  coverage:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      jdkversion: 25
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up OpenJDK version ...
+        uses: actions/setup-java@v5
+        with:
+          distribution: "zulu"
+          java-version: ${{ env.jdkversion }}
+      - name: Install Dependencies
+        run: npm install -g ro-crate-html-js
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle (JDK ${{ env.jdkversion }})
+        run: ./gradlew clean check jacocoTestReport
+      - name: Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml #optional
+      - name: Compile Javadoc
+        run: ./gradlew javadoc
