@@ -23,8 +23,14 @@ println "JDK version: ${JavaVersion.current()}"
 println "Profile (system property): ${System.getProperty('profile')}"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+if (JavaVersion.current() == JavaVersion.VERSION_17) {
+    println "Setting encoding to UTF-8 manually"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
 }
 
 repositories {
