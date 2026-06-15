@@ -56,7 +56,7 @@ dependencies {
     // common file system operations
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
     // read from and write to zip files
-    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.6'
     // compare json documents in tests
     implementation 'com.github.fslev:json-compare:7.2'
     // url validator
