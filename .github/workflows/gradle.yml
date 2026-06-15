@@ -13,15 +13,12 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
 jobs:
   build:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        jdk: [21, 25] # (open)JDK releases
+        jdk: [21, 25, 26] # (open)JDK releases
     runs-on: ${{ matrix.os }}
 
     steps:
