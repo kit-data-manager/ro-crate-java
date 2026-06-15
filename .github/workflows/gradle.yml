@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        jdk: [21, 25, 26] # (open)JDK releases
+        jdk: [21] # (open)JDK releases
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -44,7 +44,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      jdkversion: 25
+      jdkversion: 21
     steps:
       - name: Checkout repo
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
