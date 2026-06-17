@@ -2,18 +2,21 @@ package edu.kit.datamanager.ro_crate.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-
+import com.networknt.schema.Error;
+import com.networknt.schema.InputFormat;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.SpecificationVersion;
+import com.networknt.schema.dialect.Dialects;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,25 +25,42 @@ import java.util.Set;
  */
 public class JsonSchemaValidation implements ValidatorStrategy {
 
-  private static final String defaultSchema = "json_schemas/default.json";
-  private JsonSchema schema;
+  private static final String defaultSchemaClasspath =
+    "classpath:json_schemas/default.json";
+  private Schema schema;
 
   private void getSchema(URI schemaUri) {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-    this.schema = factory.getSchema(schemaUri);
+    try {
+      // Enable fetchRemoteResources to support file:// and http:// $ref resolution
+      SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(
+        Dialects.getDraft201909(),
+        builder -> builder.schemaLoader(loader -> loader.fetchRemoteResources())
+      );
+
+      // For bundled schemas, use classpath: URI
+      String location =
+        schemaUri.getScheme() == null ||
+        "classpath".equals(schemaUri.getScheme())
+          ? defaultSchemaClasspath
+          : schemaUri.toString();
+
+      this.schema = schemaRegistry.getSchema(SchemaLocation.of(location));
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load schema: " + schemaUri, e);
+    }
   }
 
   /**
    * Default constructor for the JSON-schema validation.
    */
   public JsonSchemaValidation() {
-    try {
-      URI schemaUri = Objects.requireNonNull(
-          getClass().getClassLoader().getResource(defaultSchema)).toURI();
-      getSchema(schemaUri);
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
+    // Use classpath: URI scheme - $ref resolution is automatic!
+    SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(
+      Dialects.getDraft201909()
+    );
+    this.schema = schemaRegistry.getSchema(
+      SchemaLocation.of(defaultSchemaClasspath)
+    );
   }
 
   public JsonSchemaValidation(URI schemaUri) {
@@ -53,8 +73,10 @@ public class JsonSchemaValidation implements ValidatorStrategy {
   }
 
   public JsonSchemaValidation(JsonNode schema) {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-    this.schema = factory.getSchema(schema);
+    SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(
+      Dialects.getDraft201909()
+    );
+    this.schema = schemaRegistry.getSchema(schema.toString(), InputFormat.JSON);
   }
 
   @Override
@@ -62,13 +84,15 @@ public class JsonSchemaValidation implements ValidatorStrategy {
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     try {
       final JsonNode good = objectMapper.readTree(crate.getJsonMetadata());
-      Set<ValidationMessage> errors = this.schema.validate(good);
+      java.util.List<Error> errors = this.schema.validate(good);
       if (errors.size() == 0) {
         return true;
       } else {
-        System.err.println("This crate does not validate against the this schema."
-            + " If you haven't provided any schemas,"
-            + " then it does not validate against the default one.");
+        System.err.println(
+          "This crate does not validate against the this schema." +
+            " If you haven't provided any schemas," +
+            " then it does not validate against the default one."
+        );
         for (var e : errors) {
           System.err.println(e.getMessage());
         }
