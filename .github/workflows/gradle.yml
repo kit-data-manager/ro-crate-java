@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Set up openJDK version
         uses: actions/setup-java@v5
         with:
@@ -47,7 +47,7 @@ jobs:
       jdkversion: 25
     steps:
       - name: Checkout repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Set up OpenJDK version ...
         uses: actions/setup-java@v5
         with:
