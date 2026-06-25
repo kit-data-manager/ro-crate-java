@@ -10,5 +10,19 @@
   "baseBranchPatterns": [
     "development"
   ],
-  "minimumReleaseAge": "3 days"
+  "minimumReleaseAge": "3 days",
+  "prConcurrentLimit": 10,
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "extends": [
+        "helpers:pinGitHubActionDigestsToSemver"
+      ],
+      "minimumReleaseAge": "3 days",
+      "rangeStrategy": "replace"
+    }
+  ]
 }
