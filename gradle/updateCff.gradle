@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter
 
 tasks.register('updateCff') {
     group = 'release'
-    description = 'Updates the version in CITATION.cff file'
+    description = 'Updates the version in CITATION.cff file and commits the change'
 
     inputs.file("CITATION.cff")
     outputs.file("CITATION.cff")
@@ -61,6 +61,30 @@ tasks.register('updateCff') {
 
         cffFile.text = content
         println "Updated CITATION.cff to version ${version} and date-released ${today}"
+
+        // Commit the change to git
+        println "Committing CITATION.cff to git..."
+
+        // Helper function to run git commands
+        def runGitCommand = { command ->
+            def process = new ProcessBuilder(command as String[])
+                .directory(project.rootDir)
+                .inheritIO()
+                .start()
+            def exitCode = process.waitFor()
+            if (exitCode != 0) {
+                throw new GradleException("Git command failed: ${command.join(' ')} (exit code: ${exitCode})")
+            }
+            return exitCode
+        }
+
+        // Stage the file
+        runGitCommand(['git', 'add', 'CITATION.cff'] as String[])
+
+        // Commit the change
+        runGitCommand(['git', 'commit', '-m', "Update CITATION.cff to version ${version}"] as String[])
+
+        println "Successfully committed CITATION.cff"
     }
 }
 
