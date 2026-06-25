@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/java:25
+FROM mcr.microsoft.com/devcontainers/java:25@sha256:816affc3f88ddcf9700e6b23ab171e94b1f84d0046a3a5973449fd12c365c5c0
 
 # Install Node.js LTS
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
