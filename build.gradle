@@ -3,8 +3,6 @@ plugins {
     id 'jvm-test-suite'
     id 'application'
     id 'jacoco'
-    // Adds coveralls task for CI to send results to the coveralls service.
-    id "com.github.kt3k.coveralls" version "2.12.2"
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
@@ -13,7 +11,7 @@ plugins {
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id "io.freefair.maven-publish-java" version "9.1.0"
+    id "io.freefair.maven-publish-java" version "9.5.0"
 }
 
 group = 'edu.kit.datamanager'
@@ -45,7 +43,7 @@ ext {
 
 dependencies {
     // JUnit setup for testing
-    testImplementation(platform("org.junit:junit-bom:6.0.1"))
+    testImplementation(platform("org.junit:junit-bom:6.1.0"))
     testImplementation('org.junit.jupiter:junit-jupiter')
     testRuntimeOnly('org.junit.platform:junit-platform-launcher')
     // JSON object mapping / (de-)serialization
@@ -54,22 +52,22 @@ dependencies {
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
-    implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.22.0'
     // read from and write to zip files
-    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.5'
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.6'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:7.2'
+    implementation 'com.github.fslev:json-compare:8.1'
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.18'
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.7.0'
     // metadata validation, profiles based on JSON schema
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.9"
     implementation 'org.glassfish:jakarta.json:2.0.1'
     //JTE for template processing
-    implementation('gg.jte:jte:3.2.1')
+    implementation('gg.jte:jte:3.2.4')
     implementation("org.freemarker:freemarker:2.3.34")
 }
 
@@ -186,12 +184,12 @@ jacocoTestReport {
     dependsOn test
     reports {
         csv.required = true
-        xml.required = true // coveralls plugin depends on xml format report
+        xml.required = true // codecov plugin may depend on xml format report
     }
 }
 
 jacoco {
-    toolVersion = "0.8.14"
+    toolVersion = "0.8.15"
 }
 
 // maxParallelForks(2)

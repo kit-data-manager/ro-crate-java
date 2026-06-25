@@ -1,0 +1,12 @@
+{
+    "name": "Java (Gradle)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "zed": {
+            "extensions": ["java"]
+        }
+    },
+    "forwardPorts": [8080]
+}
