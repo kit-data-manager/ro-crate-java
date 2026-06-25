@@ -24,5 +24,8 @@
       "minimumReleaseAge": "3 days",
       "rangeStrategy": "replace"
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": false
+  }
 }
