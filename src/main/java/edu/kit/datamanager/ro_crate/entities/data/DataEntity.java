@@ -48,6 +48,16 @@ public class DataEntity extends AbstractEntity {
         this.addIdProperty("author", id);
     }
 
+    /**
+     * Gets the path of this entity.
+     * <p>
+     * When reading a crate, this will point to the entity's file within the crate.
+     * When creating a new entity or crate, it might point to a file outside the crate,
+     * as set by {@link DataEntityBuilder#setLocation(Path)}.
+     * Such a file will be copied into the crate when writing.
+     *
+     * @return the path to the file this entity represents.
+     */
     @JsonIgnore
     public Path getPath() {
         return path;
