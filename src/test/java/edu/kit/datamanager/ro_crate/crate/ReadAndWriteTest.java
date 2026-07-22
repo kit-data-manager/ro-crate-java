@@ -115,17 +115,17 @@ class ReadAndWriteTest {
 
       builder.addDataEntity(dataEntityBuilder.build());
     }
-    Path location = tempDir.resolve("out-crate-simple-file");
+    Path location = tempDir.resolve("out");
     {
       RoCrate crate = builder.build();
       CrateWriter<String> writer = Writers.newFolderWriter();
-      writer.save(crate, location.toAbsolutePath().toString());
+      writer.save(crate, location.toString());
     }
     {
       CrateReader<String> roCrateReader = Readers.newFolderReader();
 
       RoCrate roCrate = roCrateReader.readCrate(
-        location.toAbsolutePath().toString()
+        location.toString()
       );
       for (DataEntity dataEntity : roCrate.getAllDataEntities()) {
         System.out.println(dataEntity.getId() + ": " + dataEntity.getPath());
