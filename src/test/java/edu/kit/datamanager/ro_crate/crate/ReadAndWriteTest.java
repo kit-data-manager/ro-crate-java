@@ -1,6 +1,7 @@
 package edu.kit.datamanager.ro_crate.crate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -205,5 +206,79 @@ class ReadAndWriteTest {
       assertTrue(Files.exists(filepath));
       assertEquals(idEncoded, filepath.getFileName().toString());
     }
+  }
+
+  @Test
+  void testFilenamesAreSelfHealing(@TempDir Path tempDir) throws IOException {
+    // This is how we add the id. But the space will be encoded
+    String id = "id 42";
+    // This is how we get it out (the encoded id as it will exist in the crate)
+    String idEncoded = IdentifierUtils.encode(id).orElseThrow();
+
+    RoCrate.RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
+
+    // add dummy file
+    Path filepath_outside = tempDir.resolve("someFile.txt");
+    Files.writeString(filepath_outside, "File");
+
+    {
+      // Add file entity without a file with id
+      FileEntity.FileEntityBuilder fileEntityBuilder =
+        new FileEntity.FileEntityBuilder();
+      fileEntityBuilder.setId(id);
+      fileEntityBuilder.addTypes(List.of("File"));
+      fileEntityBuilder.setLocation(filepath_outside);
+
+      builder.addDataEntity(fileEntityBuilder.build());
+    }
+
+    Path cratepath = tempDir.resolve("test1");
+    {
+      Writers.newFolderWriter().save(builder.build(), cratepath.toString());
+      Path currentFilePath = cratepath.resolve(id);
+      assertTrue(currentFilePath.toFile().exists());
+      // swap file names
+      Path newFilePath = cratepath.resolve(idEncoded);
+      Files.move(currentFilePath, newFilePath);
+      assertFalse(currentFilePath.toFile().exists());
+      assertTrue(newFilePath.toFile().exists());
+    }
+
+    {
+        RoCrate crate = Readers.newFolderReader().readCrate(
+          cratepath.toString()
+        );
+
+        DataEntity entity = crate.getDataEntityById(idEncoded);
+        assertEquals(idEncoded, entity.getId());
+
+        // Even if a file's name is encoded, the path will work as expected
+        Path filepath = entity.getPath();
+        assertNotNull(filepath);
+        assertTrue(Files.exists(filepath));
+        assertEquals(idEncoded, filepath.getFileName().toString());
+    }
+
+    // When saving the crate again, the file will be renamed to the decoded id
+    Path cratepath2 = tempDir.resolve("test2");
+    {
+      Writers.newFolderWriter().save(builder.build(), cratepath2.toString());
+    }
+
+    {
+        RoCrate crate = Readers.newFolderReader().readCrate(
+          cratepath2.toString()
+        );
+
+        DataEntity entity = crate.getDataEntityById(idEncoded);
+        assertEquals(idEncoded, entity.getId());
+
+        // The filename is now decoded to the original id
+        Path filepath = entity.getPath();
+        assertNotNull(filepath);
+        assertTrue(Files.exists(filepath));
+        assertEquals(id, filepath.getFileName().toString());
+    }
+
   }
 }
