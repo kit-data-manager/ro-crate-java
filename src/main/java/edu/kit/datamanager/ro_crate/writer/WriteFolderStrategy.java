@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,16 +65,18 @@ public class WriteFolderStrategy implements GenericWriterStrategy<String> {
             }
         }
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            savetoFile(dataEntity, file);
+            saveToFile(dataEntity, file);
         }
     }
 
-    private void savetoFile(DataEntity entity, File file) throws IOException {
+    private void saveToFile(DataEntity entity, File file) throws IOException {
         if (entity.getPath() != null) {
+            String id = entity.getId();
+            String filename = IdentifierUtils.decode(id).orElse(id);
             if (entity.getPath().toFile().isDirectory()) {
-                FileUtils.copyDirectory(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+                FileUtils.copyDirectory(entity.getPath().toFile(), file.toPath().resolve(filename).toFile());
             } else {
-                FileUtils.copyFile(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+                FileUtils.copyFile(entity.getPath().toFile(), file.toPath().resolve(filename).toFile());
             }
         }
     }

@@ -4,6 +4,7 @@ import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 
+import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,6 +35,7 @@ interface CommonWriterTest extends TestableWriterStrategy {
 
         Path writtenCrate = tempDir.resolve("written-crate");
         Path extractionPath = tempDir.resolve("checkMe");
+        String id = "id will be encoded";
         {
             RoCrate builtCrate = getCrateWithFileAndDir(pathToFile, pathToDir)
                     .addDataEntity(new DataSetEntity.DataSetBuilder()
@@ -43,6 +45,11 @@ interface CommonWriterTest extends TestableWriterStrategy {
                             .setId("lots_of_little_files/subdir-renamed/")
                             .build()
                     )
+                    .addDataEntity(new FileEntity.FileEntityBuilder()
+                            .setId(id)
+                            .setLocation(pathToFile)
+                            .build()
+                    )
                     .build();
             this.saveCrate(builtCrate, writtenCrate);
             ensureCrateIsExtractedIn(writtenCrate, extractionPath);
@@ -50,6 +57,12 @@ interface CommonWriterTest extends TestableWriterStrategy {
 
         HelpFunctions.printFileTree(correctCrate);
         HelpFunctions.printFileTree(extractionPath);
+
+        // Ensure the file uses the id, not the encoded id as a file name
+        assertTrue(
+                Files.exists(extractionPath.resolve(id)),
+                "The file '%s' should exist, because this is the ID of the entity".formatted(id)
+        );
 
         // The actual file name should **not** appear in the crate
         String fileName = pathToFile.getFileName().toString();

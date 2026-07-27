@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
@@ -154,16 +155,18 @@ public class WriteZipStreamStrategy implements
         }
 
         boolean isDirectory = entity.getPath().toFile().isDirectory();
+        String id = entity.getId();
+        String filename = IdentifierUtils.decode(id).orElse(id);
         if (isDirectory) {
             ZipStreamUtil.addFolderToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + entity.getId());
+                    prefix + filename);
         } else {
             ZipStreamUtil.addFileToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + entity.getId());
+                    prefix + filename);
         }
     }
 }
