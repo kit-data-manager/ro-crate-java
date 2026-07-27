@@ -107,7 +107,7 @@ class ReadAndWriteTest {
     {
       FileEntity.FileEntityBuilder dataEntityBuilder =
         new FileEntity.FileEntityBuilder();
-      dataEntityBuilder.setId("id|1");
+      dataEntityBuilder.setId("id面试1");
       dataEntityBuilder.addTypes(List.of("File"));
       UUID uuid = UUID.randomUUID();
       Path path = tempDir.resolve(uuid.toString());
