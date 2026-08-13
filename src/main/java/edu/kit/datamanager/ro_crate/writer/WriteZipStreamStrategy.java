@@ -157,16 +157,46 @@ public class WriteZipStreamStrategy implements
         boolean isDirectory = entity.getPath().toFile().isDirectory();
         String id = entity.getId();
         String filename = IdentifierUtils.decode(id).orElse(id);
+        String safeName = sanitizeZipEntryName(filename);
+        if (safeName.isEmpty()) {
+            logger.warn("Skipping entity '{}': decoded name contains only traversal or absolute segments", id);
+            return;
+        }
+        String entryName = prefix + safeName;
         if (isDirectory) {
             ZipStreamUtil.addFolderToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + filename);
+                    entryName);
         } else {
             ZipStreamUtil.addFileToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + filename);
+                    entryName);
         }
+    }
+
+    /**
+     * Strips absolute markers and path-traversal segments from a name so it
+     * cannot escape the crate root when the zip is extracted.
+     *
+     * @param name the raw decoded entry name
+     * @return a safe relative entry name with no leading slashes or ".." segments
+     */
+    private static String sanitizeZipEntryName(String name) {
+        // zip entries always use forward slashes as separators
+        String normalized = name.replace('\\', '/');
+        String[] segments = normalized.split("/");
+        StringBuilder safe = new StringBuilder();
+        for (String segment : segments) {
+            if (segment.isEmpty() || segment.equals(".") || segment.equals("..")) {
+                continue;
+            }
+            if (safe.length() > 0) {
+                safe.append("/");
+            }
+            safe.append(segment);
+        }
+        return safe.toString();
     }
 }
