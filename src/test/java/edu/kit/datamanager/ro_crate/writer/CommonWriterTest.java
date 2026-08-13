@@ -220,4 +220,43 @@ interface CommonWriterTest extends TestableWriterStrategy {
         assertFalse(Files.exists(escapeTarget),
                 "Path traversal must be blocked: '%s' must not exist outside the crate".formatted(escapeTarget));
     }
+
+    /**
+     * Tests that valid files are accepted even when the destination path itself
+     * contains parent segments (e.g. "../"). The containment check must compare
+     * normalized paths so equivalent base folders are not falsely rejected.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testValidFileAcceptedWithParentSegmentInDestination(@TempDir Path tempDir) throws IOException {
+        // Create a subdirectory so the ".." in the destination path resolves correctly
+        Files.createDirectories(tempDir.resolve("outer"));
+
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Parent Segment Test",
+                "Crate written to a destination with a parent segment",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("valid.txt")
+                        .build())
+                .build();
+
+        // Destination contains a parent segment (..) that resolves inside tempDir
+        Path crateDestination = tempDir.resolve("outer").resolve("../my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        assertTrue(Files.isRegularFile(extractionPath.resolve("valid.txt")),
+                "Valid file should be written even when destination path contains parent segments");
+    }
 }
