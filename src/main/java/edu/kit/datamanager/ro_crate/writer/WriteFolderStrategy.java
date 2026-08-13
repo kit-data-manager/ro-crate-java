@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 /**
  * A class for writing a crate to a folder.
@@ -73,10 +74,17 @@ public class WriteFolderStrategy implements GenericWriterStrategy<String> {
         if (entity.getPath() != null) {
             String id = entity.getId();
             String filename = IdentifierUtils.decode(id).orElse(id);
+            Path baseFolder = file.toPath().toAbsolutePath();
+            Path destination = baseFolder.resolve(filename).normalize();
+            // defence-in-depth: ensure the resolved path remains inside the crate folder
+            if (!destination.startsWith(baseFolder)) {
+                logger.warn("Skipping entity '{}': resolved path '{}' escapes destination folder '{}'", id, destination, file);
+                return;
+            }
             if (entity.getPath().toFile().isDirectory()) {
-                FileUtils.copyDirectory(entity.getPath().toFile(), file.toPath().resolve(filename).toFile());
+                FileUtils.copyDirectory(entity.getPath().toFile(), destination.toFile());
             } else {
-                FileUtils.copyFile(entity.getPath().toFile(), file.toPath().resolve(filename).toFile());
+                FileUtils.copyFile(entity.getPath().toFile(), destination.toFile());
             }
         }
     }

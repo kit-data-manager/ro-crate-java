@@ -185,4 +185,39 @@ interface CommonWriterTest extends TestableWriterStrategy {
                 roCrate,
                 "/json/crate/fileAndDir.json");
     }
+
+    /**
+     * Tests that data entity ids containing path traversal segments (e.g. "../")
+     * cannot cause files to be written outside the crate destination.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testPathTraversalIsBlocked(@TempDir Path tempDir) throws IOException {
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Traversal Test",
+                "Crate with a traversal id",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("../escape.txt")
+                        .build())
+                .build();
+
+        Path crateDestination = tempDir.resolve("my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        Path escapeTarget = tempDir.resolve("escape.txt");
+        assertFalse(Files.exists(escapeTarget),
+                "Path traversal must be blocked: '%s' must not exist outside the crate".formatted(escapeTarget));
+    }
 }
