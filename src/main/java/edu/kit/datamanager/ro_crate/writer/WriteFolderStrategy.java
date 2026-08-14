@@ -74,7 +74,7 @@ public class WriteFolderStrategy implements GenericWriterStrategy<String> {
         if (entity.getPath() != null) {
             String id = entity.getId();
             String filename = IdentifierUtils.decode(id).orElse(id);
-            Path baseFolder = file.toPath().toAbsolutePath();
+            Path baseFolder = file.toPath().toAbsolutePath().normalize();
             Path destination = baseFolder.resolve(filename).normalize();
             // defence-in-depth: ensure the resolved path remains inside the crate folder
             if (!destination.startsWith(baseFolder)) {
