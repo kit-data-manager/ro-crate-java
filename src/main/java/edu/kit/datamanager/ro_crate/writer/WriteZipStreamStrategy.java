@@ -10,11 +10,14 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
@@ -154,16 +157,67 @@ public class WriteZipStreamStrategy implements
         }
 
         boolean isDirectory = entity.getPath().toFile().isDirectory();
+        String id = entity.getId();
+        String filename = IdentifierUtils.decode(id).orElse(id);
+        String safeName = sanitizeZipEntryName(filename);
+        if (safeName.isEmpty()) {
+            logger.warn("Skipping entity '{}': decoded name resolves outside the crate root", id);
+            return;
+        }
+        String entryName = prefix + safeName;
         if (isDirectory) {
             ZipStreamUtil.addFolderToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + entity.getId());
+                    entryName);
         } else {
             ZipStreamUtil.addFileToZipStream(
                     zipStream,
                     entity.getPath().toFile(),
-                    prefix + entity.getId());
+                    entryName);
         }
+    }
+
+    /**
+     * Normalizes a decoded entry name into a safe relative path, consistent
+     * with the containment check in {@link WriteFolderStrategy#saveToFile}.
+     * <p>
+     * Absolute paths (leading {@code /}) and Windows drive-qualified paths
+     * (e.g. {@code C:/}) are rejected. Internal {@code .} and {@code ..}
+     * segments are resolved; if the result escapes the virtual crate root
+     * the name is rejected.
+     *
+     * @param name the raw decoded entry name
+     * @return a canonical relative entry name, or an empty string if the name
+     *         is absolute, drive-qualified, or escapes the crate root
+     */
+    private static String sanitizeZipEntryName(String name) {
+        // zip entries always use forward slashes as separators
+        String normalized = name.replace('\\', '/');
+
+        // Reject absolute paths and Windows drive-qualified paths (e.g. C:/)
+        if (normalized.startsWith("/")
+                || (normalized.length() >= 2 && normalized.charAt(1) == ':'
+                        && Character.isLetter(normalized.charAt(0)))) {
+            return "";
+        }
+
+        // Normalize "." and ".." segments, rejecting paths that escape the root
+        String[] segments = normalized.split("/");
+        List<String> stack = new ArrayList<>();
+        for (String segment : segments) {
+            if (segment.isEmpty() || segment.equals(".")) {
+                continue;
+            }
+            if (segment.equals("..")) {
+                if (stack.isEmpty()) {
+                    return "";
+                }
+                stack.remove(stack.size() - 1);
+            } else {
+                stack.add(segment);
+            }
+        }
+        return String.join("/", stack);
     }
 }

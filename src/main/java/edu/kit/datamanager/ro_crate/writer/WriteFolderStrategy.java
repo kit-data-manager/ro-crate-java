@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 /**
  * A class for writing a crate to a folder.
@@ -64,16 +66,25 @@ public class WriteFolderStrategy implements GenericWriterStrategy<String> {
             }
         }
         for (DataEntity dataEntity : crate.getAllDataEntities()) {
-            savetoFile(dataEntity, file);
+            saveToFile(dataEntity, file);
         }
     }
 
-    private void savetoFile(DataEntity entity, File file) throws IOException {
+    private void saveToFile(DataEntity entity, File file) throws IOException {
         if (entity.getPath() != null) {
+            String id = entity.getId();
+            String filename = IdentifierUtils.decode(id).orElse(id);
+            Path baseFolder = file.toPath().toAbsolutePath().normalize();
+            Path destination = baseFolder.resolve(filename).normalize();
+            // defence-in-depth: ensure the resolved path remains inside the crate folder
+            if (!destination.startsWith(baseFolder)) {
+                logger.warn("Skipping entity '{}': resolved path '{}' escapes destination folder '{}'", id, destination, file);
+                return;
+            }
             if (entity.getPath().toFile().isDirectory()) {
-                FileUtils.copyDirectory(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+                FileUtils.copyDirectory(entity.getPath().toFile(), destination.toFile());
             } else {
-                FileUtils.copyFile(entity.getPath().toFile(), file.toPath().resolve(entity.getId()).toFile());
+                FileUtils.copyFile(entity.getPath().toFile(), destination.toFile());
             }
         }
     }

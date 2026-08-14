@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -240,12 +241,13 @@ public class CrateReader<T> {
         if (IdentifierUtils.isUrl(filepathOrId)) {
             return Optional.empty();
         }
-        return IdentifierUtils.decode(filepathOrId)
-                .map(decoded -> folder.toPath().resolve(decoded).normalize())
+        return Stream.of(IdentifierUtils.decode(filepathOrId).orElse(filepathOrId), filepathOrId)
+                .map(filename -> folder.toPath().resolve(filename).normalize().toAbsolutePath())
                 // defence-in-depth: ensure we are still inside the crate folder
                 .filter(resolved -> resolved.startsWith(folder.toPath()))
                 .map(Path::toFile)
-                .filter(File::exists);
+                .filter(File::exists)
+                .findFirst();
     }
 
     /**

@@ -4,6 +4,7 @@ import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 
+import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,6 +35,7 @@ interface CommonWriterTest extends TestableWriterStrategy {
 
         Path writtenCrate = tempDir.resolve("written-crate");
         Path extractionPath = tempDir.resolve("checkMe");
+        String id = "id will be encoded";
         {
             RoCrate builtCrate = getCrateWithFileAndDir(pathToFile, pathToDir)
                     .addDataEntity(new DataSetEntity.DataSetBuilder()
@@ -43,6 +45,11 @@ interface CommonWriterTest extends TestableWriterStrategy {
                             .setId("lots_of_little_files/subdir-renamed/")
                             .build()
                     )
+                    .addDataEntity(new FileEntity.FileEntityBuilder()
+                            .setId(id)
+                            .setLocation(pathToFile)
+                            .build()
+                    )
                     .build();
             this.saveCrate(builtCrate, writtenCrate);
             ensureCrateIsExtractedIn(writtenCrate, extractionPath);
@@ -50,6 +57,12 @@ interface CommonWriterTest extends TestableWriterStrategy {
 
         HelpFunctions.printFileTree(correctCrate);
         HelpFunctions.printFileTree(extractionPath);
+
+        // Ensure the file uses the id, not the encoded id as a file name
+        assertTrue(
+                Files.exists(extractionPath.resolve(id)),
+                "The file '%s' should exist, because this is the ID of the entity".formatted(id)
+        );
 
         // The actual file name should **not** appear in the crate
         String fileName = pathToFile.getFileName().toString();
@@ -171,5 +184,117 @@ interface CommonWriterTest extends TestableWriterStrategy {
         HelpFunctions.compareCrateJsonToFileInResources(
                 roCrate,
                 "/json/crate/fileAndDir.json");
+    }
+
+    /**
+     * Tests that data entity ids containing path traversal segments (e.g. "../")
+     * cannot cause files to be written outside the crate destination.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testPathTraversalIsBlocked(@TempDir Path tempDir) throws IOException {
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Traversal Test",
+                "Crate with a traversal id",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("../escape.txt")
+                        .build())
+                .build();
+
+        Path crateDestination = tempDir.resolve("my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        Path escapeTarget = tempDir.resolve("escape.txt");
+        assertFalse(Files.exists(escapeTarget),
+                "Path traversal must be blocked: '%s' must not exist outside the crate".formatted(escapeTarget));
+    }
+
+    /**
+     * Tests that valid files are accepted even when the destination path itself
+     * contains parent segments (e.g. "../"). The containment check must compare
+     * normalized paths so equivalent base folders are not falsely rejected.
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testValidFileAcceptedWithParentSegmentInDestination(@TempDir Path tempDir) throws IOException {
+        // Create a subdirectory so the ".." in the destination path resolves correctly
+        Files.createDirectories(tempDir.resolve("outer"));
+
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Parent Segment Test",
+                "Crate written to a destination with a parent segment",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("valid.txt")
+                        .build())
+                .build();
+
+        // Destination contains a parent segment (..) that resolves inside tempDir
+        Path crateDestination = tempDir.resolve("outer").resolve("../my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        assertTrue(Files.isRegularFile(extractionPath.resolve("valid.txt")),
+                "Valid file should be written even when destination path contains parent segments");
+    }
+
+    /**
+     * Tests that internal ".." segments are normalized rather than deleted.
+     * An entity id like "subdir/../valid.txt" should resolve to "valid.txt"
+     * (consistent with WriteFolderStrategy), not "subdir/valid.txt".
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testInternalTraversalSegmentsAreNormalized(@TempDir Path tempDir) throws IOException {
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Normalization Test",
+                "Crate with an internal traversal segment in an entity id",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("subdir/../valid.txt")
+                        .build())
+                .build();
+
+        Path crateDestination = tempDir.resolve("my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        // After normalization, the file should be at the root, not inside "subdir"
+        assertTrue(Files.isRegularFile(extractionPath.resolve("valid.txt")),
+                "Internal '..' should be normalized: 'subdir/../valid.txt' must resolve to 'valid.txt'");
+        assertFalse(Files.exists(extractionPath.resolve("subdir")),
+                "The 'subdir' segment should have been cancelled by the following '..'");
     }
 }
