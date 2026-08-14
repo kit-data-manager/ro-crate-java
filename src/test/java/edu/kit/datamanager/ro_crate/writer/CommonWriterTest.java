@@ -259,4 +259,42 @@ interface CommonWriterTest extends TestableWriterStrategy {
         assertTrue(Files.isRegularFile(extractionPath.resolve("valid.txt")),
                 "Valid file should be written even when destination path contains parent segments");
     }
+
+    /**
+     * Tests that internal ".." segments are normalized rather than deleted.
+     * An entity id like "subdir/../valid.txt" should resolve to "valid.txt"
+     * (consistent with WriteFolderStrategy), not "subdir/valid.txt".
+     *
+     * @param tempDir the temporary directory given by junit for our test
+     * @throws IOException if an error occurs while writing the crate
+     */
+    @Test
+    default void testInternalTraversalSegmentsAreNormalized(@TempDir Path tempDir) throws IOException {
+        Path sourceFile = tempDir.resolve("source.txt");
+        FileUtils.writeStringToFile(sourceFile.toFile(), "content", Charset.defaultCharset());
+
+        RoCrate crate = new RoCrate.RoCrateBuilder(
+                "Normalization Test",
+                "Crate with an internal traversal segment in an entity id",
+                "2024",
+                "https://creativecommons.org/licenses/by/4.0/")
+                .setPreview(new edu.kit.datamanager.ro_crate.preview.AutomaticPreview())
+                .addDataEntity(new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(sourceFile)
+                        .setId("subdir/../valid.txt")
+                        .build())
+                .build();
+
+        Path crateDestination = tempDir.resolve("my-crate");
+        this.saveCrate(crate, crateDestination);
+
+        Path extractionPath = tempDir.resolve("extracted");
+        ensureCrateIsExtractedIn(crateDestination, extractionPath);
+
+        // After normalization, the file should be at the root, not inside "subdir"
+        assertTrue(Files.isRegularFile(extractionPath.resolve("valid.txt")),
+                "Internal '..' should be normalized: 'subdir/../valid.txt' must resolve to 'valid.txt'");
+        assertFalse(Files.exists(extractionPath.resolve("subdir")),
+                "The 'subdir' segment should have been cancelled by the following '..'");
+    }
 }
