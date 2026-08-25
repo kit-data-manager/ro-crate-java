@@ -3,15 +3,14 @@ package edu.kit.datamanager.ro_crate.entities.validation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-
+import com.networknt.schema.Error;
+import com.networknt.schema.InputFormat;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.dialect.Dialects;
 import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Set;
 
@@ -20,27 +19,28 @@ import java.util.Set;
  */
 public class JsonSchemaValidation implements EntityValidationStrategy {
 
-  private static final URL entitySchemaDefault
-      = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader()
-      .getResource("json_schemas/entity_schema.json"));
-  private static final URL fieldSchemaDefault
-      = Objects.requireNonNull(JsonSchemaValidation.class.getClassLoader()
-      .getResource("json_schemas/entity_field_structure_schema.json"));
+  private static final String entitySchemaClasspath =
+    "classpath:json_schemas/entity_schema.json";
+  private static final String fieldSchemaClasspath =
+    "classpath:json_schemas/entity_field_structure_schema.json";
 
-  private JsonSchema entitySchema;
-  private JsonSchema entityFieldSchema;
+  private Schema entitySchema;
+  private Schema entityFieldSchema;
 
   /**
    *  Default constructor that uses the default schemas.
    */
   public JsonSchemaValidation() {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-    try {
-      this.entitySchema = factory.getSchema(entitySchemaDefault.toURI());
-      this.entityFieldSchema = factory.getSchema(fieldSchemaDefault.toURI());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
+    // Use classpath: URI scheme - $ref resolution is automatic!
+    SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(
+      Dialects.getDraft201909()
+    );
+    this.entitySchema = schemaRegistry.getSchema(
+      SchemaLocation.of(entitySchemaClasspath)
+    );
+    this.entityFieldSchema = schemaRegistry.getSchema(
+      SchemaLocation.of(fieldSchemaClasspath)
+    );
   }
 
   /**
@@ -50,16 +50,26 @@ public class JsonSchemaValidation implements EntityValidationStrategy {
    * @param fieldSchema schema for the field validation.
    */
   public JsonSchemaValidation(JsonNode entitySchema, JsonNode fieldSchema) {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-    this.entitySchema = factory.getSchema(entitySchema);
-    this.entityFieldSchema = factory.getSchema(fieldSchema);
+    SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(
+      Dialects.getDraft201909()
+    );
+    this.entitySchema = schemaRegistry.getSchema(
+      entitySchema.toString(),
+      InputFormat.JSON
+    );
+    this.entityFieldSchema = schemaRegistry.getSchema(
+      fieldSchema.toString(),
+      InputFormat.JSON
+    );
   }
 
   @Override
   public boolean validateEntity(JsonNode entity) {
-    Set<ValidationMessage> errors = this.entitySchema.validate(entity);
-    if (errors.size() != 0) {
-      System.err.println("This entity does not comply to the basic RO-Crate entity structure.");
+    java.util.List<Error> errors = this.entitySchema.validate(entity);
+    if (!errors.isEmpty()) {
+      System.err.println(
+        "This entity does not comply to the basic RO-Crate entity structure."
+      );
       errors.forEach(error -> System.err.println(error.getMessage()));
       return false;
     }
@@ -68,17 +78,23 @@ public class JsonSchemaValidation implements EntityValidationStrategy {
 
   @Override
   public boolean validateFieldOfEntity(JsonNode field) {
-    Set<ValidationMessage> errors = this.entityFieldSchema.validate(field);
+    java.util.List<Error> errors = this.entityFieldSchema.validate(field);
     if (!errors.isEmpty()) {
       ObjectMapper objectMapper = MyObjectMapper.getMapper();
       System.err.println("The property: ");
       try {
-        System.err.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(field));
+        System.err.println(
+          objectMapper
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(field)
+        );
       } catch (JsonProcessingException e) {
         e.printStackTrace();
       }
-      System.err.println("does not comply with the flattened structure"
-          + " of the RO-Crate json document.");
+      System.err.println(
+        "does not comply with the flattened structure" +
+          " of the RO-Crate json document."
+      );
       return false;
     }
     return true;
