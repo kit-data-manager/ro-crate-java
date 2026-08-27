@@ -68,7 +68,7 @@ dependencies {
     implementation 'org.glassfish:jakarta.json:2.0.1'
     //JTE for template processing
     implementation('gg.jte:jte:3.2.4')
-    implementation("org.freemarker:freemarker:2.3.34")
+    implementation("org.freemarker:freemarker:2.3.35")
 }
 
 // enable -Xlint:deprecation
