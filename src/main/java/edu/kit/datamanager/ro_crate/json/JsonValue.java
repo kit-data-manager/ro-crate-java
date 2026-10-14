@@ -1,7 +1,10 @@
 package edu.kit.datamanager.ro_crate.json;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * A JSON value of the neutral, Jackson-free tree model used inside
@@ -61,12 +64,72 @@ public abstract class JsonValue implements Iterable<JsonValue> {
     return false;
   }
 
+  /** Mirrors Jackson's {@code isTextual()}. */
+  public boolean isTextual() {
+    return false;
+  }
+
+  /**
+   * Mirrors Jackson's {@code get(String)}: null when absent or when this is
+   * not an object.
+   */
+  public JsonValue get(String name) {
+    return null;
+  }
+
+  /**
+   * Mirrors Jackson's {@code get(int)}: null when out of bounds or when this
+   * is not an array.
+   */
+  public JsonValue get(int index) {
+    return null;
+  }
+
+  /** Mirrors Jackson's {@code has(String)}: false unless this is an object. */
+  public boolean has(String name) {
+    return false;
+  }
+
+  /** Mirrors Jackson's {@code size()}: 0 unless this is a container. */
+  public int size() {
+    return 0;
+  }
+
+  /** Mirrors Jackson's {@code isEmpty()}: containers by size, strings by length. */
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+
   /**
    * Mirrors Jackson's {@code path(String)} on non-container nodes: always the
    * missing value. Containers override this.
    */
   public JsonValue path(String name) {
     return JsonMissing.INSTANCE;
+  }
+
+  /**
+   * Mirrors Jackson's {@code path(int)} on non-container nodes: always the
+   * missing value. Arrays override this.
+   */
+  public JsonValue path(int index) {
+    return JsonMissing.INSTANCE;
+  }
+
+  /**
+   * Mirrors Jackson's {@code fields()}: an entry iterator; empty for
+   * non-container nodes.
+   */
+  public Iterator<Map.Entry<String, JsonValue>> fields() {
+    return Collections.emptyIterator();
+  }
+
+  /**
+   * Mirrors Jackson's {@code valueStream()}: scalars stream themselves,
+   * containers stream their values/elements.
+   */
+  public Stream<JsonValue> valueStream() {
+    return Stream.of(this);
   }
 
   /**

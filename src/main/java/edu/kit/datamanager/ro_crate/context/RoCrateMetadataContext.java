@@ -1,20 +1,15 @@
 package edu.kit.datamanager.ro_crate.context;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -28,9 +23,11 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class RoCrateMetadataContext implements CrateMetadataContext {
 
-  public static final String DEFAULT_CONTEXT = "https://w3id.org/ro/crate/1.1/context";
-  protected static final String DEFAULT_CONTEXT_LOCATION = "default_context/version1.1.json";
-  protected static JsonNode defaultContext = null;
+  public static final String DEFAULT_CONTEXT =
+    "https://w3id.org/ro/crate/1.1/context";
+  protected static final String DEFAULT_CONTEXT_LOCATION =
+    "default_context/version1.1.json";
+  protected static JsonValue defaultContext = null;
 
   protected final Set<String> urls = new HashSet<>();
   protected final HashMap<String, String> contextMap = new HashMap<>();
@@ -63,9 +60,8 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    *
    * @param context the Json object of the context.
    */
-  public RoCrateMetadataContext(JsonNode context) {
-
-    Consumer<JsonNode> addPairs = x -> {
+  public RoCrateMetadataContext(JsonValue context) {
+    Consumer<JsonValue> addPairs = x -> {
       var iterate = x.fields();
       while (iterate.hasNext()) {
         var next = iterate.next();
@@ -74,7 +70,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
       }
     };
     if (context.isArray()) {
-      for (JsonNode jsonNode : context) {
+      for (JsonValue jsonNode : context) {
         if (jsonNode.isTextual()) {
           this.addToContextFromUrl(jsonNode.asText());
         } else if (jsonNode.isObject()) {
@@ -108,14 +104,13 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    * }
    * </pre>
    *
-   * @return an ObjectNode containing the JSON-LD context representation
+   * @return an JsonObject containing the JSON-LD context representation
    */
   @Override
-  public ObjectNode getContextJsonEntity() {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ArrayNode array = objectMapper.createArrayNode();
-    ObjectNode jsonNode = objectMapper.createObjectNode();
-    ObjectNode finalNode = objectMapper.createObjectNode();
+  public JsonObject getContextJsonEntity() {
+    JsonArray array = Json.arrayNode();
+    JsonObject jsonNode = Json.objectNode();
+    JsonObject finalNode = Json.objectNode();
     for (String e : urls) {
       array.add(e);
     }
@@ -150,19 +145,20 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    */
   @Override
   public boolean checkEntity(AbstractEntity entity) {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ObjectNode node = entity.getProperties().deepCopy();
+    JsonObject node = (JsonObject) entity.getProperties().deepCopy();
     node.remove("@id");
     node.remove("@type");
 
-    Set<String> types = objectMapper.convertValue(
-            entity.getProperties().path("@type"),
-            new TypeReference<>() {}
+    Set<String> types = extractStringValues(
+      entity.getProperties().path("@type")
     );
 
-    final Function<String, Boolean> isFail = checkMeStr -> this.contextMap.get(checkMeStr) == null
-            && this.contextMap.keySet().stream()
-            .noneMatch(key -> checkMeStr.startsWith(key + ":"));
+    final Function<String, Boolean> isFail = checkMeStr ->
+      this.contextMap.get(checkMeStr) == null &&
+      this.contextMap
+        .keySet()
+        .stream()
+        .noneMatch(key -> checkMeStr.startsWith(key + ":"));
 
     // check if the items in the array of types are present in the context
     for (String s : types) {
@@ -188,7 +184,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
     }
 
     // check if the fields of the entity are present in the context
-    for (var names = node.fieldNames(); names.hasNext();) {
+    for (var names = node.fieldNames(); names.hasNext(); ) {
       String s = names.next();
       if (IdentifierUtils.isUrl(s)) {
         // full URLs are considered fine
@@ -213,16 +209,17 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   public void addToContextFromUrl(String url) {
     this.urls.add(url);
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-
-    JsonNode jsonNode = null;
+    JsonValue jsonNode = null;
     if (url.equals(DEFAULT_CONTEXT)) {
       if (defaultContext != null) {
         jsonNode = defaultContext;
       } else {
-        try {
-          jsonNode = objectMapper.readTree(
-              getClass().getClassLoader().getResource(DEFAULT_CONTEXT_LOCATION));
+        try (
+          var contextStream = getClass()
+            .getClassLoader()
+            .getResourceAsStream(DEFAULT_CONTEXT_LOCATION)
+        ) {
+          jsonNode = Json.parse(contextStream);
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -233,8 +230,7 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
       CloseableHttpResponse response;
       try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
         response = httpclient.execute(httpGet);
-        jsonNode = objectMapper.readValue(response.getEntity().getContent(),
-            JsonNode.class);
+        jsonNode = Json.parse(response.getEntity().getContent());
       } catch (IOException e) {
         System.err.printf("Cannot get context from url %s%n", url);
         return;
@@ -243,17 +239,66 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
         defaultContext = jsonNode;
       }
     }
-    this.contextMap.putAll(objectMapper.convertValue(jsonNode.get("@context"),
-        new TypeReference<>() {
-        }));
+    this.contextMap.putAll(extractStringPairs(jsonNode.get("@context")));
   }
 
-    /**
-     * Adds a key-value pair to the context.
-     *
-     * @param key   the key to add. It may be a prefix or a term.
-     * @param value the value to add
-     */
+  /**
+   * Mirrors the former {@code convertValue(..., TypeReference<Set<String>>)}:
+   * collects the text values of a JSON value (a single string or an array of
+   * strings) into a set.
+   */
+  private static Set<String> extractStringValues(JsonValue value) {
+    Set<String> result = new HashSet<>();
+    if (value == null || value.isNull()) {
+      return result;
+    }
+    if (value.isArray()) {
+      for (JsonValue element : value) {
+        if (element.isTextual()) {
+          result.add(element.asText());
+        }
+      }
+    } else if (value.isTextual()) {
+      result.add(value.asText());
+    }
+    return result;
+  }
+
+  /**
+   * Mirrors the former {@code convertValue(..., TypeReference<Map<String,String>>)}:
+   * collects the string pairs of a context object. Non-object values mirror
+   * the former Jackson conversion failure (an IllegalArgumentException).
+   */
+  private static Map<String, String> extractStringPairs(JsonValue value) {
+    Map<String, String> result = new HashMap<>();
+    if (value == null || value.isNull()) {
+      return result;
+    }
+    if (!value.isObject()) {
+      throw new IllegalArgumentException(
+        "Cannot read context pairs from a non-object JSON value"
+      );
+    }
+    for (
+      Iterator<String> names = ((JsonObject) value).fieldNames();
+      names.hasNext();
+
+    ) {
+      String name = names.next();
+      JsonValue entryValue = ((JsonObject) value).get(name);
+      if (entryValue.isTextual()) {
+        result.put(name, entryValue.asText());
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Adds a key-value pair to the context.
+   *
+   * @param key   the key to add. It may be a prefix or a term.
+   * @param value the value to add
+   */
   @Override
   public void addToContext(String key, String value) {
     this.contextMap.put(key, value);
@@ -266,8 +311,9 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
    */
   @Override
   public String getValueOf(String key) {
-    return Optional.ofNullable(this.contextMap.get(key))
-            .orElseGet(() -> this.other.get(key));
+    return Optional.ofNullable(this.contextMap.get(key)).orElseGet(() ->
+      this.other.get(key)
+    );
   }
 
   /**
@@ -310,5 +356,4 @@ public class RoCrateMetadataContext implements CrateMetadataContext {
   public void deleteUrlFromContext(String url) {
     this.urls.remove(url);
   }
-
 }

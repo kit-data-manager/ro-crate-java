@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * The JSON object value: a mutable, insertion-ordered map from names to
@@ -119,8 +120,16 @@ public final class JsonObject extends JsonValue {
     return names.isEmpty();
   }
 
-  /** Property names in insertion order. */
-  public List<String> fieldNames() {
+  /**
+   * Property names in insertion order, mirroring Jackson's
+   * {@code fieldNames()} iterator.
+   */
+  public Iterator<String> fieldNames() {
+    return List.copyOf(names).iterator();
+  }
+
+  /** Property names as a list, in insertion order. */
+  public List<String> names() {
     return List.copyOf(names);
   }
 
@@ -141,6 +150,11 @@ public final class JsonObject extends JsonValue {
   @Override
   public Iterator<JsonValue> iterator() {
     return List.copyOf(values).iterator();
+  }
+
+  @Override
+  public Stream<JsonValue> valueStream() {
+    return List.copyOf(values).stream();
   }
 
   private List<Map.Entry<String, JsonValue>> namedValues() {

@@ -1,14 +1,15 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.kit.datamanager.ro_crate.Crate;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
 
 public class JsonDescriptor extends ContextualEntity {
@@ -78,13 +79,12 @@ public class JsonDescriptor extends ContextualEntity {
                 return new JsonDescriptor(entityBuilder);
             } else {
                 // use an array to collect all values into an array of simple @id objects.
-                ObjectMapper mapper = MyObjectMapper.getMapper();
-                ArrayNode array = mapper.createArrayNode();
+                JsonArray array = Json.arrayNode();
                 array.add(
-                        mapper.createObjectNode().put("@id", this.version.conformsTo));
+                        Json.objectNode().put("@id", this.version.conformsTo));
                 for (String other : this.otherConformsToValues) {
                     array.add(
-                            mapper.createObjectNode().put("@id", other));
+                            Json.objectNode().put("@id", other));
                 }
                 ContextualEntityBuilder entityBuilder = staticPropertiesPrefilledBuilder()
                         .addProperty(CONFORMS_TO, array);

@@ -1,15 +1,13 @@
 package edu.kit.datamanager.ro_crate.payload;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.special.JsonUtilFunctions;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,8 +20,8 @@ public class RoCratePayload implements CratePayload {
   private final HashMap<String, ContextualEntity> contextualEntities;
 
   /**
-    * A map containing for each entity id a set of ids of entities that are linked to it.
-    * This is used to make the removal of entities from the crate faster.
+   * A map containing for each entity id a set of ids of entities that are linked to it.
+   * This is used to make the removal of entities from the crate faster.
    */
   private final HashMap<String, Set<String>> associatedItems;
 
@@ -123,15 +121,13 @@ public class RoCratePayload implements CratePayload {
   }
 
   @Override
-  public ArrayNode getEntitiesMetadata() {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-
-    ArrayNode node = objectMapper.createArrayNode();
+  public JsonArray getEntitiesMetadata() {
+    JsonArray node = Json.arrayNode();
     for (DataEntity ent : this.getAllDataEntities()) {
-      node.add(objectMapper.convertValue(ent, ObjectNode.class));
+      node.add(ent.toJson());
     }
     for (ContextualEntity ent : this.getAllContextualEntities()) {
-      node.add(objectMapper.convertValue(ent, ObjectNode.class));
+      node.add(ent.toJson());
     }
     return node;
   }
@@ -144,16 +140,19 @@ public class RoCratePayload implements CratePayload {
   }
 
   private void removeAllOccurrencesOf(String entityId) {
-    this.getEntitiesByIds(this.associatedItems.get(entityId))
-            .forEach(entity -> JsonUtilFunctions.removeFieldsWith(entityId, entity.getProperties()));
+    this.getEntitiesByIds(this.associatedItems.get(entityId)).forEach(entity ->
+      JsonUtilFunctions.removeFieldsWith(entityId, entity.getProperties())
+    );
   }
 
   private Set<AbstractEntity> getEntitiesByIds(Collection<String> ids) {
-    if (ids == null) { return new HashSet<>(); }
-    return ids.stream()
-            .map(this::getEntityById)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+    if (ids == null) {
+      return new HashSet<>();
+    }
+    return ids
+      .stream()
+      .map(this::getEntityById)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toSet());
   }
-
 }

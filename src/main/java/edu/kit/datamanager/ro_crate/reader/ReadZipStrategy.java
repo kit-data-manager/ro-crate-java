@@ -1,18 +1,18 @@
 package edu.kit.datamanager.ro_crate.reader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
-import net.lingala.zip4j.ZipFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
+import net.lingala.zip4j.ZipFile;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 
 /**
  * Reads a crate from a ZIP archive (file).
@@ -42,7 +42,9 @@ import java.util.UUID;
 public class ReadZipStrategy implements GenericReaderStrategy<String> {
 
   protected final String ID = UUID.randomUUID().toString();
-  protected Path temporaryFolder = Path.of(String.format("./.tmp/ro-crate-java/zipReader/%s/", ID));
+  protected Path temporaryFolder = Path.of(
+    String.format("./.tmp/ro-crate-java/zipReader/%s/", ID)
+  );
   protected boolean isExtracted = false;
 
   /**
@@ -106,29 +108,41 @@ public class ReadZipStrategy implements GenericReaderStrategy<String> {
   }
 
   @Override
-  public ObjectNode readMetadataJson(String location) throws IOException {
+  public JsonObject readMetadataJson(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
+    File jsonMetadata = this.temporaryFolder
+      .resolve(JsonDescriptor.ID)
+      .toFile();
     if (!jsonMetadata.isFile()) {
       // Try to find the metadata file in subdirectories
       File firstSubdir = FileUtils.listFilesAndDirs(
-            temporaryFolder.toFile(),
-            FileFilterUtils.directoryFileFilter(),
-            null // not recursive
-        )
+        temporaryFolder.toFile(),
+        FileFilterUtils.directoryFileFilter(),
+        null // not recursive
+      )
         .stream()
         .limit(50)
-        .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
+        .filter(file ->
+          file
+            .toPath()
+            .toAbsolutePath()
+            .resolve(JsonDescriptor.ID)
+            .toFile()
+            .isFile()
+        )
         .findFirst()
-        .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
+        .orElseThrow(() ->
+          new IllegalStateException(
+            "No %s found in zip file".formatted(JsonDescriptor.ID)
+          )
+        );
       jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
     }
 
-    return objectMapper.readTree(jsonMetadata).deepCopy();
+    return (JsonObject) Json.parse(jsonMetadata).deepCopy();
   }
 
   @Override

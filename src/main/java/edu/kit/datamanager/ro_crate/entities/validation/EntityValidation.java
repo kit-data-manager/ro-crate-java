@@ -1,7 +1,10 @@
 package edu.kit.datamanager.ro_crate.entities.validation;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Class used for validation of entities before their creation.
@@ -14,11 +17,11 @@ public class EntityValidation {
     this.strategy = strategy;
   }
 
-  public boolean entityValidation(JsonNode entity) {
+  public boolean entityValidation(JsonValue entity) {
     return strategy.validateEntity(entity);
   }
 
-  public boolean fieldValidation(JsonNode entity) {
+  public boolean fieldValidation(JsonValue entity) {
     return strategy.validateFieldOfEntity(entity);
   }
 }

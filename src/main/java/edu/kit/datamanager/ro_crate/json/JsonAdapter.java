@@ -13,7 +13,6 @@ import java.io.InputStream;
  * (see {@link Json}).
  */
 public interface JsonAdapter {
-
   JsonObject objectNode();
 
   JsonArray arrayNode();
@@ -27,4 +26,7 @@ public interface JsonAdapter {
 
   /** Serializes a neutral tree to compact JSON text. */
   String write(JsonValue value) throws IOException;
+
+  /** Serializes a neutral tree to pretty-printed JSON text. */
+  String writePretty(JsonValue value) throws IOException;
 }

@@ -1,12 +1,9 @@
 package edu.kit.datamanager.ro_crate.entities.data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.datamanager.ro_crate.entities.serializers.HasPartSerializer;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,128 +16,144 @@ import java.util.stream.Collectors;
  */
 public class DataSetEntity extends DataEntity {
 
-    public static final String TYPE = "Dataset";
+  public static final String TYPE = "Dataset";
 
-    /**
-     * Points to the parts of this dataset.
-     * <p>
-     * This will be serialized to and deserialized from the "hasPart" property
-     * and exists for convenience to represent the additional capabilities of
-     * a DataSetEntity over a normal DataEntity.
-     */
-    @JsonSerialize(using = HasPartSerializer.class)
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public Set<String> hasPart;
+  /**
+   * Points to the parts of this dataset.
+   * <p>
+   * This will be serialized to and deserialized from the "hasPart" property
+   * and exists for convenience to represent the additional capabilities of
+   * a DataSetEntity over a normal DataEntity.
+   */
+  public Set<String> hasPart;
 
-    /**
-     * Constructor for instantiating a Dataset entity from the builder.
-     *
-     * @param entityBuilder the builder passed as argument.
-     */
-    public DataSetEntity(AbstractDataSetBuilder<?> entityBuilder) {
-        super(entityBuilder);
-        this.hasPart = entityBuilder.hasPart.stream()
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toSet());
-        this.addType(TYPE);
+  /**
+   * Constructor for instantiating a Dataset entity from the builder.
+   *
+   * @param entityBuilder the builder passed as argument.
+   */
+  public DataSetEntity(AbstractDataSetBuilder<?> entityBuilder) {
+    super(entityBuilder);
+    this.hasPart = entityBuilder.hasPart
+      .stream()
+      .filter(s -> !s.isBlank())
+      .collect(Collectors.toSet());
+    this.addType(TYPE);
+  }
+
+  public void removeFromHasPart(String str) {
+    this.hasPart.remove(str);
+  }
+
+  public void addToHasPart(String id) {
+    if (id != null && !id.isEmpty()) {
+      this.hasPart.add(id);
+    }
+  }
+
+  /**
+   * Check if the hasPart property contains a specific id.
+   *
+   * @deprecated use {@link #hasPart(String)} instead.
+   *
+   * @param id the id to check for
+   * @return true if the id is present, false otherwise
+   */
+  @Deprecated(forRemoval = true)
+  public boolean hasInHasPart(String id) {
+    return this.hasPart.contains(id);
+  }
+
+  /**
+   * Check if the hasPart property contains a specific id.
+   * @param id the id to check for
+   * @return true if the id is present, false otherwise
+   */
+  public boolean hasPart(String id) {
+    return this.hasPart.contains(id);
+  }
+
+  /**
+   * Appends the hasPart references, mirroring the former
+   * {@code HasPartSerializer}: a single {@code {"@id": ...}} object for one
+   * element, an array of such objects otherwise, in set iteration order.
+   */
+  @Override
+  protected void appendAdditionalJsonProperties(JsonObject output) {
+    if (this.hasPart.isEmpty()) {
+      return;
+    }
+    JsonArray array = Json.arrayNode();
+    for (String id : this.hasPart) {
+      array.add(Json.objectNode().put("@id", id));
+    }
+    output.set("hasPart", this.hasPart.size() == 1 ? array.get(0) : array);
+  }
+
+  abstract static class AbstractDataSetBuilder<T extends AbstractDataEntityBuilder<T>> extends AbstractDataEntityBuilder<T> {
+
+    Set<String> hasPart;
+
+    public AbstractDataSetBuilder() {
+      this.hasPart = new HashSet<>();
     }
 
-    public void removeFromHasPart(String str) {
-        this.hasPart.remove(str);
+    public T setHasPart(Set<String> hasPart) {
+      this.hasPart = hasPart;
+      return self();
     }
 
-    public void addToHasPart(String id) {
-        if (id != null && !id.isEmpty()) {
-            this.hasPart.add(id);
-        }
+    public T addToHasPart(DataEntity dataEntity) {
+      if (dataEntity != null) {
+        this.hasPart.add(dataEntity.getId());
+        this.relatedItems.add(dataEntity.getId());
+      }
+      return self();
     }
 
-    /**
-     * Check if the hasPart property contains a specific id.
-     *
-     * @deprecated use {@link #hasPart(String)} instead.
-     *
-     * @param id the id to check for
-     * @return true if the id is present, false otherwise
-     */
-    @Deprecated(forRemoval = true)
-    public boolean hasInHasPart(String id) {
-        return this.hasPart.contains(id);
+    public T addToHasPart(String dataEntity) {
+      if (dataEntity != null) {
+        this.hasPart.add(dataEntity);
+        this.relatedItems.add(dataEntity);
+      }
+      return self();
     }
 
-    /**
-     * Check if the hasPart property contains a specific id.
-     * @param id the id to check for
-     * @return true if the id is present, false otherwise
-     */
-    public boolean hasPart(String id) {
-        return this.hasPart.contains(id);
+    @Override
+    public T setAllUnsafe(JsonObject properties) {
+      super.setAllUnsafe(properties);
+      JsonValue hasPart = properties.path("hasPart");
+      String txt = hasPart.asText();
+      if (!txt.isBlank()) {
+        this.hasPart.add(txt);
+      }
+      hasPart
+        .valueStream()
+        .map(JsonValue::asText)
+        .filter(value -> !value.isBlank())
+        .forEach(value -> this.hasPart.add(value));
+      return self();
     }
 
-    abstract static class AbstractDataSetBuilder<T extends AbstractDataEntityBuilder<T>> extends
-            AbstractDataEntityBuilder<T> {
+    @Override
+    public abstract DataSetEntity build();
+  }
 
-        Set<String> hasPart;
+  /**
+   * Builder for the helping class DataSetEntity.
+   */
+  public static final class DataSetBuilder
+    extends AbstractDataSetBuilder<DataSetBuilder>
+  {
 
-        public AbstractDataSetBuilder() {
-            this.hasPart = new HashSet<>();
-        }
-
-        public T setHasPart(Set<String> hasPart) {
-            this.hasPart = hasPart;
-            return self();
-        }
-
-        public T addToHasPart(DataEntity dataEntity) {
-            if (dataEntity != null) {
-                this.hasPart.add(dataEntity.getId());
-                this.relatedItems.add(dataEntity.getId());
-            }
-            return self();
-        }
-
-        public T addToHasPart(String dataEntity) {
-            if (dataEntity != null) {
-                this.hasPart.add(dataEntity);
-                this.relatedItems.add(dataEntity);
-            }
-            return self();
-        }
-
-        @Override
-        public T setAllUnsafe(ObjectNode properties) {
-            super.setAllUnsafe(properties);
-            JsonNode hasPart = properties.path("hasPart");
-            String txt = hasPart.asText();
-            if (!txt.isBlank()) {
-                this.hasPart.add(txt);
-            }
-            hasPart.valueStream()
-                    .map(JsonNode::asText)
-                    .filter(value -> !value.isBlank())
-                    .forEach(
-                            value -> this.hasPart.add(value)
-                    );
-            return self();
-        }
-
-        @Override
-        public abstract DataSetEntity build();
+    @Override
+    public DataSetBuilder self() {
+      return this;
     }
 
-    /**
-     * Builder for the helping class DataSetEntity.
-     */
-    public static final class DataSetBuilder extends AbstractDataSetBuilder<DataSetBuilder> {
-
-        @Override
-        public DataSetBuilder self() {
-            return this;
-        }
-
-        @Override
-        public DataSetEntity build() {
-            return new DataSetEntity(this);
-        }
+    @Override
+    public DataSetEntity build() {
+      return new DataSetEntity(this);
     }
+  }
 }

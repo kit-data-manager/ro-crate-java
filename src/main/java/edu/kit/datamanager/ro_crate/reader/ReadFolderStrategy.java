@@ -1,9 +1,9 @@
 package edu.kit.datamanager.ro_crate.reader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -17,11 +17,12 @@ import java.nio.file.Path;
 public class ReadFolderStrategy implements GenericReaderStrategy<String> {
 
   @Override
-  public ObjectNode readMetadataJson(String location) throws IOException {
-    Path metadata = new File(location).toPath().resolve("ro-crate-metadata.json");
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ObjectNode objectNode = objectMapper.createObjectNode();
-    objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
+  public JsonObject readMetadataJson(String location) throws IOException {
+    Path metadata = new File(location)
+      .toPath()
+      .resolve("ro-crate-metadata.json");
+    JsonObject objectNode = Json.objectNode();
+    objectNode = (JsonObject) Json.parse(metadata.toFile()).deepCopy();
     return objectNode;
   }
 

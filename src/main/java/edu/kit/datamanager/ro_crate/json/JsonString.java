@@ -27,6 +27,17 @@ public final class JsonString extends JsonValue {
   }
 
   @Override
+  public boolean isTextual() {
+    return true;
+  }
+
+  /** Mirrors Jackson's {@code TextNode.isEmpty()}. */
+  @Override
+  public boolean isEmpty() {
+    return value.isEmpty();
+  }
+
+  @Override
   public String asText() {
     return value;
   }

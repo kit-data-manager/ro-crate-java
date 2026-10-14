@@ -1,10 +1,5 @@
 package edu.kit.datamanager.ro_crate.externalproviders.dataentities;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.RoCrate.RoCrateBuilder;
@@ -15,8 +10,10 @@ import edu.kit.datamanager.ro_crate.entities.contextual.PersonEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.externalproviders.organizationprovider.RorProvider;
 import edu.kit.datamanager.ro_crate.externalproviders.personprovider.OrcidProvider;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,7 +49,7 @@ public class ImportFromDataCite {
 
   /**
    * This will take a DataCite entry and create a crate from it.
-   * 
+   *
    * Except of the url, all parameters are optional. If present, they will be
    * added to the crate.
    *
@@ -65,12 +62,12 @@ public class ImportFromDataCite {
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteResource(
-      String url,
-      Optional<String> name,
-      Optional<String> description,
-      Optional<String> datePublished,
-      Optional<String> licenseId) {
-
+    String url,
+    Optional<String> name,
+    Optional<String> description,
+    Optional<String> datePublished,
+    Optional<String> licenseId
+  ) {
     RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
     name.ifPresent(builder::addName);
     description.ifPresent(builder::addDescription);
@@ -90,8 +87,9 @@ public class ImportFromDataCite {
    * @param crate the existing crate.
    */
   public static void addDataCiteToCrate(String url, Crate crate) {
-    var entities =
-        getEntitiesFromDataCiteResource(Objects.requireNonNull(getJsonNodeFromDataCite(url)));
+    var entities = getEntitiesFromDataCiteResource(
+      Objects.requireNonNull(getJsonNodeFromDataCite(url))
+    );
     crate.addFromCollection(entities);
   }
 
@@ -106,12 +104,12 @@ public class ImportFromDataCite {
    * @return the created crate.
    */
   public static Crate createCrateFromDataCiteJson(
-      JsonNode json,
-      Optional<String> name,
-      Optional<String> description,
-      Optional<String> datePublished,
-      Optional<String> licenseId) {
-
+    JsonValue json,
+    Optional<String> name,
+    Optional<String> description,
+    Optional<String> datePublished,
+    Optional<String> licenseId
+  ) {
     RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
     name.ifPresent(builder::addName);
     description.ifPresent(builder::addDescription);
@@ -123,20 +121,18 @@ public class ImportFromDataCite {
     return crate;
   }
 
-  public static void addDataCiteToCrateFromJson(JsonNode json, Crate crate) {
+  public static void addDataCiteToCrateFromJson(JsonValue json, Crate crate) {
     var entities = getEntitiesFromDataCiteResource(json);
     crate.addFromCollection(entities);
   }
 
-  private static JsonNode getJsonNodeFromDataCite(String url) {
+  private static JsonValue getJsonNodeFromDataCite(String url) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     HttpGet request = new HttpGet(url);
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    ObjectNode jsonNode;
+    JsonObject jsonNode;
     try {
       CloseableHttpResponse response = httpClient.execute(request);
-      jsonNode = objectMapper.readValue(response.getEntity().getContent(),
-          ObjectNode.class);
+      jsonNode = (JsonObject) Json.parse(response.getEntity().getContent());
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -144,55 +140,57 @@ public class ImportFromDataCite {
     return jsonNode;
   }
 
-  private static List<AbstractEntity> getEntitiesFromDataCiteResource(JsonNode jsonNode) {
-
+  private static List<AbstractEntity> getEntitiesFromDataCiteResource(
+    JsonValue jsonNode
+  ) {
     List<AbstractEntity> entityList = new ArrayList<>();
-    final ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    final Map<String, String> relationType = Stream.of(new String[][]{
-        {"IsCitedBy", "isPartOf"},
-        {"Cites", "citation"},
-        {"IsSupplementTo", "isPartOf"},
-        {"IsSupplementedBy", "isPartOf"},
-        {"IsContinuedBy", "isPartOf"},
-        {"Continues", "isBasedOn"},
-        {"IsDescribedBy", "hasPart"},
-        {"Describes", "isPartOf"},
-        {"HasMetadata", "hasPart"},
-        {"IsMetadataFor", "isPartOf"},
-        {"HasVersion", "hasPart"},
-        {"IsVersionOf", "isPartOf"},
-        {"IsNewVersionOf", "isBasedOn"},
-        {"IsPreviousVersionOf", "PredecessorOf"},
-        {"IsPartOf", "isPartOf"},
-        {"HasPart", "hasPart"},
-        {"IsPublishedIn", "isPartOf"},
-        {"IsReferencedBy", "isPartOf"},
-        {"References", "citation"},
-        {"IsDocumentedBy", "hasPart"},
-        {"Documents", "isPartOf"},
-        {"IsCompiledBy", "hasPart"},
-        {"Compiles", "isPartOf"},
-        {"IsVariantFormOf", "isBasedOn"},
-        {"IsOriginalFormOf", "sameAs"},
-        {"IsIdenticalTo", "sameAs"},
-        {"IsReviewedBy", "hasPart"},
-        {"Reviews", "isPartOf"},
-        {"IsDerivedFrom", "isBasedOn"},
-        {"IsSourceOf", "isBasedOn"},
-        {"IsRequiredBy", "isPartOf"},
-        {"Requires", "hasPart"},
-        {"IsObsoletedBy", "hasPart"},
-        {"Obsoletes", "isBasedOn"}
-    }).collect(Collectors.collectingAndThen(
+    final Map<String, String> relationType = Stream.of(new String[][] {
+      { "IsCitedBy", "isPartOf" },
+      { "Cites", "citation" },
+      { "IsSupplementTo", "isPartOf" },
+      { "IsSupplementedBy", "isPartOf" },
+      { "IsContinuedBy", "isPartOf" },
+      { "Continues", "isBasedOn" },
+      { "IsDescribedBy", "hasPart" },
+      { "Describes", "isPartOf" },
+      { "HasMetadata", "hasPart" },
+      { "IsMetadataFor", "isPartOf" },
+      { "HasVersion", "hasPart" },
+      { "IsVersionOf", "isPartOf" },
+      { "IsNewVersionOf", "isBasedOn" },
+      { "IsPreviousVersionOf", "PredecessorOf" },
+      { "IsPartOf", "isPartOf" },
+      { "HasPart", "hasPart" },
+      { "IsPublishedIn", "isPartOf" },
+      { "IsReferencedBy", "isPartOf" },
+      { "References", "citation" },
+      { "IsDocumentedBy", "hasPart" },
+      { "Documents", "isPartOf" },
+      { "IsCompiledBy", "hasPart" },
+      { "Compiles", "isPartOf" },
+      { "IsVariantFormOf", "isBasedOn" },
+      { "IsOriginalFormOf", "sameAs" },
+      { "IsIdenticalTo", "sameAs" },
+      { "IsReviewedBy", "hasPart" },
+      { "Reviews", "isPartOf" },
+      { "IsDerivedFrom", "isBasedOn" },
+      { "IsSourceOf", "isBasedOn" },
+      { "IsRequiredBy", "isPartOf" },
+      { "Requires", "hasPart" },
+      { "IsObsoletedBy", "hasPart" },
+      { "Obsoletes", "isBasedOn" },
+    }).collect(
+      Collectors.collectingAndThen(
         Collectors.toMap(data -> data[0], data -> data[1]),
-        Collections::<String, String>unmodifiableMap));
+        Collections::<String, String>unmodifiableMap
+      )
+    );
 
     final Collection<AbstractEntity> citation = new HashSet<>();
     final Collection<AbstractEntity> hasPart = new HashSet<>();
     final Collection<AbstractEntity> IsBasedOn = new HashSet<>();
     final Collection<AbstractEntity> IsPartOf = new HashSet<>();
     final Collection<AbstractEntity> sameAs = new HashSet<>();
-
 
     // the id of the main entity
     String id = null;
@@ -207,7 +205,7 @@ public class ImportFromDataCite {
 
     // main entity type
     String type = "CreativeWork";
-    JsonNode types = jsonNode.get("types");
+    JsonValue types = jsonNode.get("types");
     var schemaType = types.get("schemaOrg");
     if (schemaType != null) {
       type = schemaType.asText();
@@ -215,7 +213,7 @@ public class ImportFromDataCite {
 
     // the title
     String title;
-    JsonNode titles = jsonNode.get("titles");
+    JsonValue titles = jsonNode.get("titles");
     if (titles == null || titles.isEmpty()) {
       // no title
       title = null;
@@ -225,11 +223,11 @@ public class ImportFromDataCite {
 
     // publicationYear
     String publicationYear;
-    JsonNode pubYear = jsonNode.get("publicationYear");
+    JsonValue pubYear = jsonNode.get("publicationYear");
     publicationYear = pubYear != null ? pubYear.asText() : null;
 
     // the creators + their affiliations
-    JsonNode creators = jsonNode.get("creators");
+    JsonValue creators = jsonNode.get("creators");
     List<AbstractEntity> creatorsList = new ArrayList<>();
     if (creators != null) {
       for (var e : creators) {
@@ -240,15 +238,16 @@ public class ImportFromDataCite {
 
     // the publisher
     OrganizationEntity publisher = null;
-    JsonNode publisherNode = jsonNode.get("publisher");
+    JsonValue publisherNode = jsonNode.get("publisher");
     if (publisherNode != null && publisherNode.isTextual()) {
       publisher = new OrganizationEntity.OrganizationEntityBuilder()
-          .addProperty("name", publisherNode.asText()).build();
+        .addProperty("name", publisherNode.asText())
+        .build();
       entityList.add(publisher);
     }
 
     // contributors
-    JsonNode contributors = jsonNode.get("contributors");
+    JsonValue contributors = jsonNode.get("contributors");
     List<AbstractEntity> contributorsList = new ArrayList<>();
     if (contributors != null) {
       for (var e : contributors) {
@@ -258,8 +257,8 @@ public class ImportFromDataCite {
     }
 
     // description
-    ArrayNode descriptionArray = objectMapper.createArrayNode();
-    JsonNode descriptionNode = jsonNode.get("descriptions");
+    JsonArray descriptionArray = Json.arrayNode();
+    JsonValue descriptionNode = jsonNode.get("descriptions");
     if (descriptionNode != null) {
       for (var e : descriptionNode) {
         var desc = e.get("description");
@@ -271,7 +270,7 @@ public class ImportFromDataCite {
     String dateCreated = null;
     String dateModified = null;
     String datePublished = null;
-    JsonNode dates = jsonNode.get("dates");
+    JsonValue dates = jsonNode.get("dates");
     if (dates != null) {
       for (var el : dates) {
         String dataType = el.get("dateType").asText();
@@ -298,15 +297,15 @@ public class ImportFromDataCite {
     }
 
     // subjects which are mapped to keywords
-    JsonNode subjects = jsonNode.get("subjects");
-    ArrayNode keyWordsArray = objectMapper.createArrayNode();
+    JsonValue subjects = jsonNode.get("subjects");
+    JsonArray keyWordsArray = Json.arrayNode();
     if (subjects != null) {
       for (var sub : subjects) {
         keyWordsArray.add(sub.get("subject").asText());
       }
     }
 
-    Consumer<DataEntity> addRelatedEntity = (entity) -> {
+    Consumer<DataEntity> addRelatedEntity = entity -> {
       var mapEntry = relationType.get(entity.getProperty("keywords").asText());
       if (mapEntry != null) {
         switch (mapEntry) {
@@ -330,32 +329,32 @@ public class ImportFromDataCite {
     };
 
     // relatedIdentifiers
-    JsonNode related = jsonNode.get("relatedIdentifiers");
+    JsonValue related = jsonNode.get("relatedIdentifiers");
     if (related != null) {
       for (var element : related) {
         String relatedId = element.get("relatedIdentifier").asText();
         String relatedIdType = element.get("relatedIdentifierType").asText();
         String relationTypeString = element.get("relationType").asText();
         DataEntity relatedItem = new DataEntity.DataEntityBuilder()
-            .addType("CreativeWork")
-            .setId(relatedId)
-            .addProperty("description", relatedIdType)
-            .addProperty("keywords", relationTypeString)
-            .build();
+          .addType("CreativeWork")
+          .setId(relatedId)
+          .addProperty("description", relatedIdType)
+          .addProperty("keywords", relationTypeString)
+          .build();
         entityList.add(relatedItem);
 
         addRelatedEntity.accept(relatedItem);
       }
     }
 
-
     // geolocations
-    JsonNode geo = jsonNode.get("geoLocations");
+    JsonValue geo = jsonNode.get("geoLocations");
     Collection<AbstractEntity> geoSet = new HashSet<>();
     if (geo != null) {
       for (var geoThing : geo) {
         // geo point
-        ContextualEntity geoEntity = new ContextualEntity.ContextualEntityBuilder()
+        ContextualEntity geoEntity =
+          new ContextualEntity.ContextualEntityBuilder()
             .addType("Place")
             .build();
 
@@ -367,10 +366,10 @@ public class ImportFromDataCite {
         if (geoThing.get("geoLocationPoint") != null) {
           var point = geoThing.get("geoLocationPoint");
           var geoCoordinate = new ContextualEntity.ContextualEntityBuilder()
-              .addType("GeoCoordinates")
-              .addProperty("latitude", point.get("pointLatitude"))
-              .addProperty("longitude", point.get("pointLongitude"))
-              .build();
+            .addType("GeoCoordinates")
+            .addProperty("latitude", point.get("pointLatitude"))
+            .addProperty("longitude", point.get("pointLongitude"))
+            .build();
           entityList.add(geoCoordinate);
           geoEntity.addIdProperty("geo", geoCoordinate.getId());
         }
@@ -384,9 +383,14 @@ public class ImportFromDataCite {
           String topRightLongitude = box.get("eastBoundLongitude").asText();
           String topRightLatitude = box.get("northBoundLatitude").asText();
 
-          boxString = bottomLeftLongitude + "," + bottomLeftLatitude + " "
-              + topRightLongitude + "," + topRightLatitude;
-
+          boxString =
+            bottomLeftLongitude +
+            "," +
+            bottomLeftLatitude +
+            " " +
+            topRightLongitude +
+            "," +
+            topRightLatitude;
         }
         if (geoThing.get("geoLocationPolygon") != null) {
           StringBuilder stringBuilder = new StringBuilder();
@@ -394,13 +398,18 @@ public class ImportFromDataCite {
             var point = polygonEl.get("polygonPoint");
             String longitude = point.get("pointLongitude").asText();
             String latitude = point.get("pointLatitude").asText();
-            stringBuilder.append(longitude).append(",").append(latitude).append(" ");
+            stringBuilder
+              .append(longitude)
+              .append(",")
+              .append(latitude)
+              .append(" ");
           }
           polygonString = stringBuilder.toString();
         }
 
         if (boxString != null || polygonString != null) {
-          ContextualEntity shapeEntity = new ContextualEntity.ContextualEntityBuilder()
+          ContextualEntity shapeEntity =
+            new ContextualEntity.ContextualEntityBuilder()
               .addType("GeoShape")
               .addProperty("box", boxString)
               .addProperty("box", polygonString)
@@ -420,7 +429,7 @@ public class ImportFromDataCite {
     }
 
     // alternateIdentifier
-    ArrayNode alternate = objectMapper.createArrayNode();
+    JsonArray alternate = Json.arrayNode();
     if (jsonNode.get("alternateIdentifiers") != null) {
       for (var el : jsonNode) {
         alternate.add(el.get("alternateIdentifier").asText());
@@ -428,15 +437,15 @@ public class ImportFromDataCite {
     }
 
     // size
-    ArrayNode sizes = null;
+    JsonArray sizes = null;
     if (jsonNode.get("sizes") != null) {
-      sizes = (ArrayNode) jsonNode.get("sizes");
+      sizes = (JsonArray) jsonNode.get("sizes");
     }
 
     // format
-    ArrayNode formats = null;
+    JsonArray formats = null;
     if (jsonNode.get("formats") != null) {
-      formats = (ArrayNode) jsonNode.get("formats");
+      formats = (JsonArray) jsonNode.get("formats");
     }
 
     // rights
@@ -458,7 +467,8 @@ public class ImportFromDataCite {
           rightsIdentifier = element.get("rightsIdentifier").asText();
         }
 
-        ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
+        ContextualEntity license =
+          new ContextualEntity.ContextualEntityBuilder()
             .addType("CreativeWork")
             .addProperty("name", licenseName)
             .setId(rightsUri)
@@ -475,7 +485,6 @@ public class ImportFromDataCite {
     Set<AbstractEntity> funderSet = new HashSet<>();
     Set<AbstractEntity> grandSet = new HashSet<>();
     if (jsonNode.get(fundingNameString) != null) {
-
       for (var el : jsonNode.get(fundingNameString)) {
         var funderId = el.get("funderIdentifierType");
         PersonEntity funder;
@@ -483,10 +492,13 @@ public class ImportFromDataCite {
           funder = OrcidProvider.getPerson(funderId.asText());
         } else {
           funder = new PersonEntity.PersonEntityBuilder()
-              .addProperty("name", el.get("funderName"))
-              .setId(el.get("funderIdentifier") == null
-                  ? null : el.get("funderIdentifier").asText())
-              .build();
+            .addProperty("name", el.get("funderName"))
+            .setId(
+              el.get("funderIdentifier") == null
+                ? null
+                : el.get("funderIdentifier").asText()
+            )
+            .build();
         }
         funderSet.add(funder);
         entityList.add(funder);
@@ -496,7 +508,8 @@ public class ImportFromDataCite {
         var awardTitle = el.get("awardTitle");
         var awardNumber = el.get("awardNumber");
         if (awardNumber != null || awardTitle != null || awardUri != null) {
-          ContextualEntity grant = new ContextualEntity.ContextualEntityBuilder()
+          ContextualEntity grant =
+            new ContextualEntity.ContextualEntityBuilder()
               .addType("Grant")
               .setId(awardUri == null ? null : awardUri.asText())
               .addProperty("name", awardTitle)
@@ -520,53 +533,55 @@ public class ImportFromDataCite {
       }
     }
     DataEntity dataEntity = new DataEntity.DataEntityBuilder()
-        .setId(id)
-        .addType(type)
-        .addProperty("title", title)
-        .addProperty("publicationYear", publicationYear)
-        .addIdProperty("publisher", publisher)
-        .addIdFromCollectionOfEntities("creator", creatorsList)
-        .addIdFromCollectionOfEntities("contributor", contributorsList)
-        .addIdFromCollectionOfEntities("spatialCoverage", geoSet)
-        .addIdFromCollectionOfEntities("license", licenses)
-        .addIdFromCollectionOfEntities("funder", funderSet)
-        .addIdFromCollectionOfEntities("funding", grandSet)
-        .addIdFromCollectionOfEntities("isPartOf", IsPartOf)
-        .addIdFromCollectionOfEntities("citation", citation)
-        .addIdFromCollectionOfEntities("hasPart", hasPart)
-        .addIdFromCollectionOfEntities("isBasedOn", IsBasedOn)
-        .addIdFromCollectionOfEntities("sameAs", sameAs)
-        .addProperty("description", descriptionArray)
-        .addProperty("dateCreated", dateCreated)
-        .addProperty("dateModified", dateModified)
-        .addProperty(PROPTERY_DATE_PUBLISHED, datePublished)
-        .addProperty("keywords", keyWordsArray)
-        .addProperty("inLanguage", language)
-        .addProperty("identifier", alternate)
-        .addProperty("size", sizes)
-        .addProperty("encodingFormat", formats)
-        .addProperty("version", jsonNode.get("version"))
-        .build();
+      .setId(id)
+      .addType(type)
+      .addProperty("title", title)
+      .addProperty("publicationYear", publicationYear)
+      .addIdProperty("publisher", publisher)
+      .addIdFromCollectionOfEntities("creator", creatorsList)
+      .addIdFromCollectionOfEntities("contributor", contributorsList)
+      .addIdFromCollectionOfEntities("spatialCoverage", geoSet)
+      .addIdFromCollectionOfEntities("license", licenses)
+      .addIdFromCollectionOfEntities("funder", funderSet)
+      .addIdFromCollectionOfEntities("funding", grandSet)
+      .addIdFromCollectionOfEntities("isPartOf", IsPartOf)
+      .addIdFromCollectionOfEntities("citation", citation)
+      .addIdFromCollectionOfEntities("hasPart", hasPart)
+      .addIdFromCollectionOfEntities("isBasedOn", IsBasedOn)
+      .addIdFromCollectionOfEntities("sameAs", sameAs)
+      .addProperty("description", descriptionArray)
+      .addProperty("dateCreated", dateCreated)
+      .addProperty("dateModified", dateModified)
+      .addProperty(PROPTERY_DATE_PUBLISHED, datePublished)
+      .addProperty("keywords", keyWordsArray)
+      .addProperty("inLanguage", language)
+      .addProperty("identifier", alternate)
+      .addProperty("size", sizes)
+      .addProperty("encodingFormat", formats)
+      .addProperty("version", jsonNode.get("version"))
+      .build();
 
     entityList.add(dataEntity);
     return entityList;
   }
 
   // here one can map also all the other properties of relatedItem if necessary
-  private static DataEntity getFromRelatedItem(JsonNode relatedItem) {
+  private static DataEntity getFromRelatedItem(JsonValue relatedItem) {
     var relatedId = relatedItem.get("relatedIdentifier");
     String relatedIdType = relatedItem.get("relatedIdentifierType").asText();
     String relationTypeString = relatedItem.get("relationType").asText();
     return new DataEntity.DataEntityBuilder()
-        .addType("CreativeWork")
-        .setId(relatedId == null ? null : relatedId.asText())
-        .addProperty("description", relatedIdType)
-        .addProperty("keywords", relationTypeString)
-        .build();
+      .addType("CreativeWork")
+      .setId(relatedId == null ? null : relatedId.asText())
+      .addProperty("description", relatedIdType)
+      .addProperty("keywords", relationTypeString)
+      .build();
   }
 
-  private static AbstractEntity addPersonToListOfEntities(JsonNode personNode,
-                                                          Collection<AbstractEntity> entities) {
+  private static AbstractEntity addPersonToListOfEntities(
+    JsonValue personNode,
+    Collection<AbstractEntity> entities
+  ) {
     // if there is an Orcid provider use it to get the entity directly from orcid
     var creatorIdentifiers = personNode.get("nameIdentifiers");
     PersonEntity person = null;
@@ -574,7 +589,9 @@ public class ImportFromDataCite {
     if (creatorIdentifiers != null && !creatorIdentifiers.isEmpty()) {
       for (var identifier : creatorIdentifiers) {
         if (identifier.get("nameIdentifierScheme").asText().equals("ORCID")) {
-          person = OrcidProvider.getPerson(identifier.get("nameIdentifier").asText());
+          person = OrcidProvider.getPerson(
+            identifier.get("nameIdentifier").asText()
+          );
         } else {
           personUrl = identifier.get("nameIdentifier").asText();
         }
@@ -583,11 +600,11 @@ public class ImportFromDataCite {
 
     if (person == null) {
       person = new PersonEntity.PersonEntityBuilder()
-          .addProperty("name", personNode.get("creatorName"))
-          .addProperty("givenName", personNode.get("givenName"))
-          .addProperty("familyName", personNode.get("familyName"))
-          .addProperty("url", personUrl)
-          .build();
+        .addProperty("name", personNode.get("creatorName"))
+        .addProperty("givenName", personNode.get("givenName"))
+        .addProperty("familyName", personNode.get("familyName"))
+        .addProperty("url", personUrl)
+        .build();
     }
 
     // get the person affiliations
@@ -605,15 +622,20 @@ public class ImportFromDataCite {
           organization = RorProvider.getOrganization(affiliationId.asText());
         } else {
           organization = new OrganizationEntity.OrganizationEntityBuilder()
-              .setId(affiliationId.asText())
-              .addProperty("name", affiliationName)
-              .build();
+            .setId(affiliationId.asText())
+            .addProperty("name", affiliationName)
+            .build();
         }
         organizationEntitySet.add(organization);
       }
     }
-    person.addIdListProperties("affiliation",
-        organizationEntitySet.stream().map(AbstractEntity::getId).collect(Collectors.toList()));
+    person.addIdListProperties(
+      "affiliation",
+      organizationEntitySet
+        .stream()
+        .map(AbstractEntity::getId)
+        .collect(Collectors.toList())
+    );
     entities.addAll(organizationEntitySet);
     entities.add(person);
     return person;

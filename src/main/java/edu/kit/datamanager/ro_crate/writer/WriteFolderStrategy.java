@@ -1,10 +1,11 @@
 package edu.kit.datamanager.ro_crate.writer;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -46,9 +47,8 @@ public class WriteFolderStrategy implements GenericWriterStrategy<String> {
     public void save(Crate crate, String destination) throws IOException {
         File file = new File(destination);
         FileUtils.forceMkdir(file);
-        ObjectMapper objectMapper = MyObjectMapper.getMapper();
-        JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-        String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        JsonValue node = Json.parse(crate.getJsonMetadata());
+        String str = Json.writePretty(node);
         InputStream inputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
 
         File json = new File(destination, "ro-crate-metadata.json");

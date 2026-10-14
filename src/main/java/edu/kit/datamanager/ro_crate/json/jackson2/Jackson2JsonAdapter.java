@@ -67,6 +67,13 @@ public final class Jackson2JsonAdapter implements JsonAdapter {
     return MAPPER.writeValueAsString(toJackson(value));
   }
 
+  @Override
+  public String writePretty(JsonValue value) throws IOException {
+    return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(
+      toJackson(value)
+    );
+  }
+
   /** Converts a Jackson 2 tree into the neutral model. */
   public static JsonValue toNeutral(JsonNode node) {
     if (node == null || node.isMissingNode()) {

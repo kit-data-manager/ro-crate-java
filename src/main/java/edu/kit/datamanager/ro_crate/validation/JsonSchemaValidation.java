@@ -1,15 +1,13 @@
 package edu.kit.datamanager.ro_crate.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-
 import edu.kit.datamanager.ro_crate.Crate;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
+import edu.kit.datamanager.ro_crate.json.jackson2.Jackson2JsonAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +24,9 @@ public class JsonSchemaValidation implements ValidatorStrategy {
   private JsonSchema schema;
 
   private void getSchema(URI schemaUri) {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(
+      SpecVersion.VersionFlag.V201909
+    );
     this.schema = factory.getSchema(schemaUri);
   }
 
@@ -36,7 +36,8 @@ public class JsonSchemaValidation implements ValidatorStrategy {
   public JsonSchemaValidation() {
     try {
       URI schemaUri = Objects.requireNonNull(
-          getClass().getClassLoader().getResource(defaultSchema)).toURI();
+        getClass().getClassLoader().getResource(defaultSchema)
+      ).toURI();
       getSchema(schemaUri);
     } catch (URISyntaxException e) {
       e.printStackTrace();
@@ -52,23 +53,28 @@ public class JsonSchemaValidation implements ValidatorStrategy {
     getSchema(schemaUri);
   }
 
-  public JsonSchemaValidation(JsonNode schema) {
-    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
-    this.schema = factory.getSchema(schema);
+  public JsonSchemaValidation(JsonValue schema) {
+    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(
+      SpecVersion.VersionFlag.V201909
+    );
+    this.schema = factory.getSchema(Jackson2JsonAdapter.toJackson(schema));
   }
 
   @Override
   public boolean validate(Crate crate) {
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
     try {
-      final JsonNode good = objectMapper.readTree(crate.getJsonMetadata());
-      Set<ValidationMessage> errors = this.schema.validate(good);
+      final JsonValue good = Json.parse(crate.getJsonMetadata());
+      Set<ValidationMessage> errors = this.schema.validate(
+        Jackson2JsonAdapter.toJackson(good)
+      );
       if (errors.size() == 0) {
         return true;
       } else {
-        System.err.println("This crate does not validate against the this schema."
-            + " If you haven't provided any schemas,"
-            + " then it does not validate against the default one.");
+        System.err.println(
+          "This crate does not validate against the this schema." +
+            " If you haven't provided any schemas," +
+            " then it does not validate against the default one."
+        );
         for (var e : errors) {
           System.err.println(e.getMessage());
         }

@@ -1,10 +1,10 @@
 package edu.kit.datamanager.ro_crate.special;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,8 +20,8 @@ public class JsonUtilFunctions {
    * @param node the json node that should be unwrapped.
    * @return the unwrapped Json.
    */
-  public static JsonNode unwrapSingleArray(JsonNode node) {
-    ObjectNode newNode = MyObjectMapper.getMapper().createObjectNode();
+  public static JsonValue unwrapSingleArray(JsonValue node) {
+    JsonObject newNode = Json.objectNode();
     if (node.isObject()) {
       var itr = node.fields();
       while (itr.hasNext()) {
@@ -33,7 +33,7 @@ public class JsonUtilFunctions {
       if (node.size() == 1) {
         return unwrapSingleArray(node.get(0));
       } else {
-        ArrayNode arrayNode = MyObjectMapper.getMapper().createArrayNode();
+        JsonArray arrayNode = Json.arrayNode();
         for (var n : node) {
           arrayNode.add(unwrapSingleArray(n));
         }
@@ -49,10 +49,10 @@ public class JsonUtilFunctions {
    * @param id every property with this as id will be removed.
    * @param node the json from which to remove the properties.
    */
-  public static void removeFieldsWith(String id, JsonNode node) {
-    //MyObjectMapper.getMapper().createObjectNode();
+  public static void removeFieldsWith(String id, JsonValue node) {
+    //Json.objectNode();
     if (node.isObject()) {
-      ObjectNode newNode = (ObjectNode) node;
+      JsonObject newNode = (JsonObject) node;
       var itr = newNode.fields();
       while (itr.hasNext()) {
         var nxt = itr.next();
@@ -65,7 +65,7 @@ public class JsonUtilFunctions {
         }
       }
     } else if (node.isArray()) {
-      ArrayNode arrayNode = (ArrayNode) node;
+      JsonArray arrayNode = (JsonArray) node;
       for (int i = 0; i < arrayNode.size(); i++) {
         var p = arrayNode.get(i);
         if (p.isValueNode()) {
@@ -83,10 +83,10 @@ public class JsonUtilFunctions {
    * This method extracts from every property of a json objects its id's.
    * The method is intended for flattened json objects.
    *
-   * @param node The JsonNode json object.
+   * @param node The JsonValue json object.
    * @return the set containing all the strings.
    */
-  public static Set<String> getIdPropertiesFromJsonNode(JsonNode node) {
+  public static Set<String> getIdPropertiesFromJsonNode(JsonValue node) {
     Set<String> set = new HashSet<>();
     var itr = node.fields();
     while (itr.hasNext()) {
@@ -96,14 +96,14 @@ public class JsonUtilFunctions {
   }
 
   /**
-   * Extracts the id from a JsonNode property.
+   * Extracts the id from a JsonValue property.
    * This method is intended for flattened json-ld
    * that is why it is not recursive
    *
-   * @param node the JsonNode property
+   * @param node the JsonValue property
    * @return Set containing all the id as string
    */
-  public static Set<String> getIdPropertiesFromProperty(JsonNode node) {
+  public static Set<String> getIdPropertiesFromProperty(JsonValue node) {
     Set<String> set = new HashSet<>();
     if (node.isArray()) {
       for (var element : node) {
@@ -131,7 +131,7 @@ public class JsonUtilFunctions {
    * @return true if an equal node was found and removed, false if no equal node
    *         was found.
    */
-  public static boolean removeJsonNodeFromArrayNode(ArrayNode array, JsonNode node) {
+  public static boolean removeJsonNodeFromArrayNode(JsonArray array, JsonValue node) {
     for (int i = 0; i < array.size(); i++) {
       if (array.get(i).equals(node)) {
         array.remove(i);

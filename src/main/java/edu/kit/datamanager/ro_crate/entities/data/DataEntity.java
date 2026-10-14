@@ -1,6 +1,9 @@
 package edu.kit.datamanager.ro_crate.entities.data;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
@@ -19,7 +22,6 @@ import java.util.List;
  */
 public class DataEntity extends AbstractEntity {
 
-    @JsonIgnore
     private Path path;
 
     /**
@@ -58,7 +60,6 @@ public class DataEntity extends AbstractEntity {
      *
      * @return the path to the file this entity represents.
      */
-    @JsonIgnore
     public Path getPath() {
         return path;
     }

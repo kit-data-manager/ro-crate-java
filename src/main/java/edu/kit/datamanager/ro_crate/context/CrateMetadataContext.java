@@ -1,6 +1,9 @@
 package edu.kit.datamanager.ro_crate.context;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 
@@ -17,7 +20,7 @@ import java.util.Set;
  */
 public interface CrateMetadataContext {
 
-  ObjectNode getContextJsonEntity();
+  JsonObject getContextJsonEntity();
 
   boolean checkEntity(AbstractEntity entity);
 

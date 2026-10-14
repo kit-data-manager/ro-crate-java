@@ -1,6 +1,9 @@
 package edu.kit.datamanager.ro_crate.util;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.stream.StreamSupport;
 
@@ -21,10 +24,10 @@ public class Graph {
      *
      * @param graph The JSON node representing the graph.
      * @param id    The ID of the entity to find.
-     * @return The entity as a JsonNode if found, null otherwise.
+     * @return The entity as a JsonValue if found, null otherwise.
      */
-    public static JsonNode findEntityById(JsonNode graph, String id) {
-        for (JsonNode entity : graph) {
+    public static JsonValue findEntityById(JsonValue graph, String id) {
+        for (JsonValue entity : graph) {
             if (entity.has("@id") && entity.get("@id").asText().equals(id)) {
                 return entity;
             }
@@ -37,9 +40,9 @@ public class Graph {
      *
      * @param graph The JSON node representing the graph.
      * @param type  The type of the entity to find.
-     * @return The entity as a JsonNode if found, null otherwise.
+     * @return The entity as a JsonValue if found, null otherwise.
      */
-    public static JsonNode findEntityByType(JsonNode graph, String type) {
+    public static JsonValue findEntityByType(JsonValue graph, String type) {
         return StreamSupport.stream(graph.spliterator(), false)
                 .filter(entity -> entity.path("@type").asText().equals(type))
                 .findFirst()
@@ -51,11 +54,11 @@ public class Graph {
      *
      * @param graph The JSON node representing the graph.
      * @param type  The type of the entities to find.
-     * @return An array of JsonNode containing all entities of the specified type.
+     * @return An array of JsonValue containing all entities of the specified type.
      */
-    public static JsonNode[] findEntitiesByType(JsonNode graph, String type) {
+    public static JsonValue[] findEntitiesByType(JsonValue graph, String type) {
         return StreamSupport.stream(graph.spliterator(), false)
                 .filter(entity -> entity.path("@type").asText().equals(type))
-                .toArray(JsonNode[]::new);
+                .toArray(JsonValue[]::new);
     }
 }

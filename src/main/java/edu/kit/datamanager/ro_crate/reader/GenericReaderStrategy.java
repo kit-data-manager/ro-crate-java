@@ -1,6 +1,9 @@
 package edu.kit.datamanager.ro_crate.reader;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,9 +18,9 @@ public interface GenericReaderStrategy<SOURCE_TYPE> {
      * Read the metadata.json file from the given location.
      *
      * @param location the location to read from
-     * @return the parsed metadata.json as ObjectNode
+     * @return the parsed metadata.json as JsonObject
      */
-    ObjectNode readMetadataJson(SOURCE_TYPE location) throws IOException;
+    JsonObject readMetadataJson(SOURCE_TYPE location) throws IOException;
 
     /**
      * Read the content from the given location.

@@ -1,13 +1,16 @@
 package edu.kit.datamanager.ro_crate.entities.validation;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Interface for the strategy of the entity validation.
  */
 public interface EntityValidationStrategy {
 
-  boolean validateEntity(JsonNode entity);
+  boolean validateEntity(JsonValue entity);
 
-  boolean validateFieldOfEntity(JsonNode field);
+  boolean validateFieldOfEntity(JsonValue field);
 }

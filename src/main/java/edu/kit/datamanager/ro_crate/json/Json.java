@@ -41,14 +41,16 @@ public final class Json {
     var candidates = ServiceLoader.load(JsonAdapter.class).iterator();
     if (!candidates.hasNext()) {
       throw new IllegalStateException(
-          "No JsonAdapter found on the classpath. Add the ro-crate-java "
-              + "jackson2 or jackson3 module as a dependency.");
+        "No JsonAdapter found on the classpath. Add the ro-crate-java " +
+          "jackson2 or jackson3 module as a dependency."
+      );
     }
     JsonAdapter discovered = candidates.next();
     if (candidates.hasNext()) {
       throw new IllegalStateException(
-          "Multiple JsonAdapters found on the classpath; ro-crate-java "
-              + "supports only one JSON backend at a time.");
+        "Multiple JsonAdapters found on the classpath; ro-crate-java " +
+          "supports only one JSON backend at a time."
+      );
     }
     return discovered;
   }
@@ -75,5 +77,9 @@ public final class Json {
 
   public static String write(JsonValue value) throws IOException {
     return adapter().write(value);
+  }
+
+  public static String writePretty(JsonValue value) throws IOException {
+    return adapter().writePretty(value);
   }
 }

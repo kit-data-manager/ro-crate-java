@@ -1,6 +1,9 @@
 package edu.kit.datamanager.ro_crate.payload;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
@@ -38,7 +41,7 @@ public interface CratePayload {
 
   Set<ContextualEntity> getAllContextualEntities();
 
-  ArrayNode getEntitiesMetadata();
+  JsonArray getEntitiesMetadata();
 
   void removeEntityById(String id);
 }

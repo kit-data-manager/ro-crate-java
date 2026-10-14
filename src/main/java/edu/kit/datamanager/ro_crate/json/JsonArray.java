@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.json;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * The JSON array value: a mutable, order-preserving list of values. Mirrors
@@ -53,9 +54,19 @@ public final class JsonArray extends JsonValue {
   // -- access -----------------------------------------------------------------
 
   public JsonValue get(int index) {
+    if (index < 0 || index >= items.size()) {
+      return null; // mirrors Jackson: out-of-bounds yields null
+    }
     return items.get(index);
   }
 
+  /** @return the element, or {@link JsonMissing} when out of bounds */
+  public JsonValue path(int index) {
+    JsonValue value = get(index);
+    return value == null ? JsonMissing.INSTANCE : value;
+  }
+
+  @Override
   public int size() {
     return items.size();
   }
@@ -67,6 +78,11 @@ public final class JsonArray extends JsonValue {
   @Override
   public Iterator<JsonValue> iterator() {
     return List.copyOf(items).iterator();
+  }
+
+  @Override
+  public Stream<JsonValue> valueStream() {
+    return List.copyOf(items).stream();
   }
 
   // -- tree operations --------------------------------------------------------

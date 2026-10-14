@@ -1,11 +1,12 @@
 package edu.kit.datamanager.ro_crate.writer;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -96,10 +97,9 @@ public class WriteZipStreamStrategy implements
         // write the metadata.json file
         ZipParameters zipParameters = new ZipParameters();
         zipParameters.setFileNameInZip(prefix + "ro-crate-metadata.json");
-        ObjectMapper objectMapper = MyObjectMapper.getMapper();
-        // we create an JsonNode only to have the file written pretty
-        JsonNode node = objectMapper.readTree(crate.getJsonMetadata());
-        String str = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        // we create an JsonValue only to have the file written pretty
+        JsonValue node = Json.parse(crate.getJsonMetadata());
+        String str = Json.writePretty(node);
         // write the ro-crate-metadata
 
         byte[] buff = new byte[4096];
