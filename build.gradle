@@ -178,6 +178,8 @@ test {
     useJUnitPlatform()
     dependsOn generateVersionPropsTest
     finalizedBy jacocoTestReport
+    // make flags like -Drocrate.golden.update=true visible to the test JVM
+    systemProperties System.getProperties().findAll { it.key.toString().startsWith('rocrate.') }
 }
 
 jacocoTestReport {
