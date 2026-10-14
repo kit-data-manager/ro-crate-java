@@ -17,7 +17,7 @@ class NeutralJsonModelTest {
   void objectPreservesInsertionOrderAndOverwritesInPlace() {
     JsonObject object = JsonObject.create();
     object.put("b", "second").put("a", "first");
-    assertEquals("b", object.fieldNames().get(0));
+    assertEquals("b", object.names().get(0));
     object.put("b", "changed");
     assertEquals(2, object.size());
     assertEquals("changed", object.get("b").asText());
