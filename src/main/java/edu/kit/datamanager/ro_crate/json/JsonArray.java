@@ -21,7 +21,8 @@ public final class JsonArray extends JsonValue {
   // -- construction / mutation ------------------------------------------------
 
   public JsonArray add(JsonValue value) {
-    items.add(value);
+    // mirrors Jackson's ArrayNode.add: a null argument becomes a null node
+    items.add(value == null ? JsonNull.INSTANCE : value);
     return this;
   }
 

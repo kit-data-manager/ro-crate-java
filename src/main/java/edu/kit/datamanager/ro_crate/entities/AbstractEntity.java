@@ -97,15 +97,24 @@ public class AbstractEntity {
    */
   public JsonObject getProperties() {
     if (this.types != null) {
-      // mirrors the former Jackson valueToTree(types): a string array in
-      // the iteration order of the underlying set
-      JsonArray typeArray = Json.arrayNode();
-      for (String type : this.types) {
-        typeArray.add(type);
-      }
-      this.properties.set("@type", typeArray);
+      this.properties.set("@type", typesNode());
     }
     return properties;
+  }
+
+  /**
+   * The types as a JSON value, mirroring the former
+   * {@code MyObjectMapper.valueToTree(types)}: the shared mapper had
+   * {@code WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED} enabled, so a single type
+   * serialized to a plain string and multiple types to a string array
+   * (in the iteration order of the underlying set).
+   */
+  private JsonValue typesNode() {
+    JsonArray typeArray = Json.arrayNode();
+    for (String type : this.types) {
+      typeArray.add(type);
+    }
+    return this.types.size() == 1 ? typeArray.get(0) : typeArray;
   }
 
   public JsonValue getProperty(String propertyKey) {
@@ -410,11 +419,7 @@ public class AbstractEntity {
       this.types = new HashSet<>();
     }
     this.types.add(type);
-    JsonArray typeArray = Json.arrayNode();
-    for (String typeValue : this.types) {
-      typeArray.add(typeValue);
-    }
-    this.properties.set("@type", typeArray);
+    this.properties.set("@type", typesNode());
   }
 
   /**

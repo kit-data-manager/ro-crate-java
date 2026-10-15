@@ -149,14 +149,13 @@ public abstract class JsonValue implements Iterable<JsonValue> {
   }
 
   /**
-   * Iterates over the elements of an array, mirroring Jackson. Calling this on
-   * any other type throws {@link UnsupportedOperationException}.
+   * Mirrors Jackson's node iteration (verified against Jackson 2.22.1):
+   * arrays iterate their elements, objects iterate their values, scalars
+   * iterate nothing.
    */
   @Override
   public Iterator<JsonValue> iterator() {
-    throw new UnsupportedOperationException(
-      "Iteration is only supported on arrays"
-    );
+    return Collections.emptyIterator();
   }
 
   /** Compact JSON representation, delegated to the active {@link JsonAdapter}. */
