@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
@@ -14,7 +13,7 @@ import java.io.IOException;
 
 class BuilderTest {
     @Test
-    void testReadBuilder() throws JsonProcessingException {
+    void testReadBuilder() throws IOException {
         ContextualEntity license = new ContextualEntity.ContextualEntityBuilder()
                 .addType("CreativeWork")
                 .setId("https://creativecommons.org/licenses/by-nc-sa/3.0/au/")
@@ -56,7 +55,7 @@ class BuilderTest {
     }
     
     @Test
-    void testEmptyCrates() throws JsonProcessingException {
+    void testEmptyCrates() throws IOException {
         RoCrate built = new RoCrate.RoCrateBuilder().build();
         RoCrate constructed = new RoCrate();
 

@@ -1,12 +1,13 @@
 package edu.kit.datamanager.ro_crate.entities.data;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -78,8 +79,7 @@ public class DataSetEntityTest {
 
     @Test
     void testWebDir() {
-        ObjectMapper objectMapper = MyObjectMapper.getMapper();
-        ObjectNode propertyValue = objectMapper.createObjectNode();
+        JsonObject propertyValue = Json.objectNode();
         propertyValue.put("@id", "http://example.com/downloads/2020/lots_of_little_files.zip");
 
         DataSetEntity dir = new DataSetEntity.DataSetBuilder()

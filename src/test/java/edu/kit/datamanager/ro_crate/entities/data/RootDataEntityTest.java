@@ -1,12 +1,14 @@
 package edu.kit.datamanager.ro_crate.entities.data;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
 import edu.kit.datamanager.ro_crate.HelpFunctions;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
@@ -53,12 +55,11 @@ public class RootDataEntityTest {
 
     @Test
     void testSerializationMinimalExample() throws IOException, IllegalArgumentException {
-        ObjectMapper objectMapper = MyObjectMapper.getMapper();
         RootDataEntity rootDataEntity = new RootDataEntity.RootDataEntityBuilder()
                 .addProperty("name", "Data files")
                 .addProperty("description", "Palliative care planning...")
                 .addDateTimePropertyWithExceptions("datePublished", "2024-02-09T08:21:41Z")
-                .addProperty("license", objectMapper.createObjectNode().put("@id", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"))
+                .addProperty("license", Json.objectNode().put("@id", "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"))
                 .build();
         HelpFunctions.compareEntityWithFile(rootDataEntity, "/json/entities/data/rootMinimalExample.json");
 

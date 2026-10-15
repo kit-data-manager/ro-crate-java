@@ -4,7 +4,6 @@ import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -25,7 +24,7 @@ public class TestRemoveAddContext {
   }
 
   @Test
-  void testAddRemoveValuePair() throws JsonProcessingException {
+  void testAddRemoveValuePair() throws IOException {
     RoCrate crate = new RoCrate.RoCrateBuilder().addValuePairToContext("key", "value").build();
     RoCrate defaultCrate = new RoCrate.RoCrateBuilder().build();
 
@@ -36,7 +35,7 @@ public class TestRemoveAddContext {
   }
 
   @Test
-  void testAddRemoveUrl() throws JsonProcessingException {
+  void testAddRemoveUrl() throws IOException {
     RoCrate crate = new RoCrate.RoCrateBuilder().addUrlToContext("https://example.com").build();
     RoCrate defaultCrate = new RoCrate.RoCrateBuilder().build();
 

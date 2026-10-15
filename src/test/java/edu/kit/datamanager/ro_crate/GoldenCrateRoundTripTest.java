@@ -3,11 +3,11 @@ package edu.kit.datamanager.ro_crate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonArray;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
+import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.reader.Readers;
 import edu.kit.datamanager.ro_crate.writer.Writers;
 import java.io.IOException;
@@ -59,11 +59,11 @@ class GoldenCrateRoundTripTest {
    * not stable across JVM runs), so entity order is excluded from the lock;
    * everything else — entity content, property order, formatting — is locked.
    */
-  static String canonicalize(String metadata) throws JsonProcessingException {
-    JsonNode root = MyObjectMapper.getMapper().readTree(metadata);
-    JsonNode graph = root.path("@graph");
+  static String canonicalize(String metadata) throws IOException {
+    JsonObject root = (JsonObject) Json.parse(metadata);
+    JsonValue graph = root.path("@graph");
     if (graph.isArray()) {
-      List<JsonNode> entities = new ArrayList<>();
+      List<JsonValue> entities = new ArrayList<>();
       graph.forEach(entities::add);
       entities.sort(
         Comparator.comparing(
@@ -71,10 +71,13 @@ class GoldenCrateRoundTripTest {
           String.CASE_INSENSITIVE_ORDER
         )
       );
-      ((ArrayNode) graph).removeAll();
-      entities.forEach(((ArrayNode) graph)::add);
+      JsonArray graphArray = (JsonArray) graph;
+      while (!graphArray.isEmpty()) {
+        graphArray.remove(0);
+      }
+      entities.forEach(graphArray::add);
     }
-    return MyObjectMapper.getMapper().writeValueAsString(root);
+    return Json.write(root);
   }
 
   @ParameterizedTest
