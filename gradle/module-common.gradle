@@ -1,0 +1,44 @@
+/*
+ * Common configuration applied to every module of ro-crate-java.
+ */
+
+apply plugin: 'java'
+
+println "Building ${name} version: ${version}"
+println "Profile (system property): ${System.getProperty('profile')}"
+
+java {
+    //package JavaDoc as part of publication
+    withJavadocJar()
+    //package Sources as part of publication
+    withSourcesJar()
+    // set java version compatibility
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+if (JavaVersion.current() == JavaVersion.VERSION_17) {
+    println "Setting encoding to UTF-8 manually"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+}
+
+// enable -Xlint:deprecation
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+tasks.withType(Test).configureEach {
+    // make flags like -Drocrate.golden.update=true visible to the test JVM
+    systemProperties System.getProperties().findAll { it.key.toString().startsWith('rocrate.') }
+}

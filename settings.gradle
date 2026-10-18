@@ -1,2 +1,3 @@
 rootProject.name = 'ro-crate-java'
 
+include 'core', 'jackson2', 'jackson3'

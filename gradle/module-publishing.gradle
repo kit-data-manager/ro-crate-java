@@ -1,0 +1,67 @@
+/*
+ * Publishing configuration shared by the backend modules.
+ *
+ * The publication name is provided by the applying module via the
+ * 'publishedArtifactId' extra property (defaults to the project name).
+ */
+
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = project.findProperty('publishedArtifactId') ?: project.name
+            from components.java
+            //set elements in generated pom.xml according to requirements
+            //by Sonatype (see https://central.sonatype.org/pages/requirements.html)
+            pom {
+                name = project['name']
+                description = project['description']
+                url = 'https://github.com/kit-data-manager/ro-crate-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Pfeil'
+                        name = 'Andreas Pfeil'
+                        email = 'webmaster@datamanager.kit.edu'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com/kit-data-manager/ro-crate-java'
+                    developerConnection = 'scm:git:github.com/kit-data-manager/ro-crate-java'
+                    url = 'https://github.com/kit-data-manager/ro-crate-java'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    //make signing required unless for SNAPSHOT releases or if signing is explicitly skipped
+    required { !project.version.endsWith("-SNAPSHOT") && !project.hasProperty("skipSigning") }
+
+    //look for property 'signingKey'
+    if (project.findProperty("signingKey")) {
+        //read property 'signingKey'
+        def signingKey = findProperty("signingKey")
+        //read property 'signingPassword'
+        def signingPassword = findProperty("signingPassword")
+        //use in-memory ascii-armored keys
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        //sign publication identity 'publishing.publications.maven'
+        sign publishing.publications.maven
+    } else {
+        println 'WARNING: No property \'signingKey\' found. Artifact signing will be skipped.'
+    }
+}
+
+def signingTasks = tasks.withType(Sign)
+tasks.withType(AbstractPublishToMaven).configureEach {
+    mustRunAfter(signingTasks)
+}

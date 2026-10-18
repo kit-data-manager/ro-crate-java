@@ -1,0 +1,40 @@
+/*
+ * The Jackson 2 backend of ro-crate-java.
+ *
+ * Publishes under the historical artifact coordinates (edu.kit.datamanager:
+ * ro-crate-java), so consumers of the library keep resolving the same
+ * artifact; it transitively pulls in the Jackson-free core.
+ */
+
+plugins {
+    id 'java-library'
+    id "maven-publish"
+    id "io.freefair.maven-publish-java" version "9.5.0"
+}
+
+ext {
+    jacksonVersion = '2.22.1'
+    // this module publishes under the historical library coordinates
+    publishedArtifactId = 'ro-crate-java'
+}
+
+description = "A library for easy creation and modification of valid RO-Crates (Jackson 2 backend)."
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':core')
+    // JSON object mapping / (de-)serialization
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    // metadata validation, profiles based on JSON schema
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.5.9"
+
+    // test parity reference
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+apply from: rootProject.file('gradle/module-publishing.gradle')
