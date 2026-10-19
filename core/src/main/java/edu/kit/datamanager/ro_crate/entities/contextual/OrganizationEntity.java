@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * A helping class for creating organization entities.
@@ -19,7 +15,9 @@ public class OrganizationEntity extends ContextualEntity {
    *
    * @param entityBuilder the builder from which to create the entity.
    */
-  public OrganizationEntity(AbstractOrganizationEntityBuilder<?> entityBuilder) {
+  public OrganizationEntity(
+    AbstractOrganizationEntityBuilder<?> entityBuilder
+  ) {
     super(entityBuilder);
     this.addProperty("address", entityBuilder.address);
     this.addProperty("email", entityBuilder.email);
@@ -28,9 +26,7 @@ public class OrganizationEntity extends ContextualEntity {
     this.addType(TYPE);
   }
 
-  abstract static class AbstractOrganizationEntityBuilder<T
-      extends AbstractOrganizationEntityBuilder<T>>
-      extends AbstractContextualEntityBuilder<T> {
+  abstract static class AbstractOrganizationEntityBuilder<T extends AbstractOrganizationEntityBuilder<T>> extends AbstractContextualEntityBuilder<T> {
 
     String address;
     String email;
@@ -64,8 +60,9 @@ public class OrganizationEntity extends ContextualEntity {
   /**
    * A builder for the organization entity.
    */
-  public static final class OrganizationEntityBuilder extends
-      AbstractOrganizationEntityBuilder<OrganizationEntityBuilder> {
+  public static final class OrganizationEntityBuilder
+    extends AbstractOrganizationEntityBuilder<OrganizationEntityBuilder>
+  {
 
     @Override
     public OrganizationEntityBuilder self() {

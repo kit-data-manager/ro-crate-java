@@ -1,14 +1,9 @@
 package edu.kit.datamanager.ro_crate.payload;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
-
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-
+import edu.kit.datamanager.ro_crate.json.JsonArray;
 import java.util.Collection;
 import java.util.Set;
 

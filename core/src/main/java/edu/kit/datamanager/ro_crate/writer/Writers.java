@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.writer;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import java.io.OutputStream;
 
@@ -12,35 +8,35 @@ import java.io.OutputStream;
  */
 public class Writers {
 
-    /**
-     * Prevents instantiation of this utility class.
-     */
-    private Writers() {}
+  /**
+   * Prevents instantiation of this utility class.
+   */
+  private Writers() {}
 
-    /**
-     * Creates a new instance of a crate writer that writes to a folder.
-     *
-     * @return a new instance of {@link CrateWriter} for writing to a folder
-     */
-    public static CrateWriter<String> newFolderWriter() {
-        return new CrateWriter<>(new WriteFolderStrategy());
-    }
+  /**
+   * Creates a new instance of a crate writer that writes to a folder.
+   *
+   * @return a new instance of {@link CrateWriter} for writing to a folder
+   */
+  public static CrateWriter<String> newFolderWriter() {
+    return new CrateWriter<>(new WriteFolderStrategy());
+  }
 
-    /**
-     * Creates a new instance of a crate writer that writes to a zip stream.
-     *
-     * @return a new instance of {@link CrateWriter} for writing to a zip stream
-     */
-    public static CrateWriter<OutputStream> newZipStreamWriter() {
-        return new CrateWriter<>(new WriteZipStreamStrategy());
-    }
+  /**
+   * Creates a new instance of a crate writer that writes to a zip stream.
+   *
+   * @return a new instance of {@link CrateWriter} for writing to a zip stream
+   */
+  public static CrateWriter<OutputStream> newZipStreamWriter() {
+    return new CrateWriter<>(new WriteZipStreamStrategy());
+  }
 
-    /**
-     * Creates a new instance of a crate writer that writes to a zip file.
-     *
-     * @return a new instance of {@link CrateWriter} for writing to a zip file
-     */
-    public static CrateWriter<String> newZipPathWriter() {
-        return new CrateWriter<>(new WriteZipStrategy());
-    }
+  /**
+   * Creates a new instance of a crate writer that writes to a zip file.
+   *
+   * @return a new instance of {@link CrateWriter} for writing to a zip file
+   */
+  public static CrateWriter<String> newZipPathWriter() {
+    return new CrateWriter<>(new WriteZipStrategy());
+  }
 }

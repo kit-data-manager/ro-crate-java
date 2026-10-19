@@ -1,24 +1,19 @@
 package edu.kit.datamanager.ro_crate.externalproviders.dataentities;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
-
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.RoCrate.RoCrateBuilder;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-
+import edu.kit.datamanager.ro_crate.json.Json;
+import edu.kit.datamanager.ro_crate.json.JsonObject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,12 +41,12 @@ public class ImportFromZenodo {
    * @return the created crate.
    */
   public static Crate createCrateWithItem(
-      String url,
-      Optional<String> name,
-      Optional<String> description,
-      Optional<String> datePublished,
-      Optional<String> licenseId) {
-
+    String url,
+    Optional<String> name,
+    Optional<String> description,
+    Optional<String> datePublished,
+    Optional<String> licenseId
+  ) {
     RoCrateBuilder builder = new RoCrate.RoCrateBuilder();
     name.ifPresent(builder::addName);
     description.ifPresent(builder::addDescription);
@@ -72,7 +67,9 @@ public class ImportFromZenodo {
     HttpGet requestZenodo = new HttpGet(url);
 
     // HttpGet requestSchema= new HttpGet("https://www.researchobject.org/ro-crate/1.1/context.jsonld");
-    HttpGet requestSchema = new HttpGet("https://schema.org/docs/jsonldcontext.json");
+    HttpGet requestSchema = new HttpGet(
+      "https://schema.org/docs/jsonldcontext.json"
+    );
     requestZenodo.addHeader(HttpHeaders.ACCEPT, "application/ld+json");
     JsonObject jsonNode;
     String mainId;
@@ -84,9 +81,13 @@ public class ImportFromZenodo {
       jsonNode = (JsonObject) Json.parse(stream);
       mainId = jsonNode.get("@id").asText();
 
-      final var el = JsonLd.flatten(JsonDocument.of(
-              new ByteArrayInputStream(
-                  jsonNode.toString().getBytes(StandardCharsets.UTF_8)))).get();
+      final var el = JsonLd.flatten(
+        JsonDocument.of(
+          new ByteArrayInputStream(
+            jsonNode.toString().getBytes(StandardCharsets.UTF_8)
+          )
+        )
+      ).get();
 
       CloseableHttpResponse schema = httpClient.execute(requestSchema);
       JsonObject doc = (JsonObject) Json.parse(schema.getEntity().getContent());
@@ -95,10 +96,13 @@ public class ImportFromZenodo {
       con.remove("id");
       doc.set("@context", con);
       var finalVersion = JsonLd.compact(
-          JsonDocument.of(el),
-          JsonDocument.of(new ByteArrayInputStream(
-              doc.toString().getBytes(StandardCharsets.UTF_8)))).get();
-
+        JsonDocument.of(el),
+        JsonDocument.of(
+          new ByteArrayInputStream(
+            doc.toString().getBytes(StandardCharsets.UTF_8)
+          )
+        )
+      ).get();
 
       jsonNode = (JsonObject) Json.parse(finalVersion.toString());
     } catch (IOException | JsonLdError e) {
@@ -112,12 +116,14 @@ public class ImportFromZenodo {
       for (var entity : graph) {
         if (entity.get("@id").asText().equals(mainId)) {
           var dataEntity = new DataEntity.DataEntityBuilder()
-              .setAllUnsafe((JsonObject) entity).build();
+            .setAllUnsafe((JsonObject) entity)
+            .build();
           crate.addDataEntity(dataEntity);
         } else {
           // here we have to think of a way to differentiate between data and contextual entities.
           var contextualEntity = new ContextualEntity.ContextualEntityBuilder()
-              .setAllUnsafe((JsonObject) entity).build();
+            .setAllUnsafe((JsonObject) entity)
+            .build();
           crate.addContextualEntity(contextualEntity);
         }
       }

@@ -1,10 +1,5 @@
 package edu.kit.datamanager.ro_crate.json.jackson3;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
 import edu.kit.datamanager.ro_crate.json.JsonAdapter;
 import edu.kit.datamanager.ro_crate.json.JsonArray;
 import edu.kit.datamanager.ro_crate.json.JsonBoolean;
@@ -19,6 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Jackson 3 implementation of the {@link JsonAdapter} SPI.
@@ -35,9 +34,13 @@ import java.math.BigInteger;
 public final class Jackson3JsonAdapter implements JsonAdapter {
 
   private static final JsonMapper MAPPER = JsonMapper.builder()
-      .enable(tools.jackson.databind.DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-      .enable(tools.jackson.databind.DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)
-      .build();
+    .enable(
+      tools.jackson.databind.DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY
+    )
+    .enable(
+      tools.jackson.databind.DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS
+    )
+    .build();
 
   @Override
   public JsonObject objectNode() {
@@ -71,7 +74,9 @@ public final class Jackson3JsonAdapter implements JsonAdapter {
 
   @Override
   public String writePretty(JsonValue value) {
-    return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(toJackson(value));
+    return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(
+      toJackson(value)
+    );
   }
 
   /** Converts a Jackson 3 tree into the neutral model. */
@@ -106,7 +111,8 @@ public final class Jackson3JsonAdapter implements JsonAdapter {
       return new JsonNumber(numberOf(node));
     }
     throw new IllegalArgumentException(
-        "Unsupported Jackson node type: " + node.getNodeType());
+      "Unsupported Jackson node type: " + node.getNodeType()
+    );
   }
 
   private static Number numberOf(JsonNode node) {
@@ -154,8 +160,9 @@ public final class Jackson3JsonAdapter implements JsonAdapter {
       return MAPPER.getNodeFactory().textNode(string.getValue());
     }
     if (value instanceof JsonBoolean bool) {
-      return bool.getValue() ? MAPPER.getNodeFactory().booleanNode(true)
-          : MAPPER.getNodeFactory().booleanNode(false);
+      return bool.getValue()
+        ? MAPPER.getNodeFactory().booleanNode(true)
+        : MAPPER.getNodeFactory().booleanNode(false);
     }
     if (value instanceof JsonNull) {
       return MAPPER.getNodeFactory().nullNode();
@@ -167,7 +174,8 @@ public final class Jackson3JsonAdapter implements JsonAdapter {
       return numberNode(number.getValue());
     }
     throw new IllegalArgumentException(
-        "Unsupported neutral JSON value: " + value.getClass());
+      "Unsupported neutral JSON value: " + value.getClass()
+    );
   }
 
   private static JsonNode numberNode(Number number) {

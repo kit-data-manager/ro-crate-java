@@ -1,10 +1,6 @@
 package edu.kit.datamanager.ro_crate.writer;
 
 import edu.kit.datamanager.ro_crate.Crate;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.validation.Validation;
 import edu.kit.datamanager.ro_crate.validation.Validator;
 import java.io.IOException;

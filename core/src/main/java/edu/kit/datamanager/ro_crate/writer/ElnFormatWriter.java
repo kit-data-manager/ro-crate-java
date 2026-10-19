@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.writer;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * An Interface for {@link GenericWriterStrategy} implementations which support writing
@@ -10,22 +6,22 @@ import edu.kit.datamanager.ro_crate.json.JsonValue;
  *
  * @param <DESTINATION_TYPE> the type which determines the destination of the result
  */
-public interface ElnFormatWriter<DESTINATION_TYPE> extends GenericWriterStrategy<DESTINATION_TYPE> {
+public interface ElnFormatWriter<DESTINATION_TYPE> extends
+  GenericWriterStrategy<DESTINATION_TYPE> {
+  /**
+   * Write in ELN format style, meaning with a root subfolder in the zip file.
+   * Same as {@link #withRootSubdirectory()}.
+   *
+   * @return this writer
+   */
+  ElnFormatWriter<DESTINATION_TYPE> usingElnStyle();
 
-    /**
-     * Write in ELN format style, meaning with a root subfolder in the zip file.
-     * Same as {@link #withRootSubdirectory()}.
-     *
-     * @return this writer
-     */
-    ElnFormatWriter<DESTINATION_TYPE> usingElnStyle();
-
-    /**
-     * Alias with more generic name for {@link #usingElnStyle()}.
-     *
-     * @return this writer
-     */
-    default ElnFormatWriter<DESTINATION_TYPE> withRootSubdirectory() {
-        return this.usingElnStyle();
-    }
+  /**
+   * Alias with more generic name for {@link #usingElnStyle()}.
+   *
+   * @return this writer
+   */
+  default ElnFormatWriter<DESTINATION_TYPE> withRootSubdirectory() {
+    return this.usingElnStyle();
+  }
 }

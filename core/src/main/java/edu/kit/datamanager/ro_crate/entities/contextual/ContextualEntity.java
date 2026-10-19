@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 
@@ -18,8 +14,7 @@ public class ContextualEntity extends AbstractEntity {
     super(entityBuilder);
   }
 
-  abstract static class AbstractContextualEntityBuilder
-      <T extends AbstractContextualEntityBuilder<T>> extends AbstractEntityBuilder<T> {
+  abstract static class AbstractContextualEntityBuilder<T extends AbstractContextualEntityBuilder<T>> extends AbstractEntityBuilder<T> {
 
     @Override
     public abstract ContextualEntity build();
@@ -29,8 +24,9 @@ public class ContextualEntity extends AbstractEntity {
    * This is the Contextual entity builder base class,
    * as of right now it does not contain any methods.
    */
-  public static final class ContextualEntityBuilder extends
-      AbstractContextualEntityBuilder<ContextualEntityBuilder> {
+  public static final class ContextualEntityBuilder
+    extends AbstractContextualEntityBuilder<ContextualEntityBuilder>
+  {
 
     @Override
     public ContextualEntityBuilder self() {

@@ -1,9 +1,6 @@
 package edu.kit.datamanager.ro_crate.reader;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
+import edu.kit.datamanager.ro_crate.json.JsonObject;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,19 +11,19 @@ import java.io.IOException;
  * @param <SOURCE_TYPE> the type which determines the source of the crate
  */
 public interface GenericReaderStrategy<SOURCE_TYPE> {
-    /**
-     * Read the metadata.json file from the given location.
-     *
-     * @param location the location to read from
-     * @return the parsed metadata.json as JsonObject
-     */
-    JsonObject readMetadataJson(SOURCE_TYPE location) throws IOException;
+  /**
+   * Read the metadata.json file from the given location.
+   *
+   * @param location the location to read from
+   * @return the parsed metadata.json as JsonObject
+   */
+  JsonObject readMetadataJson(SOURCE_TYPE location) throws IOException;
 
-    /**
-     * Read the content from the given location.
-     *
-     * @param location the location to read from
-     * @return the content as a File
-     */
-    File readContent(SOURCE_TYPE location) throws IOException;
+  /**
+   * Read the content from the given location.
+   *
+   * @param location the location to read from
+   * @return the content as a File
+   */
+  File readContent(SOURCE_TYPE location) throws IOException;
 }

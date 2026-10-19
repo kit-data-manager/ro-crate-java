@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.writer;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * The class used for writing (exporting) crates. The class uses a strategy
@@ -13,7 +9,7 @@ import edu.kit.datamanager.ro_crate.json.JsonValue;
 @Deprecated(since = "2.1.0", forRemoval = true)
 public class RoCrateWriter extends CrateWriter<String> {
 
-    public RoCrateWriter(GenericWriterStrategy<String> writer) {
-        super(writer);
-    }
+  public RoCrateWriter(GenericWriterStrategy<String> writer) {
+    super(writer);
+  }
 }

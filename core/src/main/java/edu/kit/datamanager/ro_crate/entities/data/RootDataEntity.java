@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.data;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import java.nio.file.Paths;
 
@@ -24,7 +20,8 @@ public class RootDataEntity extends DataSetEntity {
    * Builder class for easier creation of root data entities.
    */
   public static final class RootDataEntityBuilder
-      extends AbstractDataSetBuilder<RootDataEntityBuilder> {
+    extends AbstractDataSetBuilder<RootDataEntityBuilder>
+  {
 
     @Override
     public RootDataEntityBuilder self() {
@@ -34,8 +31,7 @@ public class RootDataEntity extends DataSetEntity {
     @Override
     public RootDataEntity build() {
       // small hack not to get the command line message
-      this.setLocation(Paths.get("./"))
-          .setId("./");
+      this.setLocation(Paths.get("./")).setId("./");
       return new RootDataEntity(this);
     }
   }

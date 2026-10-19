@@ -1,12 +1,7 @@
 package edu.kit.datamanager.ro_crate.context;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
-
 
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
-
+import edu.kit.datamanager.ro_crate.json.JsonObject;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +14,6 @@ import java.util.Set;
  * @version 1
  */
 public interface CrateMetadataContext {
-
   JsonObject getContextJsonEntity();
 
   boolean checkEntity(AbstractEntity entity);
@@ -42,9 +36,9 @@ public interface CrateMetadataContext {
   Set<String> getKeys();
 
   /**
-  * Get an immutable map of the context.
-  * @return an immutable map containing the context key-value pairs
-  */
+   * Get an immutable map of the context.
+   * @return an immutable map containing the context key-value pairs
+   */
   Map<String, String> getPairs();
 
   void deleteValuePairFromContext(String key);

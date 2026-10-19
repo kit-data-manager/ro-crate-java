@@ -1,25 +1,20 @@
 package edu.kit.datamanager.ro_crate;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import edu.kit.datamanager.ro_crate.context.CrateMetadataContext;
-import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
-import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
+import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.preview.CratePreview;
 import edu.kit.datamanager.ro_crate.special.CrateVersion;
+import java.io.File;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * An interface describing an ROCrate.
@@ -28,7 +23,6 @@ import edu.kit.datamanager.ro_crate.special.CrateVersion;
  * @version 1
  */
 public interface Crate {
-
   /**
    * Mark the crate as imported, i.e. it has been read from a file
    * or is for other reasons not considered a new crate.
@@ -57,7 +51,7 @@ public interface Crate {
    * <p>
    * NOTE: If there is no version in the crate, it does not comply with the
    * specification.
-   * 
+   *
    * @return the class representation indication the version of this crate, if
    *         available.
    */
@@ -71,7 +65,7 @@ public interface Crate {
    * <p>
    * This corresponds technically to all conformsTo values, excluding the RO crate
    * version / specification.
-   * 
+   *
    * @return a collection of the profiles or specifications this crate conforms
    *         to.
    */
@@ -147,7 +141,8 @@ public interface Crate {
    * @param parentId the ID of the parent entity. Must not be null.
    * @throws IllegalArgumentException if parentId is null or not found, or not a DataEntity.
    */
-  void addDataEntity(DataEntity entity, String parentId) throws IllegalArgumentException;
+  void addDataEntity(DataEntity entity, String parentId)
+    throws IllegalArgumentException;
 
   void addContextualEntity(ContextualEntity entity);
 
@@ -183,7 +178,9 @@ public interface Crate {
    * @param addInverseRelationships if true, also adds isPartOf relationships from child to parent
    * @return result object containing information about what was processed, as well as potential errors.
    */
-  HierarchyRecognitionResult createDataEntityFileStructure(boolean addInverseRelationships);
+  HierarchyRecognitionResult createDataEntityFileStructure(
+    boolean addInverseRelationships
+  );
 
   /**
    * Automatically recognizes hierarchical file structure from DataEntity IDs
@@ -194,5 +191,7 @@ public interface Crate {
    * @param config configuration object specifying how the recognition should behave
    * @return result object containing information about what was processed, as well as potential errors.
    */
-  HierarchyRecognitionResult createDataEntityFileStructure(HierarchyRecognitionConfig config);
+  HierarchyRecognitionResult createDataEntityFileStructure(
+    HierarchyRecognitionConfig config
+  );
 }

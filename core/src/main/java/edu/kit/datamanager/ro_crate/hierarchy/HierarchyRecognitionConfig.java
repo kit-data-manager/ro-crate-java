@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.hierarchy;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * Configuration class for automatic hierarchy recognition.
@@ -15,33 +11,49 @@ import edu.kit.datamanager.ro_crate.json.JsonValue;
  * </ul>
  */
 public record HierarchyRecognitionConfig(
-        boolean createMissingIntermediateEntities,
-        boolean createInverseRelationships,
-        boolean removeExistingConnections
+  boolean createMissingIntermediateEntities,
+  boolean createInverseRelationships,
+  boolean removeExistingConnections
 ) {
-    /**
-     * Creates a new configuration with default values.
-     * <p>
-     * Default values:
-     * <ul>
-     *   <li>createMissingIntermediateEntities: false</li>
-     *   <li>createInverseRelationships: false</li>
-     *   <li>removeExistingConnections: false</li>
-     * </ul>
-     */
-    public HierarchyRecognitionConfig() {
-        this(false, false, false);
-    }
+  /**
+   * Creates a new configuration with default values.
+   * <p>
+   * Default values:
+   * <ul>
+   *   <li>createMissingIntermediateEntities: false</li>
+   *   <li>createInverseRelationships: false</li>
+   *   <li>removeExistingConnections: false</li>
+   * </ul>
+   */
+  public HierarchyRecognitionConfig() {
+    this(false, false, false);
+  }
 
-    public HierarchyRecognitionConfig withCreateMissingIntermediateEntities(boolean value) {
-        return new HierarchyRecognitionConfig(value, this.createInverseRelationships, this.removeExistingConnections);
-    }
+  public HierarchyRecognitionConfig withCreateMissingIntermediateEntities(
+    boolean value
+  ) {
+    return new HierarchyRecognitionConfig(
+      value,
+      this.createInverseRelationships,
+      this.removeExistingConnections
+    );
+  }
 
-    public HierarchyRecognitionConfig withSetInverseRelationships(boolean value) {
-        return new HierarchyRecognitionConfig(this.createMissingIntermediateEntities, value, this.removeExistingConnections);
-    }
+  public HierarchyRecognitionConfig withSetInverseRelationships(boolean value) {
+    return new HierarchyRecognitionConfig(
+      this.createMissingIntermediateEntities,
+      value,
+      this.removeExistingConnections
+    );
+  }
 
-    public HierarchyRecognitionConfig withRemoveExistingConnections(boolean value) {
-        return new HierarchyRecognitionConfig(this.createMissingIntermediateEntities, this.createInverseRelationships, value);
-    }
+  public HierarchyRecognitionConfig withRemoveExistingConnections(
+    boolean value
+  ) {
+    return new HierarchyRecognitionConfig(
+      this.createMissingIntermediateEntities,
+      this.createInverseRelationships,
+      value
+    );
+  }
 }

@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * A helping class for creating a Person Entity.
@@ -29,9 +25,7 @@ public class PersonEntity extends ContextualEntity {
     this.addType(TYPE);
   }
 
-  abstract static class AbstractPersonEntityBuilder
-      <T extends AbstractPersonEntityBuilder<T>>
-      extends AbstractContextualEntityBuilder<T> {
+  abstract static class AbstractPersonEntityBuilder<T extends AbstractPersonEntityBuilder<T>> extends AbstractContextualEntityBuilder<T> {
 
     String affiliation;
     String contactPoint;
@@ -72,7 +66,8 @@ public class PersonEntity extends ContextualEntity {
    * Person Entity builder for easier creation of Person entities.
    */
   public static final class PersonEntityBuilder
-      extends AbstractPersonEntityBuilder<PersonEntityBuilder> {
+    extends AbstractPersonEntityBuilder<PersonEntityBuilder>
+  {
 
     @Override
     public PersonEntityBuilder self() {

@@ -1,8 +1,6 @@
 package edu.kit.datamanager.ro_crate.preview;
 
 import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
 import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.util.ZipStreamUtil;
 import freemarker.template.Configuration;
@@ -16,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

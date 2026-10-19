@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.contextual;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * A helping class for the Place entity creation.
@@ -25,8 +21,7 @@ public class PlaceEntity extends ContextualEntity {
     this.addType(TYPE);
   }
 
-  abstract static class AbstractPlaceEntityBuilder<T extends AbstractPlaceEntityBuilder<T>> extends
-      AbstractContextualEntityBuilder<T> {
+  abstract static class AbstractPlaceEntityBuilder<T extends AbstractPlaceEntityBuilder<T>> extends AbstractContextualEntityBuilder<T> {
 
     String geo;
 
@@ -48,7 +43,8 @@ public class PlaceEntity extends ContextualEntity {
    * A builder class for the easier Place entity construction.
    */
   public static final class PlaceEntityBuilder
-      extends AbstractPlaceEntityBuilder<PlaceEntityBuilder> {
+    extends AbstractPlaceEntityBuilder<PlaceEntityBuilder>
+  {
 
     @Override
     public PlaceEntityBuilder self() {

@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.reader;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * This class allows reading crates from the outside into the library in order
@@ -18,7 +14,8 @@ import edu.kit.datamanager.ro_crate.json.JsonValue;
  */
 @Deprecated(since = "2.1.0", forRemoval = true)
 public class RoCrateReader extends CrateReader<String> {
-    public RoCrateReader(GenericReaderStrategy<String> reader) {
-        super(reader);
-    }
+
+  public RoCrateReader(GenericReaderStrategy<String> reader) {
+    super(reader);
+  }
 }

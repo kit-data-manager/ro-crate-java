@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.data;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 /**
  * A helping class representing a File entity.
@@ -19,8 +15,7 @@ public class FileEntity extends DataEntity {
     this.addType(TYPE);
   }
 
-  abstract static class AbstractFileEntityBuilder<T extends AbstractFileEntityBuilder<T>> extends
-      AbstractDataEntityBuilder<T> {
+  abstract static class AbstractFileEntityBuilder<T extends AbstractFileEntityBuilder<T>> extends AbstractDataEntityBuilder<T> {
 
     public T setEncodingFormat(String encodingFormat) {
       this.addProperty("encodingFormat", encodingFormat);
@@ -34,7 +29,9 @@ public class FileEntity extends DataEntity {
   /**
    * Builder class for the easier creation of the File entities.
    */
-  public static final class FileEntityBuilder extends AbstractFileEntityBuilder<FileEntityBuilder> {
+  public static final class FileEntityBuilder
+    extends AbstractFileEntityBuilder<FileEntityBuilder>
+  {
 
     @Override
     public FileEntityBuilder self() {

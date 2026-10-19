@@ -2,9 +2,7 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import edu.kit.datamanager.ro_crate.entities.contextual.JsonDescriptor;
 import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
 import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.util.FileSystemUtil;
 import java.io.File;
 import java.io.IOException;

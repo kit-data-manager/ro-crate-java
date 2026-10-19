@@ -1,8 +1,4 @@
 package edu.kit.datamanager.ro_crate.entities.data;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +9,10 @@ import java.util.Set;
  */
 public class WorkflowEntity extends FileEntity {
 
-  private static final Set<String> TYPES = Set.of("SoftwareSourceCode", "ComputationalWorkflow");
+  private static final Set<String> TYPES = Set.of(
+    "SoftwareSourceCode",
+    "ComputationalWorkflow"
+  );
 
   /**
    * Constructor for creating the workflow entity from a builder.
@@ -27,8 +26,7 @@ public class WorkflowEntity extends FileEntity {
     this.addIdListProperties("output", entityBuilder.output);
   }
 
-  abstract static class AbstractWorkflowEntityBuilder<T
-      extends AbstractWorkflowEntityBuilder<T>> extends AbstractFileEntityBuilder<T> {
+  abstract static class AbstractWorkflowEntityBuilder<T extends AbstractWorkflowEntityBuilder<T>> extends AbstractFileEntityBuilder<T> {
 
     List<String> input = new ArrayList<>();
     List<String> output = new ArrayList<>();
@@ -50,8 +48,9 @@ public class WorkflowEntity extends FileEntity {
   /**
    * A builder for easier creation of workflow entities.
    */
-  public static final class WorkflowEntityBuilder extends
-      AbstractWorkflowEntityBuilder<WorkflowEntityBuilder> {
+  public static final class WorkflowEntityBuilder
+    extends AbstractWorkflowEntityBuilder<WorkflowEntityBuilder>
+  {
 
     @Override
     public WorkflowEntityBuilder self() {

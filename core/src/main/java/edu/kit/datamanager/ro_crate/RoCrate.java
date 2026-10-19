@@ -13,7 +13,6 @@ import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognition;
 import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionConfig;
 import edu.kit.datamanager.ro_crate.hierarchy.HierarchyRecognitionResult;
 import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
 import edu.kit.datamanager.ro_crate.json.JsonObject;
 import edu.kit.datamanager.ro_crate.json.JsonValue;
 import edu.kit.datamanager.ro_crate.payload.CratePayload;

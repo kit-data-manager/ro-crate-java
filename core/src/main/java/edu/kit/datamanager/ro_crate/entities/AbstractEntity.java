@@ -1,6 +1,5 @@
 package edu.kit.datamanager.ro_crate.entities;
 
-import edu.kit.datamanager.ro_crate.entities.data.DataSetEntity;
 import edu.kit.datamanager.ro_crate.entities.data.RootDataEntity;
 import edu.kit.datamanager.ro_crate.entities.validation.EntityValidation;
 import edu.kit.datamanager.ro_crate.json.Json;
