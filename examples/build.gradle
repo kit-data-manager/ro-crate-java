@@ -1,0 +1,89 @@
+/*
+ * Executable examples for ro-crate-java that double as a behavior-comparison
+ * test suite: each example is run in its own JVM (required — the JSON
+ * backends register via ServiceLoader and must not share a classpath) and
+ * writes its canonical output to a file. The parity test then asserts that
+ * the output of the released 2.1.2 artifact ("legacy") is identical to the
+ * current code running with the jackson2 backend, which again is identical
+ * to the current code running with the jackson3 backend.
+ */
+
+plugins {
+    id 'java'
+}
+
+ext {
+    legacyVersion = '2.1.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    // the legacy examples are compiled and run against the released artifact,
+    // which uses the pre-port Jackson API; kept fully separate from the main
+    // (current) source set so the two classpaths never mix
+    legacy
+}
+
+configurations {
+    // runtime-only backend jars for the current examples; deliberately not on
+    // the compile classpath so the examples stay backend-agnostic
+    jackson2Backend
+    jackson3Backend
+}
+
+dependencies {
+    implementation project(':core')
+    // the released artifact exposes Jackson only at runtime scope, so the
+    // legacy source set declares the same versions for compilation
+    legacyImplementation "edu.kit.datamanager:ro-crate-java:${legacyVersion}"
+    legacyImplementation "com.fasterxml.jackson.core:jackson-databind:2.22.1"
+    jackson2Backend project(':jackson2')
+    jackson3Backend project(':jackson3')
+
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+// one output file per example and variant: build/examples/<variant>/<example>.txt
+def variants = [
+    'legacy'           : { sourceSets.legacy.runtimeClasspath },
+    'current-jackson2' : { sourceSets.main.runtimeClasspath + configurations.jackson2Backend },
+    'current-jackson3' : { sourceSets.main.runtimeClasspath + configurations.jackson3Backend },
+]
+
+def exampleClasses = ['CreateMinimalCrate']
+
+exampleClasses.each { example ->
+    variants.each { variant, variantClasspath ->
+        tasks.register("run${variant.capitalize()}${example}", JavaExec) {
+            group = 'examples'
+            description = "Runs the ${example} example with the ${variant} variant."
+            dependsOn variantClasses(variant)
+            classpath = variantClasspath()
+            mainClass = "examples.${example}"
+            def outputFile = layout.buildDirectory.file("examples/${variant}/${example}.txt")
+            args outputFile.get().asFile.absolutePath
+            doFirst {
+                outputFile.get().asFile.parentFile.mkdirs()
+            }
+            outputs.file(outputFile)
+        }
+    }
+}
+
+tasks.named('test') {
+    dependsOn exampleClasses.collectMany { example ->
+        variants.keySet().collect { variant -> tasks.named("run${variant.capitalize()}${example}") }
+    }
+}
+
+def variantClasses(variant) {
+    switch (variant) {
+        case 'legacy': return tasks.named('legacyClasses')
+        default: return tasks.named('classes')
+    }
+}
