@@ -1,11 +1,30 @@
 /*
  * Executable examples for ro-crate-java that double as a behavior-comparison
- * test suite: each example is run in its own JVM (required — the JSON
- * backends register via ServiceLoader and must not share a classpath) and
- * writes its canonical output to a file. The parity test then asserts that
- * the output of the released 2.1.2 artifact ("legacy") is identical to the
- * current code running with the jackson2 backend, which again is identical
- * to the current code running with the jackson3 backend.
+ * test suite.
+ *
+ * How it works:
+ *
+ *  - src/main      the examples written against the current API. They are
+ *                  backend-agnostic: they compile against :core only and run
+ *                  with whichever JSON backend is on the classpath.
+ *  - src/legacy    the same examples written against the released 2.1.2
+ *                  artifact (pre-port Jackson API). Kept in a separate source
+ *                  set so the two classpaths never mix.
+ *
+ *  - Every example is a main() that receives an output file path and writes
+ *    deterministic, canonical content there.
+ *
+ *  - For each example and variant (see the `variants` map below) a JavaExec
+ *    task runs the example in its own JVM — required, because the JSON
+ *    backends register via ServiceLoader and must not share a classpath —
+ *    and writes build/examples/<variant>/<Example>.txt.
+ *
+ *  - The parity test (ParityTest) then asserts that consecutive variants
+ *    produce byte-identical output: legacy == current-jackson2 ==
+ *    current-jackson3. It derives the variant names from the same `variants`
+ *    map (passed as the rocrate.parity.variants system property) and the
+ *    example list from the output files, so new examples are covered by just
+ *    adding a class and registering it in `exampleClasses` below.
  */
 
 plugins {
@@ -21,9 +40,8 @@ repositories {
 }
 
 sourceSets {
-    // the legacy examples are compiled and run against the released artifact,
-    // which uses the pre-port Jackson API; kept fully separate from the main
-    // (current) source set so the two classpaths never mix
+    // compiled and run against the released artifact; deliberately not
+    // sharing a classpath with the current code
     legacy
 }
 
@@ -48,13 +66,30 @@ dependencies {
     testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 }
 
-// one output file per example and variant: build/examples/<variant>/<example>.txt
+/*
+ * The variants to compare. The key is the variant name and is used as
+ *   - the output directory: build/examples/<variant>/<Example>.txt,
+ *   - the task name fragment: run<Variant><Example>, and
+ *   - the variant list handed to ParityTest (in map order).
+ * The classpath closure defines the JVM classpath of the variant; classesTask
+ * is the task that produces the compiled example classes for it.
+ */
 def variants = [
-    'legacy'           : { sourceSets.legacy.runtimeClasspath },
-    'current-jackson2' : { sourceSets.main.runtimeClasspath + configurations.jackson2Backend },
-    'current-jackson3' : { sourceSets.main.runtimeClasspath + configurations.jackson3Backend },
+    legacy: [
+        classesTask: 'legacyClasses',
+        classpath  : { sourceSets.legacy.runtimeClasspath },
+    ],
+    'current-jackson2': [
+        classesTask: 'classes',
+        classpath  : { sourceSets.main.runtimeClasspath + configurations.jackson2Backend },
+    ],
+    'current-jackson3': [
+        classesTask: 'classes',
+        classpath  : { sourceSets.main.runtimeClasspath + configurations.jackson3Backend },
+    ],
 ]
 
+// register every new example here; the parity test picks it up automatically
 def exampleClasses = [
     'CreateMinimalCrate',
     'ReadCrate',
@@ -64,12 +99,12 @@ def exampleClasses = [
 ]
 
 exampleClasses.each { example ->
-    variants.each { variant, variantClasspath ->
+    variants.each { variant, setup ->
         tasks.register("run${variant.capitalize()}${example}", JavaExec) {
             group = 'examples'
             description = "Runs the ${example} example with the ${variant} variant."
-            dependsOn variantClasses(variant)
-            classpath = variantClasspath()
+            dependsOn setup.classesTask
+            classpath = setup.classpath()
             mainClass = "examples.${example}"
             def outputFile = layout.buildDirectory.file("examples/${variant}/${example}.txt")
             args outputFile.get().asFile.absolutePath
@@ -85,11 +120,6 @@ tasks.named('test') {
     dependsOn exampleClasses.collectMany { example ->
         variants.keySet().collect { variant -> tasks.named("run${variant.capitalize()}${example}") }
     }
-}
-
-def variantClasses(variant) {
-    switch (variant) {
-        case 'legacy': return tasks.named('legacyClasses')
-        default: return tasks.named('classes')
-    }
+    // single source of truth for the variant names used by ParityTest
+    systemProperty 'rocrate.parity.variants', variants.keySet().join(',')
 }

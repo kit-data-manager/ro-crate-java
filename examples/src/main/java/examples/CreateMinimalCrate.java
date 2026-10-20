@@ -3,19 +3,12 @@ package examples;
 import edu.kit.datamanager.ro_crate.RoCrate;
 import edu.kit.datamanager.ro_crate.entities.contextual.ContextualEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
-import edu.kit.datamanager.ro_crate.json.Json;
-import edu.kit.datamanager.ro_crate.json.JsonArray;
-import edu.kit.datamanager.ro_crate.json.JsonObject;
-import edu.kit.datamanager.ro_crate.json.JsonValue;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 /**
- * Builds a small crate programmatically and prints its metadata in
- * canonical form (entities sorted by their {@code @id}, compact JSON).
+ * Builds a small crate programmatically and writes its metadata in canonical
+ * form (see {@link CanonicalJson}).
  *
  * <p>Run with any backend on the classpath — the example itself is
  * backend-agnostic; the ServiceLoader picks up whichever JSON backend
@@ -48,33 +41,9 @@ public class CreateMinimalCrate {
       )
       .build();
 
-    Path output = Path.of(args[0]);
-    Files.writeString(output, canonicalize(crate.getJsonMetadata()));
-  }
-
-  /**
-   * Sorts the {@code @graph} entities by their {@code @id} (the entity order
-   * follows Java hash iteration and is unspecified) and writes compact JSON,
-   * so that runs of different library versions can be compared byte-for-byte.
-   */
-  static String canonicalize(String metadata) throws Exception {
-    JsonObject root = (JsonObject) Json.parse(metadata);
-    JsonValue graph = root.path("@graph");
-    if (graph.isArray()) {
-      List<JsonValue> entities = new ArrayList<>();
-      graph.forEach(entities::add);
-      entities.sort(
-        Comparator.comparing(
-          entity -> entity.path("@id").asText(""),
-          String.CASE_INSENSITIVE_ORDER
-        )
-      );
-      JsonArray graphArray = (JsonArray) graph;
-      while (!graphArray.isEmpty()) {
-        graphArray.remove(0);
-      }
-      entities.forEach(graphArray::add);
-    }
-    return Json.write(root);
+    Files.writeString(
+      Path.of(args[0]),
+      CanonicalJson.canonicalize(crate.getJsonMetadata())
+    );
   }
 }
