@@ -44,7 +44,9 @@ No further configuration is needed: the backend registers itself via
 `META-INF/services`. At runtime, the core's JSON and validation entry points
 (the `edu.kit.datamanager.ro_crate.json.Json` and
 `edu.kit.datamanager.ro_crate.validation.Validation` classes) discover it with
-`ServiceLoader`, so they use whichever backend is on the classpath.
+`ServiceLoader`, so they use whichever backend is on the classpath. If you do
+not care about the JSON backend, do nothing: keep depending on
+`edu.kit.datamanager:ro-crate-java` as before — the backend comes with it.
 
 ## Build the library / documentation
 
