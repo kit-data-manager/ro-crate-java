@@ -13,6 +13,7 @@ and avoiding crates which do not fully comply to the specification, at the same 
 
 - [Instructions for your build manager (e.g., Gradle, Maven, etc.)](https://central.sonatype.com/artifact/edu.kit.datamanager/ro-crate-java)
 - [Quick-Start](#quick-start)
+- [Migration guide: from the Jackson-based 2.x API to the Jackson-free core](MIGRATION.md)
 - [JavaDoc Documentation](https://javadoc.io/doc/edu.kit.datamanager/ro-crate-java)
 - [Related Publications](https://publikationen.bibliothek.kit.edu/publikationslisten/get.php?referencing=all&external_publications=kit&lang=de&format=html&style=kit-3lines-title_b-authors-other&consider_suborganizations=true&order=desc%20year&contributors=%5B%5B%5B%5D%2C%5B%22p20751.105%22%5D%5D%5D&title_contains=crate)
 
