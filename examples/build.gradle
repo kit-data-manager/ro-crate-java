@@ -55,7 +55,13 @@ def variants = [
     'current-jackson3' : { sourceSets.main.runtimeClasspath + configurations.jackson3Backend },
 ]
 
-def exampleClasses = ['CreateMinimalCrate']
+def exampleClasses = [
+    'CreateMinimalCrate',
+    'ReadCrate',
+    'ModifyCrate',
+    'WriteCrate',
+    'ValidateCrate',
+]
 
 exampleClasses.each { example ->
     variants.each { variant, variantClasspath ->
