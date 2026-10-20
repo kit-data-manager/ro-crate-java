@@ -59,6 +59,25 @@ No further configuration is needed: the backend registers itself via
 
 On Windows, replace `./gradlew` with `gradlew.bat`.
 
+## Examples
+
+The `examples` module contains small, self-contained example programs. Each
+example exists twice: once written against the current API (run with either
+backend) and once against the released 2.1.2 artifact (`examples/src/legacy`).
+A parity test compares the outputs byte-for-byte, so the examples double as a
+behavior-comparison suite between the released version and the current
+development state.
+
+- Run every variant and compare: `./gradlew :examples:test`
+- Run a single variant: `./gradlew :examples:runLegacyCreateMinimalCrate`,
+  `./gradlew :examples:runCurrent-jackson2CreateMinimalCrate`,
+  `./gradlew :examples:runCurrent-jackson3CreateMinimalCrate`
+- Outputs are written to `examples/build/examples/<variant>/<example>.txt`
+- List available example tasks: `./gradlew :examples:tasks --group examples`
+
+Each variant runs in its own JVM instance, since the JSON backends register via
+`META-INF/services` and must not share a classpath.
+
 ## RO-Crate Specification Compatibility
 
 - ✅ [Version 1.1](https://www.researchobject.org/ro-crate/1.1/) ([Extracted examples as well-described unit tests/guide](core/src/test/java/edu/kit/datamanager/ro_crate/examples/ExamplesOfSpecificationV1p1Test.java))
