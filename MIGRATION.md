@@ -228,12 +228,6 @@ Validator validator = new Validator(crate -> {
 validator.validate(crate);
 ```
 
-Do not register your own implementation in a `META-INF/services` file: the
-backend module already provides one, and the core loads exactly one
-implementation per interface. A second one makes every validation fail with
-an `IllegalStateException`. Your own strategy is therefore never picked up
-implicitly; pass it explicitly as shown above.
-
 ## Removed classes
 
 Internal classes without a replacement:
