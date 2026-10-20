@@ -169,21 +169,70 @@ classpath then contains only one Jackson version. The neutral model covers
 only the subset of the JSON API the library needs, so do advanced tree
 manipulation on your own nodes before converting.
 
-## Providing your own validator
+## Validation
 
-Validation behaves like the JSON backends: the core defines the interfaces
-`edu.kit.datamanager.ro_crate.validation.ValidatorStrategy` and
-`edu.kit.datamanager.ro_crate.entities.validation.EntityValidationStrategy`,
-the backend modules implement them, and the implementations are listed in a
-`META-INF/services` file and loaded with `ServiceLoader`. The JSON-schema
-implementation keeps its historical fully qualified name in the `jackson2`
-module (`edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation`), with
-neutral JSON types in its signatures.
+The core defines two validation interfaces:
 
-To provide your own validator, implement the interface and list your class in
-a file named
-`META-INF/services/edu.kit.datamanager.ro_crate.validation.ValidatorStrategy`
-inside your jar.
+- Crate-level: `edu.kit.datamanager.ro_crate.validation.ValidatorStrategy`,
+  implemented by the JSON-schema class of the backend module:
+  `edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation` in the
+  `jackson2` module (historical fully qualified name, now with neutral JSON
+  types in its signatures), `edu.kit.datamanager.ro_crate.validation.jackson3.JsonSchemaValidation`
+  in the `jackson3` module.
+- Entity-level: `edu.kit.datamanager.ro_crate.entities.validation.EntityValidationStrategy`,
+  which the entity builders use to check that properties follow the RO-Crate
+  rules (for example, that they are flat).
+
+Like the JSON backends, the implementations are listed in `META-INF/services`
+files and loaded with `ServiceLoader`. The core requires exactly one
+implementation of each interface on the classpath; this is why a backend
+module must be present.
+
+### When validation runs
+
+The crate-level validation runs automatically at three places, always with
+the discovered backend implementation:
+
+- when an `RoCrate` is created from a builder,
+- when a crate is read from a folder or zip file,
+- when a crate is saved with `CrateWriter`.
+
+Validation problems are printed to the standard error stream; the operation
+itself continues, because `validate()` only returns a boolean, which these
+places ignore.
+
+### Running validation explicitly
+
+```java
+import edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation;
+import edu.kit.datamanager.ro_crate.validation.Validator;
+
+Validator validator = new Validator(
+    new JsonSchemaValidation("my-profile-schema.json"));
+boolean valid = validator.validate(crate);
+```
+
+With the `jackson2` backend, import
+`edu.kit.datamanager.ro_crate.validation.JsonSchemaValidation`; with the
+`jackson3` backend, `edu.kit.datamanager.ro_crate.validation.jackson3.JsonSchemaValidation`.
+
+### Providing your own validator
+
+Implement the interface and pass it to the `Validator`:
+
+```java
+Validator validator = new Validator(crate -> {
+  // your checks; return false and report problems if the crate is invalid
+  return true;
+});
+validator.validate(crate);
+```
+
+Do not register your own implementation in a `META-INF/services` file: the
+backend module already provides one, and the core loads exactly one
+implementation per interface. A second one makes every validation fail with
+an `IllegalStateException`. Your own strategy is therefore never picked up
+implicitly; pass it explicitly as shown above.
 
 ## Removed classes
 
