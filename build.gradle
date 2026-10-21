@@ -6,12 +6,12 @@ plugins {
 
     // Instructions: https://github.com/researchgate/gradle-release
     // Available versions: https://plugins.gradle.org/plugin/net.researchgate.release
-    id 'net.researchgate.release' version '3.1.0'
+    id 'net.researchgate.release' version '3.2.0'
     id "maven-publish"
     // Publishing of JAR to Nexus instances (e.g., OSSRH)
     // https://github.com/gradle-nexus/publish-plugin
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id "io.freefair.maven-publish-java" version "9.5.0"
+    id "io.freefair.maven-publish-java" version "9.8.2"
 }
 
 group = 'edu.kit.datamanager'
@@ -38,7 +38,7 @@ repositories {
 }
 
 ext {
-    jacksonVersion  = '2.22.3'
+    jacksonVersion  = '2.22.4'
 }
 
 dependencies {
@@ -56,11 +56,11 @@ dependencies {
     // read from and write to zip files
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.11.6'
     // compare json documents in tests
-    implementation 'com.github.fslev:json-compare:8.1'
+    implementation 'com.github.fslev:json-compare:8.4'
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.18'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.20'
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.7.0'
     // metadata validation, profiles based on JSON schema
