@@ -150,6 +150,8 @@ fabric.properties
 *.nar
 *.ear
 *.zip
+# but track the test fixture crates
+!core/src/test/resources/crates/**/*.zip
 *.tar.gz
 *.rar
 
