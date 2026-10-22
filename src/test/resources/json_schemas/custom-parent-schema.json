@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "Custom Parent Schema",
+  "description": "A parent schema that references a child schema via $ref",
+  "type": "object",
+  "properties": {
+    "person": {
+      "$ref": "custom-child-schema.json"
+    }
+  },
+  "required": ["person"]
+}
