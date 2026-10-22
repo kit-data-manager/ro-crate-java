@@ -9,11 +9,11 @@
 plugins {
     id 'java-library'
     id "maven-publish"
-    id "io.freefair.maven-publish-java" version "9.5.0"
+    id "io.freefair.maven-publish-java" version "9.8.2"
 }
 
 ext {
-    jacksonVersion = '2.22.1'
+    jacksonVersion = '2.22.4'
     // this module publishes under the historical library coordinates
     publishedArtifactId = 'ro-crate-java'
 }

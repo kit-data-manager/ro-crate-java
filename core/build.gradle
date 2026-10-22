@@ -25,7 +25,7 @@ dependencies {
     // the JSON backend is required to run the tests (provides the JsonAdapter)
     testImplementation project(':jackson2')
     // compare json documents in tests (test scope only; works on JSON strings)
-    testImplementation 'com.github.fslev:json-compare:8.1'
+    testImplementation 'com.github.fslev:json-compare:8.4'
     // http client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     // common file system operations
@@ -35,12 +35,12 @@ dependencies {
     // url validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
     // logging
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.18'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.20'
     // JSON-LD, Zenodo mapping
     implementation group: 'com.apicatalog', name: 'titanium-json-ld', version: '1.7.0'
     implementation 'org.glassfish:jakarta.json:2.0.1'
     // template processing for the preview
-    implementation("org.freemarker:freemarker:2.3.34")
+    implementation("org.freemarker:freemarker:2.3.35")
     implementation('gg.jte:jte:3.2.4')
 }
 
