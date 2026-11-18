@@ -1,6 +1,7 @@
 package edu.kit.datamanager.ro_crate.reader;
 
 import edu.kit.datamanager.ro_crate.Crate;
+import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,7 +66,12 @@ public interface ElnFileFormatTest<
             // Read the crate from the downloaded file
             Crate read = this.readCrate(elnFile);
             assertNotNull(read);
-            assertFalse(read.getAllDataEntities().isEmpty());
+            Set<DataEntity> allEntities = read.getAllDataEntities();
+            assertFalse(allEntities.isEmpty());
+            allEntities.forEach(entity -> {
+                assertNotNull(entity.getId());
+                assertNotNull(entity.getPath());
+            });
         } else {
             // If the file is in the blacklist, we expect an IOException
             assertThrows(IOException.class, () -> this.readCrate(elnFile));
