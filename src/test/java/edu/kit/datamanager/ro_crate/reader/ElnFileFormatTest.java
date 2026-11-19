@@ -2,6 +2,7 @@ package edu.kit.datamanager.ro_crate.reader;
 
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
+import edu.kit.datamanager.ro_crate.special.IdentifierUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -63,14 +64,28 @@ public interface ElnFileFormatTest<
         assertTrue(elnFile.toFile().exists());
 
         if (!isInBlacklist(urlStr)) {
-            // Read the crate from the downloaded file
-            Crate read = this.readCrate(elnFile);
+            // Read the crate from the downloaded file to a known place.
+            Path extractionFolder = tmp.resolve("crate");
+            READER_STRATEGY strategy = this.newReaderStrategyWithTmp(extractionFolder, false);
+            Crate read = this.readCrate(strategy, elnFile);
             assertNotNull(read);
             Set<DataEntity> allEntities = read.getAllDataEntities();
             assertFalse(allEntities.isEmpty());
+            // In ELN cases, the extraction folder might not be the root of the crate, but a subfolder.
+            Path crateRoot = strategy.findMetadataJsonByPath(extractionFolder).getParentFile().toPath();
+            // Reuse the file resolution of the reader to detect the entities with a local file.
+            CrateReader<SOURCE_T> reader = new CrateReader<>(strategy);
             allEntities.forEach(entity -> {
                 assertNotNull(entity.getId());
-                assertNotNull(entity.getPath());
+                if (IdentifierUtils.isUrl(entity.getId())) {
+                    // Remote entities do not have a local file.
+                    assertNull(entity.getPath(),
+                            "The remote entity '" + entity.getId() + "' must not expose a local path.");
+                } else if (reader.checkFolderHasFile(entity.getId(), crateRoot.toFile()).isPresent()) {
+                    // Local entities must expose their file path (issue #385).
+                    assertNotNull(entity.getPath(),
+                            "The local entity '" + entity.getId() + "' must expose its file path.");
+                }
             });
         } else {
             // If the file is in the blacklist, we expect an IOException

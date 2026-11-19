@@ -106,29 +106,21 @@ public class ReadZipStrategy implements GenericReaderStrategy<String> {
   }
 
   @Override
-  public ObjectNode readMetadataJson(String location) throws IOException {
+  public File findMetadataJson(String location) throws IOException {
     if (!isExtracted) {
       this.readCrate(location);
     }
 
-    ObjectMapper objectMapper = MyObjectMapper.getMapper();
-    File jsonMetadata = this.temporaryFolder.resolve(JsonDescriptor.ID).toFile();
-    if (!jsonMetadata.isFile()) {
-      // Try to find the metadata file in subdirectories
-      File firstSubdir = FileUtils.listFilesAndDirs(
-            temporaryFolder.toFile(),
-            FileFilterUtils.directoryFileFilter(),
-            null // not recursive
-        )
-        .stream()
-        .limit(50)
-        .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
-        .findFirst()
-        .orElseThrow(() -> new IllegalStateException("No %s found in zip file".formatted(JsonDescriptor.ID)));
-      jsonMetadata = firstSubdir.toPath().resolve(JsonDescriptor.ID).toFile();
-    }
+    return this.findMetadataJsonByPath(this.temporaryFolder);
+  }
 
-    return objectMapper.readTree(jsonMetadata).deepCopy();
+  @Override
+  public ObjectNode readMetadataJson(String location) throws IOException {
+    if (!isExtracted) {
+      this.readCrate(location);
+    }
+    ObjectMapper objectMapper = MyObjectMapper.getMapper();
+    return objectMapper.readTree(this.findMetadataJsonByPath(this.temporaryFolder)).deepCopy();
   }
 
   @Override
@@ -136,6 +128,6 @@ public class ReadZipStrategy implements GenericReaderStrategy<String> {
     if (!isExtracted) {
       this.readCrate(location);
     }
-    return temporaryFolder.toFile();
+    return this.findMetadataJson(location).getParentFile();
   }
 }

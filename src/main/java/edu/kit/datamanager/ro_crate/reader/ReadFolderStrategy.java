@@ -16,12 +16,18 @@ import java.nio.file.Path;
  */
 public class ReadFolderStrategy implements GenericReaderStrategy<String> {
 
+
+  @Override
+  public File findMetadataJson(String location) throws IOException {
+    return this.findMetadataJsonByPath(Path.of(location));
+  }
+
   @Override
   public ObjectNode readMetadataJson(String location) throws IOException {
-    Path metadata = new File(location).toPath().resolve("ro-crate-metadata.json");
+    File metadata = this.findMetadataJson(location);
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ObjectNode objectNode = objectMapper.createObjectNode();
-    objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
+    objectNode = objectMapper.readTree(metadata).deepCopy();
     return objectNode;
   }
 
