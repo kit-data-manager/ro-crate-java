@@ -128,6 +128,7 @@ public class CrateReader<T> {
                 boolean isDataEntity = dataEntityIds.contains(eId);
 
                 if (isDataEntity) {
+                    Path currentDir = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
                     DataEntity data = null;
                     boolean isDataSet = properties.path("@type").asText().equals("Dataset")
                             || properties.path("@type").valueStream()
@@ -137,7 +138,8 @@ public class CrateReader<T> {
                                 .setAllUnsafe(properties);
                         // Handle data entities with corresponding folder
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            usedFiles.add(file.getPath());
+                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
+                            usedFiles.add("./" + relative.toString());
                             builder.setLocationWithExceptions(file.toPath());
                         });
                         data = builder.build();
@@ -148,9 +150,10 @@ public class CrateReader<T> {
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            usedFiles.add(file.getPath());
+                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
+                            usedFiles.add("./" + relative.toString());
                             builder.setLocationWithExceptions(file.toPath())
-                                    .setId(file.getName());
+                                    .setId(relative.toString());
                         });
                         data = builder.build();
                     }
