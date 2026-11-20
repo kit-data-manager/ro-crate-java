@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -67,7 +68,7 @@ public interface GenericReaderStrategy<SOURCE_TYPE> {
                 .limit(50)
                 .filter(file -> file.toPath().toAbsolutePath().resolve(JsonDescriptor.ID).toFile().isFile())
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No %s found in %s".formatted(
+                .orElseThrow(() -> new FileNotFoundException("No %s found in %s".formatted(
                         JsonDescriptor.ID, root.toString()
                 )));
         jsonMetadata = firstSubDir.toPath().resolve(JsonDescriptor.ID).toFile();
