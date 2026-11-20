@@ -128,14 +128,21 @@ public class CrateReader<T> {
                 boolean isDataEntity = dataEntityIds.contains(eId);
 
                 if (isDataEntity) {
+                    Path currentDir = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
                     DataEntity data = null;
                     boolean isDataSet = properties.path("@type").asText().equals("Dataset")
                             || properties.path("@type").valueStream()
                             .anyMatch(typeString -> typeString.asText().equals("Dataset"));
                     if (isDataSet) {
-                        data = new DataSetEntity.DataSetBuilder()
-                                .setAllUnsafe(properties)
-                                .build();
+                        DataSetEntity.DataSetBuilder builder = new DataSetEntity.DataSetBuilder()
+                                .setAllUnsafe(properties);
+                        // Handle data entities with corresponding folder
+                        checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
+                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
+                            usedFiles.add("./" + relative.toString());
+                            builder.setLocationWithExceptions(file.toPath());
+                        });
+                        data = builder.build();
                     } else {
                         // data entity
                         DataEntity.DataEntityBuilder builder = new DataEntity.DataEntityBuilder()
@@ -143,9 +150,10 @@ public class CrateReader<T> {
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            usedFiles.add(file.getPath());
+                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
+                            usedFiles.add("./" + relative.toString());
                             builder.setLocationWithExceptions(file.toPath())
-                                    .setId(file.getName());
+                                    .setId(relative.toString());
                         });
                         data = builder.build();
                     }
@@ -241,10 +249,13 @@ public class CrateReader<T> {
         if (IdentifierUtils.isUrl(filepathOrId)) {
             return Optional.empty();
         }
+        // compare absolute paths only, as the crate folder may be addressed relatively
+        // (e.g. the temporary folder of the zip readers: "./.tmp/...")
+        Path basePath = folder.toPath().toAbsolutePath().normalize();
         return Stream.of(IdentifierUtils.decode(filepathOrId).orElse(filepathOrId), filepathOrId)
-                .map(filename -> folder.toPath().resolve(filename).normalize().toAbsolutePath())
+                .map(filename -> basePath.resolve(filename).normalize())
                 // defence-in-depth: ensure we are still inside the crate folder
-                .filter(resolved -> resolved.startsWith(folder.toPath()))
+                .filter(resolved -> resolved.startsWith(basePath))
                 .map(Path::toFile)
                 .filter(File::exists)
                 .findFirst();

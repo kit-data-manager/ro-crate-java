@@ -6,7 +6,6 @@ import edu.kit.datamanager.ro_crate.objectmapper.MyObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * A class for reading a crate from a folder.
@@ -16,12 +15,20 @@ import java.nio.file.Path;
  */
 public class ReadFolderStrategy implements GenericReaderStrategy<String> {
 
+
+  @Override
+  public File findMetadataJson(String location) throws IOException {
+    // Use File to convert the location string. This makes it work on Windows.
+    // Path.of throws an InvalidPathException for Windows paths.
+    return this.findMetadataJsonByPath(new File(location).toPath());
+  }
+
   @Override
   public ObjectNode readMetadataJson(String location) throws IOException {
-    Path metadata = new File(location).toPath().resolve("ro-crate-metadata.json");
+    File metadata = this.findMetadataJson(location);
     ObjectMapper objectMapper = MyObjectMapper.getMapper();
     ObjectNode objectNode = objectMapper.createObjectNode();
-    objectNode = objectMapper.readTree(metadata.toFile()).deepCopy();
+    objectNode = objectMapper.readTree(metadata).deepCopy();
     return objectNode;
   }
 
