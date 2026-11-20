@@ -14,6 +14,9 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -197,6 +200,33 @@ public interface CommonReaderTest<
             READER_STRATEGY strategyWithoutSubfolder = this.newReaderStrategyWithTmp(differentFolder, false);
             Crate crate = this.readCrate(strategyWithoutSubfolder, zipPath);
             HelpFunctions.compareTwoCrateJson(rawCrate, crate);
+        }
+    }
+
+    @Test
+    default void relativeCratePathKeepsOnlyUnassociatedFilesUntracked() throws IOException {
+        Path work = Files.createTempDirectory(Path.of("."), "crate-path-test-");
+        try {
+            Path payload = Files.writeString(work.resolve("payload.txt"), "payload");
+            RoCrate original = CommonReaderTest.newBaseCrate()
+                    .addDataEntity(CommonReaderTest.newDataEntity(payload))
+                    .setPreview(null)
+                    .build();
+
+            Path crateDir = work.resolve("crate");
+            Writers.newFolderWriter().withAutomaticProvenance(null)
+                    .save(original, crateDir.toString());
+            Files.writeString(crateDir.resolve("extra.txt"), "extra");
+
+            Crate imported = Readers.newFolderReader().readCrate(crateDir.toString());
+
+            assertEquals(1, imported.getAllDataEntities().size());
+            assertNotNull(imported.getAllDataEntities().iterator().next().getPath());
+            assertEquals(Set.of("extra.txt"), imported.getUntrackedFiles().stream()
+                    .map(File::getName)
+                    .collect(Collectors.toSet()));
+        } finally {
+            FileUtils.deleteDirectory(work.toFile());
         }
     }
 }
