@@ -209,7 +209,11 @@ public interface CommonReaderTest<
         try {
             Path payload = Files.writeString(work.resolve("payload.txt"), "payload");
             RoCrate original = CommonReaderTest.newBaseCrate()
-                    .addDataEntity(CommonReaderTest.newDataEntity(payload))
+                    .addDataEntity(new FileEntity.FileEntityBuilder()
+                            .setLocationWithExceptions(payload)
+                            .setId("data/payload.md")
+                            .build()
+                    )
                     .setPreview(null)
                     .build();
 
@@ -222,7 +226,7 @@ public interface CommonReaderTest<
 
             assertEquals(1, imported.getAllDataEntities().size());
             assertNotNull(imported.getAllDataEntities().iterator().next().getPath());
-            assertEquals(Set.of("extra.txt"), imported.getUntrackedFiles().stream()
+            assertEquals(Set.of("extra.txt", "data"), imported.getUntrackedFiles().stream()
                     .map(File::getName)
                     .collect(Collectors.toSet()));
         } finally {
