@@ -3,6 +3,7 @@ package edu.kit.datamanager.ro_crate.reader;
 import edu.kit.datamanager.ro_crate.Crate;
 import edu.kit.datamanager.ro_crate.HelpFunctions;
 import edu.kit.datamanager.ro_crate.RoCrate;
+import edu.kit.datamanager.ro_crate.entities.AbstractEntity;
 import edu.kit.datamanager.ro_crate.entities.data.DataEntity;
 import edu.kit.datamanager.ro_crate.entities.data.FileEntity;
 import edu.kit.datamanager.ro_crate.writer.CrateWriter;
@@ -15,6 +16,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -229,6 +231,78 @@ public interface CommonReaderTest<
             assertEquals(Set.of("extra.txt", "data"), imported.getUntrackedFiles().stream()
                     .map(File::getName)
                     .collect(Collectors.toSet()));
+        } finally {
+            FileUtils.deleteDirectory(work.toFile());
+        }
+    }
+
+    /**
+     * Reading the same crate must yield the same entities and untracked files,
+     * no matter which form the crate's location takes: absolute, relative, or
+     * './'-prefixed relative.
+     */
+    @Test
+    default void untrackedFilesAreIndependentOfCratePathForm() throws IOException {
+        Path work = Files.createTempDirectory(Path.of("."), "crate-path-form-test-");
+        try {
+            Path payload = Files.writeString(work.resolve("payload.txt"), "payload");
+            RoCrate original = CommonReaderTest.newBaseCrate()
+                .addDataEntity(
+                    new FileEntity.FileEntityBuilder()
+                        .setLocationWithExceptions(payload)
+                        .setId("payload.md")
+                        .build()
+                )
+                .setPreview(null)
+                .build();
+
+            Path crateDir = work.resolve("crate");
+            Writers.newFolderWriter()
+                .withAutomaticProvenance(null)
+                .save(original, crateDir.toString());
+            Files.writeString(crateDir.resolve("extra.txt"), "extra");
+
+            Path currentDir = Path.of("").toAbsolutePath().normalize();
+            String crateDirRelativeToCurrent = currentDir
+                .relativize(crateDir.toAbsolutePath().normalize())
+                .toString();
+            List<String> locations = List.of(
+                crateDir.toAbsolutePath().normalize().toString(),
+                crateDirRelativeToCurrent,
+                "./" + crateDirRelativeToCurrent
+            );
+
+            for (String location : locations) {
+                Crate imported = Readers.newFolderReader().readCrate(location);
+
+                assertEquals(
+                    Set.of("payload.md"),
+                    imported
+                        .getAllDataEntities()
+                        .stream()
+                        .map(AbstractEntity::getId)
+                        .collect(Collectors.toSet()),
+                    () -> "entity ids changed for location: " + location
+                );
+                DataEntity entity = imported
+                    .getAllDataEntities()
+                    .iterator()
+                    .next();
+                assertNotNull(
+                    entity.getPath(),
+                    "entity path for location: " + location
+                );
+
+                assertEquals(
+                    Set.of("extra.txt"),
+                    imported
+                        .getUntrackedFiles()
+                        .stream()
+                        .map(File::getName)
+                        .collect(Collectors.toSet()),
+                    () -> "unexpected untracked files for location: " + location
+                );
+            }
         } finally {
             FileUtils.deleteDirectory(work.toFile());
         }

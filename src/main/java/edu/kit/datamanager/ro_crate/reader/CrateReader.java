@@ -94,11 +94,20 @@ public class CrateReader<T> {
         // get the content of the crate
         File files = strategy.readContent(location);
 
-        // this set will contain the files that are associated with entities
+        // this set will contain the files that are associated with entities,
+        // canonicalized to absolute normalized paths, so that comparison is
+        // independent of the crate location's form (relative, absolute) and
+        // of the JVM's working directory.
         HashSet<String> usedFiles = new HashSet<>();
-        usedFiles.add(files.toPath().resolve(FILE_METADATA_JSON).toFile().getPath());
-        usedFiles.add(files.toPath().resolve(FILE_PREVIEW_HTML).toFile().getPath());
-        usedFiles.add(files.toPath().resolve(FILE_PREVIEW_FILES).toFile().getPath());
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_METADATA_JSON).toFile())
+        );
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_PREVIEW_HTML).toFile())
+        );
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_PREVIEW_FILES).toFile())
+        );
         return rebuildCrate(metadataJson, files, usedFiles).markAsImported();
     }
 
@@ -128,7 +137,6 @@ public class CrateReader<T> {
                 boolean isDataEntity = dataEntityIds.contains(eId);
 
                 if (isDataEntity) {
-                    Path currentDir = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
                     DataEntity data = null;
                     boolean isDataSet = properties.path("@type").asText().equals("Dataset")
                             || properties.path("@type").valueStream()
@@ -138,8 +146,7 @@ public class CrateReader<T> {
                                 .setAllUnsafe(properties);
                         // Handle data entities with corresponding folder
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
-                            usedFiles.add("./" + relative.toString());
+                            usedFiles.add(canonicalPath(file));
                             builder.setLocationWithExceptions(file.toPath());
                         });
                         data = builder.build();
@@ -150,10 +157,8 @@ public class CrateReader<T> {
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            Path relative = currentDir.relativize(file.toPath().toAbsolutePath().normalize());
-                            usedFiles.add("./" + relative.toString());
-                            builder.setLocationWithExceptions(file.toPath())
-                                    .setId(relative.toString());
+                            usedFiles.add(canonicalPath(file));
+                            builder.setLocationWithExceptions(file.toPath());
                         });
                         data = builder.build();
                     }
@@ -171,7 +176,7 @@ public class CrateReader<T> {
 
         Collection<File> untrackedFiles = Arrays.stream(
                 Optional.ofNullable(files.listFiles()).orElse(new File[0]))
-                .filter(f -> !usedFiles.contains(f.getPath()))
+                .filter(f -> !usedFiles.contains(canonicalPath(f)))
                 .collect(Collectors.toSet());
 
         crate.setUntrackedFiles(untrackedFiles);
@@ -243,6 +248,13 @@ public class CrateReader<T> {
         } else /*if (node.isObject())*/ {
             return node.path(PROP_ID).asText();
         }
+    }
+
+    /**
+     * The absolute, normalized path of the given file as a String.
+     */
+    private static String canonicalPath(File file) {
+        return file.toPath().toAbsolutePath().normalize().toString();
     }
 
     protected Optional<File> checkFolderHasFile(String filepathOrId, File folder) {
