@@ -94,11 +94,20 @@ public class CrateReader<T> {
         // get the content of the crate
         File files = strategy.readContent(location);
 
-        // this set will contain the files that are associated with entities
+        // this set will contain the files that are associated with entities,
+        // canonicalized to absolute normalized paths, so that comparison is
+        // independent of the crate location's form (relative, absolute) and
+        // of the JVM's working directory.
         HashSet<String> usedFiles = new HashSet<>();
-        usedFiles.add(files.toPath().resolve(FILE_METADATA_JSON).toFile().getPath());
-        usedFiles.add(files.toPath().resolve(FILE_PREVIEW_HTML).toFile().getPath());
-        usedFiles.add(files.toPath().resolve(FILE_PREVIEW_FILES).toFile().getPath());
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_METADATA_JSON).toFile())
+        );
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_PREVIEW_HTML).toFile())
+        );
+        usedFiles.add(
+            canonicalPath(files.toPath().resolve(FILE_PREVIEW_FILES).toFile())
+        );
         return rebuildCrate(metadataJson, files, usedFiles).markAsImported();
     }
 
@@ -133,9 +142,14 @@ public class CrateReader<T> {
                             || properties.path("@type").valueStream()
                             .anyMatch(typeString -> typeString.asText().equals("Dataset"));
                     if (isDataSet) {
-                        data = new DataSetEntity.DataSetBuilder()
-                                .setAllUnsafe(properties)
-                                .build();
+                        DataSetEntity.DataSetBuilder builder = new DataSetEntity.DataSetBuilder()
+                                .setAllUnsafe(properties);
+                        // Handle data entities with corresponding folder
+                        checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
+                            usedFiles.add(canonicalPath(file));
+                            builder.setLocationWithExceptions(file.toPath());
+                        });
+                        data = builder.build();
                     } else {
                         // data entity
                         DataEntity.DataEntityBuilder builder = new DataEntity.DataEntityBuilder()
@@ -143,9 +157,8 @@ public class CrateReader<T> {
 
                         // Handle data entities with corresponding file
                         checkFolderHasFile(entityJson.get(PROP_ID).asText(), files).ifPresent(file -> {
-                            usedFiles.add(file.getPath());
-                            builder.setLocationWithExceptions(file.toPath())
-                                    .setId(file.getName());
+                            usedFiles.add(canonicalPath(file));
+                            builder.setLocationWithExceptions(file.toPath());
                         });
                         data = builder.build();
                     }
@@ -163,7 +176,7 @@ public class CrateReader<T> {
 
         Collection<File> untrackedFiles = Arrays.stream(
                 Optional.ofNullable(files.listFiles()).orElse(new File[0]))
-                .filter(f -> !usedFiles.contains(f.getPath()))
+                .filter(f -> !usedFiles.contains(canonicalPath(f)))
                 .collect(Collectors.toSet());
 
         crate.setUntrackedFiles(untrackedFiles);
@@ -237,14 +250,24 @@ public class CrateReader<T> {
         }
     }
 
+    /**
+     * The absolute, normalized path of the given file as a String.
+     */
+    private static String canonicalPath(File file) {
+        return file.toPath().toAbsolutePath().normalize().toString();
+    }
+
     protected Optional<File> checkFolderHasFile(String filepathOrId, File folder) {
         if (IdentifierUtils.isUrl(filepathOrId)) {
             return Optional.empty();
         }
+        // compare absolute paths only, as the crate folder may be addressed relatively
+        // (e.g. the temporary folder of the zip readers: "./.tmp/...")
+        Path basePath = folder.toPath().toAbsolutePath().normalize();
         return Stream.of(IdentifierUtils.decode(filepathOrId).orElse(filepathOrId), filepathOrId)
-                .map(filename -> folder.toPath().resolve(filename).normalize().toAbsolutePath())
+                .map(filename -> basePath.resolve(filename).normalize())
                 // defence-in-depth: ensure we are still inside the crate folder
-                .filter(resolved -> resolved.startsWith(folder.toPath()))
+                .filter(resolved -> resolved.startsWith(basePath))
                 .map(Path::toFile)
                 .filter(File::exists)
                 .findFirst();
